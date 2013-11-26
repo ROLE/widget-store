@@ -1,0 +1,165 @@
+<?php
+// $Id: ctools_plugin_example.module,v 1.1 2009/08/17 22:07:14 merlinofchaos Exp $
+
+/*
+ * @file
+ *
+ * Working sample module to demonstrate CTools 3 plugins
+ *
+ * This sample module is only intended to demonstrate how external modules can
+ * provide ctools plugins. There is no useful functionality, and it's only
+ * intended for developers or for educational use.
+ *
+ * As far as possible, everything is kept very simple, not exercising all of
+ * the capabilities of CTools or Panels.
+ *
+ * Although the ctools documentation suggests that strict naming conventions
+ * be followed, this code attempts to follow only the conventions which are
+ * required (the hooks), in order to demonstrate the difference. You can
+ * certainly use the conventions, but it's important to know the difference
+ * between a convention and a requirement.
+ *
+ * The advanced_help module is required, because both CTools and this module
+ * provide help that way.
+ *
+ * There is a demonstration panel provided at /ctools_plugin_example/123
+ */
+
+//require_once drupal_get_path('module', 'system_config').'/system_config.blocks.inc';
+//require_once drupal_get_path('module', 'system_config').'/system_config.wysiwyg.inc';
+
+/****************************************************************
+ *       DRUPAL HOOKS        
+ ****************************************************************/
+
+/**
+ *  Implementation of hook_enable
+ */
+
+function system_config_enable() {
+
+  //set theme and module variables
+  //theme and module variables can be set as all modules are enabled via dependencies
+  include_once drupal_get_path('module', 'system_config')
+      . "/import/module_variables.inc";
+  _system_config_set_module_variables();
+
+  include_once drupal_get_path('module', 'system_config')
+      . "/import/theme_variables.inc";
+  _system_config_set_theme_variables();
+
+  //import skinr setting for the current theme
+  _system_config_import_skinr_settings();
+
+  //configure the blocks for the current theme
+  include_once drupal_get_path('module', 'system_config')
+      . "/import/blocks.inc";
+  _system_config_set_blocks();
+
+  //set the permissions for the user roles
+  include_once drupal_get_path('module', 'system_config')
+      . "/import/permissions.inc";
+  _system_config_set_permissions();
+
+  //configure input formats and filters
+  include_once drupal_get_path('module', 'system_config')
+      . '/import/input_formats.inc';
+  _system_config_set_input_formats();
+
+  //configure wyiswyg profiles	
+  include_once drupal_get_path('module', 'system_config')
+      . '/import/wysiwyg_profiles.inc';
+  _system_config_wysiwyg_all_roles();
+  _system_config_wysiwyg_editor_role();
+  
+  //configure better formats
+  include_once drupal_get_path('module', 'system_config') 
+	  . '/import/better_formats.inc';
+  _system_config_configure_better_formats();
+
+  //configure the taxonomy access module
+  include_once drupal_get_path('module', 'system_config')
+      . '/import/taxonomy_access.inc';
+  _system_config_configure_default_taxonomy_access();
+  _system_config_configure_review_FAQ_taxonomy_access();
+
+  include_once drupal_get_path('module', 'system_config')
+      . '/import/menu_items.inc';
+  _system_config_set_menu_items();
+  
+  include_once drupal_get_path('module', 'system_config')
+  . '/import/captcha.inc';
+  _system_config_set_captchas();
+  
+  include_once drupal_get_path('module', 'system_config')
+  . '/import/simplerdf.inc';
+  _system_config_configure_simplerdf_custom_fields();
+  _system_config_configure_simplerdf_namespaces();
+  _system_config_configure_simplerdf_mappings();
+  
+  //configure themekey
+  include_once drupal_get_path('module', 'system_config') 
+	  . '/import/themekey_properties.inc';
+  _system_config_set_themekey_properties();
+  
+  //rebuild all menus
+  menu_rebuild();
+
+  //claer the cache for apache solr
+  apachesolr_clear_cache();
+}
+
+/**
+ *  Implementation of hook_disable
+ */
+
+function system_config_disable() {
+ 
+}
+
+
+
+/****************************************************************
+ *       MODULE FUNCTIONS
+ ****************************************************************/
+
+/**
+ * Imports the skinr setting for themes
+ * 
+ * The settings files are stored in the folder skinr
+ * 
+ */
+function _system_config_import_skinr_settings() {
+
+  //get path to the rule export files
+  $path = drupal_get_path('module', 'system_config') . "/skinr/*.inc";
+
+  //part taken from rules_admin_form_import_submit@rules_admin.export.inc
+  if (glob($path)) {
+    foreach (glob($path) as $exported_view) {
+      $filename = basename($exported_view);
+      $name = substr($filename, 0, strrpos($filename, '.'));
+
+      eval(file_get_contents($exported_view));
+
+      if (isset($skinr) && is_array($skinr)) {
+
+        //TODO: get name of theme
+        $theme_name = "role_widget_store";
+
+        variable_set('skinr_' . $theme_name, $skinr);
+
+        drupal_set_message(
+            t('Skinr settings for the theme %theme have been saved.',
+                array(
+                  '%theme' => $theme_name
+                )));
+
+      } else {
+        drupal_set_message(t('Import of sknr settings for .'), 'error');
+      }
+    }
+  }
+}
+
+

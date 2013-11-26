@@ -1,0 +1,1 @@
+<div id="error_404"><?php print $image; ?></div>

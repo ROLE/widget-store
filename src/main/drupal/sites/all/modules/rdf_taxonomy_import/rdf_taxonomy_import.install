@@ -1,0 +1,51 @@
+<?php
+
+/**
+* @file
+* Install, update and uninstall functions for the rdf_taxonomy_import module.
+*
+*/
+
+/**
+* @file
+*   Setup for rdf_taxonomy_import
+*/
+
+
+/**
+ * Implementation of hook_install().
+ */
+function rdf_taxonomy_import_install() {
+	drupal_set_message(t("
+	 Taxonomy Import and Export functions are now available as TABS
+    at !taxonomy_link
+    <a href='!taxonomy_url'>admin/content/taxonomy</a>."
+    , array(
+    '!taxonomy_link' => l('admin/content/taxonomy', 'admin/content/taxonomy'),
+	)));
+}
+
+/**
+* Implementation of hook_uninstall().
+*/
+function rdf_taxonomy_import_uninstall() {
+	// Nothing todo right now!
+}
+
+/**
+* Implementation of hook_requirements().
+*
+* Advice deactivation after import vocabularies
+*
+*/
+function rdf_taxonomy_import_requirements($phase) {
+	$requirements = array();
+	
+	$requirements['rdf_taxonomy_import'] = array(
+	    'title' => 'RDF Taxonomy Import is enabled',
+	    'value' => "RDF Taxonomy Import is intended as a run-once setup or migration module, you are advised to disable it once it's done its job",
+	    'severity' => REQUIREMENT_INFO,
+	);
+	
+	return $requirements;
+}

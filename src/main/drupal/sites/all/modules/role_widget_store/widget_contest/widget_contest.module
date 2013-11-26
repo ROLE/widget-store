@@ -1,0 +1,502 @@
+<?php
+
+/* ###################################################################################
+ * Drupal Hooks
+ * ###################################################################################
+ */
+
+/**
+ * Implementation of hook_enable().
+ *
+ * runs when enabling the module
+ */
+function widget_contest_enable() {
+  _widget_contest_import_cck_nodes();
+  _widget_contest_import_rules();
+  _widget_contest_create_specification_status_workflow();
+
+  //taxonmies are moved to the installation profile
+  //_widget_contest_create_taxonomies();
+
+}
+
+/**
+ * Implementation of hook_disable().
+ *
+ * runs when disabling the module
+ */
+function widget_contest_disable() {
+
+  //DO NOT delete content types automatically
+  //_widget_contest_delete_cck_nodes();
+  _widget_contest_delete_imported_rules();
+  _widget_contest_delete_specification_status_workflow();
+
+  //taxonmies are moved to the installation profile
+  //_widget_contest_delete_taxonomies();
+}
+
+/*
+ * Implementation of hook_menu.
+ * This adds review tags for certain roles to view reviews connected to a node
+ */
+function widget_contest_menu() {
+  $items = array();
+
+  // add a menu entry for each widget specification node
+  $items['node/%/specification_reviews'] = array(
+      'title' => t('Reviews'), 'page callback' => 'views_page',
+      'page arguments' => array(
+        'widget_specification_review_list', 'page_1', 1
+      ), 'access callback' => '_widget_contest_access_review_at_node',
+      'access arguments' => array(
+        1
+      ), 'file' => 'views.module',
+      'file path' => drupal_get_path('module', 'views'),
+      'type' => MENU_LOCAL_TASK, 'weight' => 5,
+  );
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_views_api().
+ * 
+ * Specifies the location of the views to import and triggers the import
+ */
+function widget_contest_views_api() {
+  return array(
+    'api' => '2', 'path' => drupal_get_path('module', 'widget_contest'),
+  );
+}
+
+function widget_contest_perm() {
+  $perms = array(
+      'enable widget contest field (widget specification)',
+      'enable widget specification field (widget specification review)',
+      'read widget specification reviews at node',
+      'read widget contest results',
+  );
+
+  return $perms;
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function widget_contest_form_alter(&$form, $form_state, $form_id) {
+
+  //alter the way widget specification form is shown
+  if ($form_id == 'widget_specification_node_form') {
+
+    if (arg(2) != 'edit') {
+
+      //set the contest reference to the nid of the contest (3rd argument)
+      if (arg(3) != '') {
+        $form['field_widget_contest']['#default_value'][0]['nid'] = arg(3);
+      }
+    }
+
+    if (!user_access('enable widget contest field (widget specification)')) {
+      $form['#after_build'][] = '_widget_contest_specification_form_after_build';
+    }
+  }
+
+  //alter the way widget specification review form is shown
+  if ($form_id == 'widget_specification_review_node_form') {
+
+    if (arg(2) != 'edit') {
+
+      //set the specification reference to the nid of the contest (3rd argument)
+      if (arg(3) != '') {
+        $form['field_widget_specification']['#default_value'][0]['nid'] = arg(3);
+      }
+    }
+
+    if (!user_access(
+        'enable widget specification field (widget specification review)')) {
+      $form['#after_build'][] = '_widget_contest_specification_review_form_after_build';
+    }
+  }
+
+}
+
+/**
+ *  Implementation of hook_default_presets().
+ *
+ *  Imports all default presets
+ */
+function widget_contest_imagecache_default_presets() {
+  $presets = array();
+
+  $presets['widget_specification_400x400'] = array(
+      'presetname' => 'widget_specification_screenshot_browser_400x400',
+      'actions' => array(
+          0 => array(
+              'weight' => '0', 'module' => 'imagecache_coloractions',
+              'action' => 'imagecache_convert',
+              'data' => array(
+                'format' => 'image/png', 'width' => '1280',
+              ),
+          ),
+          1 => array(
+              'weight' => '1', 'module' => 'imagecache',
+              'action' => 'imagecache_scale',
+              'data' => array(
+                'width' => '400', 'height' => '400', 'upscale' => '1',
+              ),
+          ),
+          2 => array(
+              'weight' => '2', 'module' => 'imagecache_canvasactions',
+              'action' => 'canvasactions_file2canvas',
+              'data' => array(
+                  'xpos' => '10px', 'ypos' => 'top', 'alpha' => '100',
+                  'path' => drupal_get_path('module', 'widget_contest')
+                      . '/images/magnifier_bg.png',
+              ),
+          ),
+          3 => array(
+              'weight' => '3', 'module' => 'imagecache_canvasactions',
+              'action' => 'canvasactions_definecanvas',
+              'data' => array(
+                  'RGB' => array(
+                    'HEX' => '',
+                  ), 'under' => TRUE,
+                  'exact' => array(
+                    'width' => '400', 'height' => '400', 'xpos' => 'right', 'ypos' => 'center',
+                  ),
+                  'relative' => array(
+                      'leftdiff' => '', 'rightdiff' => '', 'topdiff' => '',
+                      'bottomdiff' => '',
+                  ),
+              ),
+          ),
+      ),
+  );// end widget_specification_screenshot_browser_400x400
+
+  return $presets;
+}
+
+/* ###################################################################################
+ * Custom Module Functions
+ * ###################################################################################
+ */
+
+/**
+ * Custom access menucallback for read review
+ */
+function _widget_contest_access_review_at_node($arg) {
+  //according to some tutorial $arg is already node object - CHECK THIS!
+  $current_node = node_load($arg);
+  $type = $current_node->type;
+  return ($type == 'widget_specification')
+      && user_access('read widget specification reviews at node');
+}
+
+/**
+ * Custom after_build callback handler for the widget specification review form
+ */
+function _widget_contest_specification_review_form_after_build($form,
+    &$form_state) {
+
+  //disable field widget contest
+  _widget_contest_fix_disabled($form['field_widget_specification']);
+
+  return $form;
+}
+
+/**
+ * Custom after_build callback handler for the widget specification form
+ */
+function _widget_contest_specification_form_after_build($form, &$form_state) {
+
+  //disable field widget contest
+  _widget_contest_fix_disabled($form['field_widget_contest']);
+
+  return $form;
+}
+
+/**
+ * Recursively set the disabled attribute of a CCK field
+ * and all its dependent FAPI elements.
+ */
+function _widget_contest_fix_disabled(&$elements) {
+  foreach (element_children($elements) as $key) {
+    if (isset($elements[$key]) && $elements[$key]) {
+
+      // Recurse through all children elements.
+      _widget_contest_fix_disabled($elements[$key]);
+    }
+  }
+
+  if (!isset($elements['#attributes'])) {
+    $elements['#attributes'] = array();
+  }
+  $elements['#attributes']['disabled'] = 'disabled';
+}
+
+/**
+ * Create new content types (using CCK)
+ */
+function _widget_contest_import_cck_nodes() {
+
+  //get path to the rule export files
+  $path = drupal_get_path('module', 'widget_contest') . "/content_types/*.inc";
+
+  //part taken from rules_admin_form_import_submit@rules_admin.export.inc
+  if (glob($path)) {
+    foreach (glob($path) as $exported_cck_node_type) {
+      $filename = basename($exported_cck_node_type);
+      $name = substr($filename, 0, strrpos($filename, '.'));
+
+      eval(file_get_contents($exported_cck_node_type));
+
+      if (isset($content) && is_array($content)) {
+
+        $form_state['values']['type_name'] = '<create>';
+        $form_state['values']['macro'] = '$content = '
+            . var_export($content, TRUE) . ';';
+
+        // form provided by content_copy.module
+        drupal_execute('content_copy_import_form', $form_state);
+        module_load_include('module', 'content');
+        content_clear_type_cache();
+
+        drupal_set_message(
+            t('Imported CCK node: %label.',
+                array(
+                  '%label' => $content['type']['name']
+                )));
+      } else {
+        drupal_set_message(t('Import of CCK nodes failed.'), 'error');
+      }
+
+    }
+  }
+}
+
+/**
+ * Create new content types (using CCK)
+ */
+function _widget_contest_delete_cck_nodes() {
+
+  //get path to the rule export files
+  $path = drupal_get_path('module', 'widget_contest') . "/content_types/*.inc";
+
+  //part taken from rules_admin_form_import_submit@rules_admin.export.inc
+  if (glob($path)) {
+    foreach (glob($path) as $exported_cck_node_type) {
+      $filename = basename($exported_cck_node_type);
+      $name = substr($filename, 0, strrpos($filename, '.'));
+
+      eval(file_get_contents($exported_cck_node_type));
+
+      if (isset($content) && is_array($content)) {
+
+        node_type_delete($content['type']['name']);
+
+        drupal_set_message(
+            t('Deleted CCK node: %label.',
+                array(
+                  '%label' => $content['type']['name']
+                )));
+      } else {
+        drupal_set_message(t('Deletion of CCK nodes failed.'), 'error');
+      }
+
+    }
+  }
+}
+
+function _widget_contest_import_rules() {
+
+  //incluse rules files
+  require_once drupal_get_path('module', 'rules_admin')
+      . '/rules_admin.export.inc';
+  require_once drupal_get_path('module', 'rules') . '/rules.module';
+
+  //get path to the rule export files
+  $path = drupal_get_path('module', 'widget_contest') . "/rules/*.inc";
+
+  //part taken from rules_admin_form_import_submit@rules_admin.export.inc
+  if (glob($path)) {
+    foreach (glob($path) as $exported_rule) {
+      $filename = basename($exported_rule);
+      $name = substr($filename, 0, strrpos($filename, '.'));
+
+      eval('$import = ' . file_get_contents($exported_rule));
+
+      if (isset($import) && is_array($import) && count($import)) {
+        // Check whether it are workflow-ng rules
+        if (rules_admin_import_workflow_ng($import)) {
+          return;
+        }
+
+        foreach ($import as $item_type => $elements) {
+          foreach ($elements as $name => $element) {
+            //let the item type alter the data before it's saved
+            rules_item_type_invoke($item_type, 'import',
+                array(
+                  &$name, &$element
+                ));
+            rules_item_save($item_type, $name, $element);
+            drupal_set_message(
+                t('Imported rule %label.',
+                    array(
+                      '%label' => rules_get_element_label($element)
+                    )));
+          }
+        }
+        rules_clear_cache();
+      } else {
+        drupal_set_message(t('Import of rules failed.'), 'error');
+      }
+
+    }
+  }
+}
+
+function _widget_contest_delete_imported_rules() {
+
+  //incluse rules files
+  require_once drupal_get_path('module', 'rules_admin')
+      . '/rules_admin.export.inc';
+  require_once drupal_get_path('module', 'rules') . '/rules.module';
+
+  //get path to the rule export files
+  $path = drupal_get_path('module', 'widget_contest') . "/rules/*.inc";
+
+  //part taken from rules_admin_form_import_submit@rules_admin.export.inc
+  if (glob($path)) {
+    foreach (glob($path) as $exported_rule) {
+      $filename = basename($exported_rule);
+      $name = substr($filename, 0, strrpos($filename, '.'));
+
+      eval('$import = ' . file_get_contents($exported_rule));
+
+      if (isset($import) && is_array($import) && count($import)) {
+        // Check whether it are workflow-ng rules
+        if (rules_admin_import_workflow_ng($import)) {
+          return;
+        }
+
+        foreach ($import as $item_type => $elements) {
+          foreach ($elements as $name => $element) {
+            //let the item type alter the data before it's saved
+            rules_item_delete($item_type, $name);
+            drupal_set_message(
+                t('Deleted rule %label.',
+                    array(
+                      '%label' => rules_get_element_label($element)
+                    )));
+          }
+        }
+        rules_clear_cache();
+      } else {
+        drupal_set_message(t('Deletion of rules failed.'), 'error');
+      }
+
+    }
+  }
+}
+
+/**
+ * Create idea status workflow
+ */
+function _widget_contest_create_specification_status_workflow() {
+  module_load_include('module', 'workflow');
+
+  $wid = workflow_create('Widget Specification Status');
+
+  //create idea status states
+  workflow_state_save(
+      array(
+        'wid' => $wid, 'state' => 'Draft', 'weight' => 0
+      ));
+  workflow_state_save(
+      array(
+        'wid' => $wid, 'state' => 'Submitted', 'weight' => 1
+      ));
+  workflow_state_save(
+      array(
+        'wid' => $wid, 'state' => 'Reviewed', 'weight' => 2
+      ));
+  workflow_state_save(
+      array(
+        'wid' => $wid, 'state' => 'Published', 'weight' => 3
+      ));
+  workflow_state_save(
+      array(
+        'wid' => $wid, 'state' => 'Winner', 'weight' => 4
+      ));
+
+  //assign workflow to idea node
+  $types_map = array();
+  foreach (node_get_types('names') as $type => $name) {
+    if ($type == 'widget_specification') {
+      $types_map[$type]['workflow'] = $wid;
+    } else {
+      $types_map[$type]['workflow'] = workflow_get_workflow_for_type($type);
+    }
+    $types_map[$type]['placement'] = array(
+      'node' => 1, 'comment' => 0
+    );
+  }
+  workflow_types_save($types_map);
+
+  drupal_set_message(t('Created widget specification status workflow.'));
+}
+
+/**
+ * Remove idea status workflow
+ */
+function _widget_contest_delete_specification_status_workflow() {
+  $workflows = array();
+  $result = db_query(
+      "SELECT wid, name FROM {workflows} WHERE name='Widget Specification Status' ORDER BY name ASC");
+  while ($data = db_fetch_object($result)) {
+
+    workflow_deletewf($data->wid);
+
+    //the API delete function does not delete database entry so doing it manually
+    db_query("DELETE FROM {workflow_states} WHERE wid=%d", $data->wid);
+
+    drupal_set_message(t('Deleted widget specification status workflow.'));
+  }
+}
+
+/*
+ * Create taxonomies (specification tags)
+ */
+function _widget_contest_create_taxonomies() {
+
+  //create specification tags taxonomy
+  $vocabulary = array(
+      'name' => 'Widget Specification Tags',
+      'description' => 'Specification tags created by users.',
+      'help' => 'User tags for sorting and managing specification.',
+      'nodes' => array(
+        'widget_specification' => 'widget_specification'
+      ), 'hierarchy' => 0, 'relations' => 1, 'tags' => 1, 'multiple' => 1,
+      'required' => 0, 'weight' => 0,
+  );
+
+  taxonomy_save_vocabulary($vocabulary);
+  drupal_set_message(t('Created taxonomy: Widget Specification Tags'));
+
+}
+
+/*
+ * Remove taxonomies (user tags taxonomies)
+ */
+function _widget_contest_delete_taxonomies() {
+
+  //remove specification tags taxonomy
+  $result = db_query(
+      "SELECT vid FROM {vocabulary} WHERE name='Widget Specification Tags'");
+  while ($data = db_fetch_object($result)) {
+    taxonomy_del_vocabulary($data->vid);
+  }
+  drupal_set_message(t('Deleted taxonomy: Widget Specification Tags'));
+}
+

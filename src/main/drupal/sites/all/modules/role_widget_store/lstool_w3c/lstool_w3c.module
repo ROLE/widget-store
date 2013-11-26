@@ -1,0 +1,190 @@
+<?php
+// $Id$
+/**
+ * Common Module Functions
+ *
+ * @author Andreas Diehl
+ * @package Role-Widgetstore
+ * @subpackage Drupal-Module
+ */
+
+/**
+ * @file
+ * The lstool_opensocial module, extends lstool
+ *
+ */
+
+/******************************************************************************
+ * API                                                                        *
+******************************************************************************/
+require_once dirname(__FILE__) . '/../lstool/lstool_helper.php';
+require_once dirname(__FILE__) . '/lstool_w3c_helper.php';
+
+/******************************************************************************
+ * CONSTANTS                                                               *
+******************************************************************************/
+
+
+/******************************************************************************
+ * Drupal Hooks                                                               *
+******************************************************************************/
+require_once dirname(__FILE__) . '/lstool_w3c.form.inc';
+require_once dirname(__FILE__) . '/lstool_w3c.edit.inc';
+require_once dirname(__FILE__) . '/lstool_w3c.cckfields.inc';
+
+
+
+/******************************************************************************
+ * Module Hooks                                                               *
+******************************************************************************/
+
+/**
+ * Implementation of hook_node_info().
+ * This adds a lstool-type for every registered module.
+ */
+function lstool_w3c_node_info() {
+
+	$types['lstool_w3c'] = array(
+            'name' => t('W3C'),
+            'module' => 'lstool_w3c',
+            'description' => t('This module adds the W3C tool type'), 	//TODO: provide a nice description
+            'has_title' => TRUE,
+            'title_label' => t('tool name'),
+            'has_body' => TRUE,
+            'body_label' => t('tool description'),
+	);
+
+	return $types;
+}
+
+/**
+ * Implementation of hook_help().
+ *
+ * Defines the help page for the module
+ */
+function lstool_w3c_help($path, $arg) {
+	//TODO: Provide a nice help page
+
+	if($path == 'admin/help#lstool_w3c') {
+		$output = 'This module adds the W3C tool type';
+		return $output;
+	}
+}
+
+/**
+* Implementation of hook_perm().
+*
+* Register new permissions
+*/
+function lstool_w3c_perm() {
+	$perms = array(
+		'administer w3c tools', 
+		'create w3c tools',
+		'edit own w3c tools',
+		'edit all w3c tools',
+		'delete own w3c tools',
+		'delete all w3c tools',
+	);
+
+	return $perms;
+}
+
+/**
+ * Implementation of hook_access().
+ *
+ * Grant permissions
+ */
+function lstool_w3c_access($op, $node, $account) {
+
+	switch ($op) {
+		case 'create':
+			return user_access('create w3c tools', $account);
+			//only allow to update a node if the user is allowed to edit all tools
+			//or she created the lstool
+		case 'update':
+			if (user_access('edit all w3c tools', $account)
+			|| (user_access('edit own w3c tools', $account)
+			&& ($account->uid == $node->uid))) {
+				return TRUE;
+			}
+			break;
+			//only allow to delete a node if the user is allowed to edit all toolss
+			//or she created the tool
+		case 'delete':
+			if (user_access('delete all w3c tools', $account)
+			|| (user_access('delete own w3c tools', $account)
+			&& ($account->uid == $node->uid))) {
+				return TRUE;
+			}
+			break;
+	}
+}
+
+
+/**
+ * Implementation of hook_enable().
+ *
+ * Set up default imagefield and imagecache settings.
+ */
+function lstool_w3c_enable() {
+
+	lstool_register_new_tooltype('lstool_w3c');
+	ls_tool_w3c_add_file_field_to_tool_type('lstool_w3c');
+			
+}
+
+
+
+/**
+ * Implementation of hook_load().
+ *
+ */
+function lstool_w3c_load(&$node){
+
+	jquery_ui_add('ui.tabs');
+	drupal_add_css('sites/all/modules/jquery_ui/jquery.ui/themes/default/ui.all.css');
+
+	$additions = new stdClass();
+	$additions = loadGeneralToolDataFromDB($node->vid, $additions);
+	$additions = loadw3cToolDataFromDB($node->vid, $additions);
+
+	return $additions;
+}
+
+/**
+ * Implementation of hook_view()
+ */
+function lstool_w3c_view($node, $teaser = FALSE, $page=FALSE) {
+	// get common things done first
+
+	$node = lstool_view_prepare($node, $teaser, $page);
+
+	return $node;
+}
+
+/**
+ * Implementation of hook_theme()
+ */
+function lstool_w3c_theme() {
+	// get basic theme
+	$theme = lstool_theme_prepare();
+
+	// extend it if necessary
+	$theme['lstool_w3c_download'] = array(
+      'arguments' => array('node'),
+      'file' => 'lstool_w3c.theme.inc');
+	
+	return $theme;
+}
+
+
+/******************************************************************************
+ * Module Functions                                                             *
+******************************************************************************/
+
+
+
+
+
+
+

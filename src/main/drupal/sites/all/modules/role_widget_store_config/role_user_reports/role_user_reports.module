@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the ROLE User Reports feature.
+ */
+
+include_once 'role_user_reports.features.inc';

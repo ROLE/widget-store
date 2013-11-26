@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Tool Modifications feature.
+ */
+
+include_once 'tool_modifications.features.inc';

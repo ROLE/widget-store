@@ -1,0 +1,757 @@
+<?php
+/**
+ * @file
+ * Simple RDF public API. This file is loaded with the main module file.
+ */
+
+/************************************************
+ * General info.
+ ************************************************/
+
+/**
+ * Get a list of mappable object types and their singular titles.
+ */
+function simplerdf_get_types() {
+  static $types;
+  if (!isset($types)) {
+    $info = simplerdf_get_type_info();
+    $types = array();
+    foreach ($info['types'] as $type_name => $type) {
+      $types[$type_name] = $type['title singular proper'];
+    }
+  }
+  return $types;
+}
+
+/**
+ * Build object type info. Note that the values under the 'types' key returned
+ * by this function is not the same as simplerdf_get_types().
+ */
+function simplerdf_get_type_info() {
+  static $info;
+  if (!isset($info)) {
+    $info = array('types' => array(), 'map' => array());
+    foreach (module_implements('simplerdf_types') as $module) {
+      if (is_array($result = module_invoke($module, 'simplerdf_types'))) {
+        // Record type info
+        $info['types'] = array_merge($info['types'], $result);
+        // Map each provided type to module
+        foreach ($result as $type => $_) {
+          $info['map'][$type] = $module;
+        }
+      }
+    }
+  }
+  return $info;
+}
+
+/**
+ * Classify an object. Modules can use hook_simplerdf_classify() to provide
+ * their own classifications of an object of specified type.
+ *
+ * @param string $type
+ *   Type of object.
+ * @param $object
+ *   Loaded object.
+ *
+ * @return array
+ *   Array of classifiers (can be used with mappers to map values).
+ */
+function simplerdf_get_classifiers($type, $object) {
+  // Classify object
+  $classifiers = module_invoke_all('simplerdf_classify', $type, $object);
+  if (!in_array(NULL, $classifiers, TRUE)) {
+    $classifiers = array_merge(array(NULL), $classifiers);
+  }
+  return $classifiers;
+}
+
+/**
+ * Load an object by its type and ID.
+ *
+ * @param string $type
+ *   Object type, e.g. node.
+ * @param int $id
+ *   Object ID.
+ * @param boolean $reset
+ *   (Optional) Wherever applicable, whether or not to reset working cache.
+ *
+ * @return
+ *   Loaded object, or NULL if loading failed.
+ */
+function simplerdf_load($type, $id, $reset = FALSE) {
+  $info = simplerdf_get_type_info();
+  if ($type && $id && is_numeric($id) && ($module = $info['map'][$type]) && module_hook($module, $hook = 'simplerdf_' . $type . '_load')) {
+    $object = module_invoke($module, $hook, $id, $reset);
+    if (is_object($object)) {
+      return $object;
+    }
+  }
+}
+
+
+/************************************************
+ * Mapping field.
+ ************************************************/
+
+/**
+ * Map a node field to an RDF property and generate RDF triples.
+ *
+ * @param string $type
+ *   Object type, e.g. node.
+ * @param $object
+ *   Node object.
+ * @param string $uri
+ *   Object URI as RDF statement subject.
+ * @param array $properties
+ *   An array of RDF properties as predicates.
+ * @param array $field
+ *   Mapping field.
+ *
+ * @return array
+ *   RDF triples in the format specified by the ARC2 library, with the
+ *   exception of the use of the variable type for any part of the triple.
+ *
+ * @see http://arc.semsol.org/docs/v2/structures
+ */
+function simplerdf_map_field($type, $object, $uri, array $properties, $field) {
+  // Map field
+  $plugin = simplerdf_get_plugins('mappers', $field['mapper']);
+  $triples = array();
+  foreach ($properties as $property) {
+    $result = simplerdf_plugin_invoke($plugin, 'map callback', $type, $object, $uri, $property, $field);
+    if (is_array($result) && !empty($result)) {
+      $triples = array_merge($triples, $result);
+    }
+  }
+
+  return $triples;
+}
+
+/**
+ * Get a list of fields to map.
+ *
+ * @param string $type
+ *   Object type, e.g. node.
+ * @param string $classifier
+ *   (Optional) Classifier, such as node type for node.
+ *
+ * @return array
+ *   Fields available for mapping to properties, keyed by mapper.
+ */
+function simplerdf_get_fields($type, $classifier = NULL) {
+  return _simplerdf_build_fields($type, $classifier);
+}
+
+/**
+ * Lazily build mapper field information.
+ *
+ * @param string $type
+ *   Object type, e.g. node.
+ * @param string $classifier
+ *   (Optional) Object classifier, such as node type for node.
+ * @param boolean $reset
+ *   If TRUE, resets the fields cache.
+ *
+ * @return array
+ *   An array of fields keyed by name (NULL if invalid type).
+ */
+function _simplerdf_build_fields($type, $classifier = NULL, $reset = FALSE) {
+  static $fields = array();
+
+  // Internal use only; reset static cache
+  if (!isset($type) && !isset($classifier)) {
+    if ($reset) {
+      $fields = array();
+    }
+    return;
+  }
+
+  if ($reset || !isset($fields[$type][$classifier])) {
+    // Fetch from cache
+    $cid = "fields:$type:$classifier";
+    if (!$reset && $cache = cache_get($cid, 'cache_simplerdf')) {
+      $fields[$type][$classifier] = $cache->data;
+    }
+    // Rebuild cache
+    elseif ($type) {
+      $plugins = simplerdf_get_plugins('mappers');
+
+      // Lookup field providers
+      $providers = array();
+      foreach ($plugins as $plugin_name => $plugin) {
+        if (!$plugin['object types'] || in_array($type, $plugin['object types'])) {
+          $providers[] = $plugin_name;
+        }
+      }
+
+      // Build field data
+      $fields[$type][$classifier] = array();
+      foreach ($providers as $plugin_name) {
+        $plugin = $plugins[$plugin_name];
+        // Fetch fields
+        foreach (simplerdf_plugin_invoke($plugin, 'fields callback', $type, $classifier) as $name => $field) {
+          $field['mapper'] = $plugin_name;
+          $fields[$type][$classifier][$name] = array('name' => $name) + $field;
+        }
+      }
+      cache_set($cid, $fields[$type][$classifier], 'cache_simplerdf');
+    }
+  }
+  return $fields[$type][$classifier];
+}
+
+/**
+ * Get a list of content fields to map.
+ *
+ * @param string $content_type
+ *   Content type name.
+ *
+ * @return array
+ *   Fields available for mapping to properties, keyed by content mapper.
+ */
+function simplerdf_get_content_fields($content_type) {
+  return _simplerdf_build_content_fields($content_type);
+}
+
+/**
+ * Lazily build content mapper field information.
+ *
+ * @param string $content_type
+ *   Content type name.
+ * @param boolean $reset
+ *   If TRUE, resets the fields cache.
+ *
+ * @return array
+ *   An array of fields keyed by name (NULL if invalid type).
+ */
+function _simplerdf_build_content_fields($content_type, $reset = FALSE) {
+  static $fields = array();
+
+  // Internal use only; reset static cache
+  if (!isset($content_type)) {
+    if ($reset) {
+      $fields = array();
+    }
+    return;
+  }
+
+  if ($reset || !isset($fields[$content_type])) {
+    $cid = "content_fields:$content_type";
+    // Fetch from cache
+    if (!$reset && $cache_fields = cache_get($cid, 'cache_simplerdf')) {
+      $fields[$content_type] = $cache_fields->data;
+    }
+    // Rebuild cache
+    else {
+      // Prepare content types
+      $content_type_info = content_types($content_type);
+      $content_fields = $content_type_info['fields'];
+      if (!empty($content_fields)) {
+        // Fetch and sort plugins
+        $plugins = simplerdf_get_plugins('content_mappers');
+
+        // Build field data
+        $fields[$content_type] = array();
+        foreach ($content_fields as $content_field) {
+          $field_name = $content_field['field_name'];
+          // Lookup field providers
+          $providers = array();
+          foreach ($plugins as $plugin_name => $plugin) {
+            if (in_array($content_field['module'], $plugin['field modules']) || in_array($content_field['type'], $plugin['field types'])) {
+              $providers[] = $plugin_name;
+            }
+          }
+          if (empty($providers)) {
+            // Specify default mapper
+            $providers[] = 'default';
+          }
+
+          // Forward field to plugins providing its type
+          foreach ($providers as $plugin_name) {
+            $plugin = $plugins[$plugin_name];
+            foreach (simplerdf_plugin_invoke($plugin, 'fields callback', $content_field) as $name => $field) {
+              $field['mapper'] = 'content';
+              $field['field type'] = $content_field['type'];
+              $field['field module'] = $content_field['module'];
+              $field['content field'] = $field_name;
+              $field['content mapper'] = $plugin_name;
+              $fields[$content_type][$name] = array('name' => $name) + $field;
+            }
+          }
+        }
+        cache_set($cid, $fields[$content_type], 'cache_simplerdf');
+      }
+    }
+  }
+  return isset($content_type) ? $fields[$content_type] : $fields;
+}
+
+
+/************************************************
+ * RDF generation/processing.
+ ************************************************/
+
+/**
+ * Get RDF triples for an object.
+ *
+ * @param string $type
+ *   Object type, e.g. node.
+ * @param int $id
+ *   Object ID.
+ * @param $object
+ *   Loaded object.
+ *
+ * @return array
+ *   Namespace-prefixed RDF triples.
+ */
+function simplerdf_get_triples($type, $id, $object) {
+  if ($type && $id && is_object($object)) {
+    // Classify object
+    $classifiers = simplerdf_get_classifiers($type, $object);
+
+    // Generate URI
+    $uri = simplerdf_get_uri($type, $id, $object);
+
+    // Build triples for each classifier
+    $triples = array();
+    foreach ($classifiers as $classifier) {
+      if (is_array($result = simplerdf_build_triples($type, $classifier, $id, $object, $uri))) {
+        $triples = array_merge($triples, $result);
+      }
+    }
+
+    // Give modules a chance to perform some hardcore postprocessing
+    drupal_alter('simplerdf_triples', $triples, $type, $id, $object, $uri);
+
+    return $triples;
+  }
+}
+
+/**
+ * Build RDF triples for an object of a specific classification.
+ *
+ * @param string $type
+ *   Object type, e.g. node.
+ * @param string $classifier
+ *   Object classifier; can be NULL.
+ * @param int $id
+ *   Object ID.
+ * @param $object
+ *   Loaded object.
+ * @param string $uri
+ *   Object URI.
+ *
+ * @return array
+ *   Namespace-prefixed RDF triples.
+ */
+function simplerdf_build_triples($type, $classifier, $id, $object, $uri) {
+  if ($type && $id && is_object($object)) {
+    $fields = simplerdf_get_fields($type, $classifier);
+    $mappings = simplerdf_get_mappings($type, $classifier);
+
+    // Map each field
+    $triples = array();
+    foreach ($fields as $field_name => $field) {
+      if (isset($mappings[$field_name])) {
+        $triples = array_merge($triples, simplerdf_map_field($type, $object, $uri, $mappings[$field_name], $field));
+      }
+    }
+    return $triples;
+  }
+}
+
+/**
+ * Process raw RDF triples for output to ARC2.
+ *
+ * @param array $triples
+ *   Array of raw RDF triples.
+ *
+ * @return array
+ *   Triples suitable for ARC2.
+ */
+function simplerdf_expand_triples(array $triples) {
+  // Expand known namespace prefixes
+  foreach ($triples as &$triple) {
+    // Subject
+    if ($triple['s_type'] == 'uri') {
+      $value = _simplerdf_expand_ns_prefix($triple['s']);
+      if (isset($value)) {
+        $triple['s'] = $value;
+      }
+    }
+    // Predicate
+    $value = _simplerdf_expand_ns_prefix($triple['p']);
+    if (isset($value)) {
+      $triple['p'] = $value;
+    }
+    // Object
+    if ($triple['o_type'] == 'uri') {
+      $value = _simplerdf_expand_ns_prefix($triple['o']);
+      if (isset($value)) {
+        $triple['o'] = $value;
+      }
+    }
+    if ($triple['o_datatype']) {
+      $datatype = _simplerdf_expand_ns_prefix($triple['o_datatype']);
+      if (isset($datatype)) {
+        $triple['o_datatype'] = $datatype;
+      }
+    }
+  }
+  unset($triple);
+
+  return $triples;
+}
+
+/**
+ * Expand a prefixed value to its full URI
+ */
+function _simplerdf_expand_ns_prefix($value) {
+  if (($prefix = _simplerdf_extract_ns_prefix($value)) && ($ns = simplerdf_get_namespaces($prefix))) {
+    return $ns . substr($value, strlen($prefix) + 1);
+  }
+}
+
+/**
+ * Extract a possible namespace prefix.
+ */
+function _simplerdf_extract_ns_prefix($value) {
+  static $protocols = array('http', 'https', 'ftp', 'news', 'nntp', 'telnet', 'mailto', 'irc', 'ssh', 'sftp', 'webcal', 'rtsp');
+
+  // Match only against possible protocol/prefix
+  if ($segment_length = strcspn($value, ':')) {
+    $segment = substr($value, 0, $segment_length);
+    // Only return if not a protocol
+    if (!in_array($segment, $protocols)) {
+      return $segment;
+    }
+  }
+}
+
+
+/************************************************
+ * Object URI.
+ ************************************************/
+
+/**
+ * Get URI of an object by its ID.
+ *
+ * @param string $type
+ *   Object type, e.g. node.
+ * @param int $id
+ *   Object ID.
+ * @param $object
+ *   (Optional) Loaded object.
+ *
+ * @return string
+ *   Object URI, or NULL if none available.
+ */
+function simplerdf_get_uri($type, $id, $object = NULL) {
+  if ($type && $id && (!isset($object) || is_object($object))) {
+    $cid = "$type:$id:uri";
+    if ($cache = cache_get($cid, 'cache_simplerdf')) {
+      // Fetch cached URI
+      return $cache->data;
+    }
+    elseif ($uri = simplerdf_format_uri($type, $id, $object)) {
+      
+    	//$uri = str_replace('embeddedv2.','',$uri);
+      //$uri = str_replace('embedded.','',$uri);
+      
+    	//remove subdomains
+    	preg_match("/(http:\/\/)?(\w*\.)?(.*)/", $uri, $matches);
+    	$uri = $matches[1].$matches[3];
+    	
+      // URI generated
+      cache_set($cid, $uri, 'cache_simplerdf');
+      return $uri;
+    }
+  }
+}
+
+/**
+ * Format object URI.
+ *
+ * @param string $type
+ *   Object type, e.g. node.
+ * @param int $id
+ *   Object ID.
+ * @param $object
+ *   (Optional) Loaded object.
+ * @param string $format
+ *   (Optional) URI format to use. If not given, the active format is used.
+ *
+ * @return string
+ *   Object URI, or NULL if none generated.
+ */
+function simplerdf_format_uri($type, $id, $object = NULL, $format = NULL) {
+  static $plugins = array();
+  if ($type && $id && (!isset($object) || is_object($object))) {
+    if ($format) {
+      $plugin = simplerdf_get_plugins('uri_formats', $format);
+    }
+    // Get active URI format for object type
+    elseif ($plugins[$type]) {
+      // Use cached plugin
+      $plugin = $plugins[$type];
+    }
+    elseif ($plugin = simplerdf_get_uri_format_plugin($type)) {
+      // Cache plugin for type
+      $plugins[$type] = $plugin;
+    }
+    // Format using active URI format
+    if ($plugin) {
+      // Prepare format settings
+      $format = $plugin['name'];
+      $all_settings = (array) variable_get('simplerdf_uri_settings', array());
+      $config = (array) $all_settings[$type][$format];
+      if (!isset($config['settings'])) {
+        $config['settings'] = array();
+      }
+      $config['settings'] += $plugin['settings defaults'];
+
+      // Generate
+      if ($uri = simplerdf_plugin_invoke($plugin, 'format callback', $type, $id, $object, $config)) {
+        if ($plugin['internal']) {
+          // Transform path to absolute path
+          $url_options = array('absolute' => TRUE);
+          if (!$config['alias']) {
+            // Don't look up alias
+            $url_options['alias'] = TRUE;
+          }
+          $uri = url($uri, $url_options);
+        }
+        return $uri;
+      }
+    }
+  }
+}
+
+/**
+ * Generate default object URI.
+ *
+ * @param string $type
+ *   Type of object, e.g. node.
+ * @param int $id
+ *   Object ID.
+ *
+ * @return string
+ *   Basic path made by joining $type and $id with a slash.
+ */
+function simplerdf_get_default_uri($type, $id) {
+  return "$type/$id";
+}
+
+/******************************
+ * 	Svens Testing/Darkhack
+ ***************************/
+/*
+function simplerdf_simplerdf_triples_alter( $triples, $type, $id, $object, $uri) {
+	// check if 'OpenSocial' RDF
+	switch ($object->type) {
+		case 'lstool_w3c':
+		case 'lstool_opensocial':
+			global $base_url;
+			$subject =   $base_url . '/user/' . $object->uid;
+			$rdfType = array(
+				's' => $subject ,
+				's_type' => 'uri',
+				'p' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
+				'o' => 'http://xmlns.com/foaf/0.1/Person',
+				'o_type' => 'uri'
+			);
+			$triples[] = $rdfType;
+			
+			if(isset($object->author)) {
+				$author = array(
+					's' => $subject,
+					's_type' => 'uri',
+					'p' => 'http://xmlns.com/foaf/0.1/name',
+					'o' => $object->author,
+					'o_type' => 'literal' 
+				);
+				$triples[] = $author;
+			}
+
+			if (isset($object->author_email)) {
+				$mail = array(
+					's' => $subject,
+					's_type' => 'uri',
+					'p' => 'http://xmlns.com/foaf/0.1/mbox',
+					'o' => $object->author_email,
+					'o_type' => 'literal' 
+				);
+				$triples[] = $mail;
+			}
+			break;
+	}
+	
+// 	ob_start();
+// 	require_once('FirePHPCore/FirePHP.class.PHP');
+// 	$firephp = FirePHP::getInstance(true);
+// 	$firephp ->log($object);
+	
+	return $triples;
+ }*/
+ 
+ function simplerdf_simplerdf_triples_alter( $triples, $type, $id, $object, $uri) {
+ 	// check if 'OpenSocial' RDF
+ 	switch ($object->type) {
+ 		case 'lstool_w3c':
+ 		case 'lstool_opensocial':
+ 			$subject = $triples[0]['s'];
+ 			global $base_url;
+ 			$user =   $base_url . '/user/' . $object->author;
+ 			$genID = '_:nid' . hash('sha256', $user);
+ 			$rdfPerson = array(
+ 					's' => $genID,
+ 					's_type' => 'bnode',
+ 					'p' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
+ 					'o' => 'http://xmlns.com/foaf/0.1/Person',
+ 					'o_type' => 'uri'
+ 			);
+ 			$triples[] = $rdfPerson;
+
+ 			$rdfMaker = array(
+ 					's' => $subject ,
+ 					's_type' => 'uri',
+ 					'p' => 'http://xmlns.com/foaf/0.1/maker',
+ 					'o' => $genID,
+ 					'o_type' => 'bnode'
+ 			);
+ 			$triples[] = $rdfMaker;
+ 			
+ 			if(isset($object->author)) {
+ 				$author = array(
+ 						's' => $genID,
+ 						's_type' => 'bnode',
+ 						'p' => 'http://xmlns.com/foaf/0.1/name',
+ 						'o' => $object->author,
+ 						'o_type' => 'literal'
+ 				);
+ 				$triples[] = $author;
+ 			}
+ 
+ 			if (isset($object->author_email)) {
+ 				$mail = array(
+ 						's' => $genID,
+ 						's_type' => 'bnode',
+ 						'p' => 'http://xmlns.com/foaf/0.1/mbox',
+ 						'o' => $object->author_email,
+ 						'o_type' => 'literal'
+ 				);
+ 				$triples[] = $mail;
+ 			}
+ 			break;
+ 		case 'bundle':
+ 			global $base_url;
+ 			$subject = $triples[0]['s'];
+ 			
+ 			// add user info i.e. foaf:name, foaf:mbox foaf:Person
+ 			$user=user_load($object->uid);
+ 			$genID = '_:nid' . hash('sha256', $object->uid);
+ 			$rdfPerson = array(
+ 					's' => $genID,
+ 					's_type' => 'bnode',
+ 					'p' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
+ 					'o' => 'http://xmlns.com/foaf/0.1/Person',
+ 					'o_type' => 'uri'
+ 			);
+ 			$triples[] = $rdfPerson;
+ 			
+ 			$rdfMaker = array(
+ 					's' => $subject ,
+ 					's_type' => 'uri',
+ 					'p' => 'http://xmlns.com/foaf/0.1/maker',
+ 					'o' => $genID,
+ 					'o_type' => 'bnode'
+ 			);
+ 			$triples[] = $rdfMaker;
+ 			
+ 			if(isset($user->name)) {
+ 				$author = array(
+ 						's' => $genID,
+ 						's_type' => 'bnode',
+ 						'p' => 'http://xmlns.com/foaf/0.1/name',
+ 						'o' => $user->name,
+ 						'o_type' => 'literal'
+ 				);
+ 				$triples[] = $author;
+ 			}
+ 			
+ 			if (isset($user->mail)) {
+ 				$mail = array(
+ 						's' => $genID,
+ 						's_type' => 'bnode',
+ 						'p' => 'http://xmlns.com/foaf/0.1/mbox',
+ 						'o' => $user->mail,
+ 						'o_type' => 'literal'
+ 				);
+ 			}
+ 				$triples[] = $mail;
+ 			$amountTools=count($object->field_bundle_tool);
+ 			
+ 			for($i=0;$i<$amountTools;$i++) {
+ 				$node_id = $object->field_bundle_tool[$i]['nid'];
+ 				$url = '/node/' . $node_id;
+ 				$genID = '_:nid' . hash('sha256', $node_id);
+	 			$rdf_tool= array(
+ 					's' => $subject,
+ 					's_type' => 'uri',
+ 					'p' => 'http://purl.org/role/terms/toolConfiguration',
+	 				'o' => $genID,
+ 					'o_type' => 'bnode'
+	 			);
+	 			$triples[] = $rdf_tool;		
+	 			
+	 			$tool_bdesc = array(
+	 					's' => $genID,
+	 					's_type' => 'bnode',
+	 					'p' => 'http://purl.org/dc/terms/description',
+	 					'o' => $object->field_bundle_tool_activity[$i]['value'],
+	 					'o_type' => 'uri'
+	 			);
+	 			$triples[] = $tool_bdesc;
+	 			
+	 			
+	 			$nodeUrl = getPathAlias($node_id);
+	 			
+	 			preg_match("/(http:\/\/)?(\w*\.)?(.*)/", $nodeUrl, $matches);
+	 			$nodeUrl = $matches[1].$matches[3];
+	 				
+	 			
+	 			$tool_ref = array(
+	 					's' => $genID,
+	 					's_type' => 'bnode',
+	 					'p' => 'http://purl.org/role/terms/tool',
+	 					'o' => $nodeUrl,
+	 					'o_type' => 'uri'
+	 			);
+	 			$triples[] = $tool_ref;
+	 			
+	 		   $tool_object = simplerdf_load('node', $node_id);
+	 		   $tool_triples=simplerdf_get_triples('node', $node_id, $tool_object);
+
+  			   $triples =array_merge($tool_triples, $triples);
+ 			}
+ 			
+ 			break;
+ 	}
+ 
+ 	// 	ob_start();
+ 	// 	require_once('FirePHPCore/FirePHP.class.PHP');
+ 	// 	$firephp = FirePHP::getInstance(true);
+ 	// 	$firephp ->log($object);
+ 
+ 	return $triples;
+ }
+ 
+ function getPathAlias($nid){
+ 
+ 	global $base_url;
+ 	//check for an alias using drupal_lookup_path()
+ 	if((drupal_lookup_path('alias', 'node/'.$nid)!==false))
+ 		$alias = drupal_lookup_path('alias', 'node/'.$nid);
+ 	return $base_url.'/'.$alias;
+ }

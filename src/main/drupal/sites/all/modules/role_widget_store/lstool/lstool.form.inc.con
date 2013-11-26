@@ -1,0 +1,342 @@
+<?php
+/**
+ * Form Definition
+ *
+ * @author Andreas Diehl
+ * @package Role-Widgetstore
+ * @subpackage Drupal-Module
+ */
+
+/**
+ * preparation of the basic form, to be called by inherited modules
+ * 
+ * @param node $node
+ * @param array $form_state
+ * @return array
+ */
+function lstool_basic_form(&$node, $form_state) {
+
+  $type = node_get_types('type', $node);
+
+  //set submit function
+  $form['#submit'][] = $node->type . '_form_submit';
+
+  //defines title field
+  if (isset($form_state['storage']['title'])) {
+    $title_field_value = $form_state['storage']['title'];
+  } else if (!empty($node->title)) {
+    $title_field_value = check_plain($node->title);
+  } else {
+    $title_field_value = '';
+  }
+
+
+  if ($type->has_title) {
+    $form['title'] = array(
+        '#type' => 'textfield',
+        '#title' => 'Tool Name',
+        '#required' => TRUE,
+        '#default_value' => $title_field_value,
+        '#maxlength' => 255,
+        '#weight' => 1,
+    );
+  }
+  if (isset($form_state['storage']['description'])) {
+    $body_field_value = $form_state['storage']['description'];
+  } else if (!empty($node->body)) {
+    $body_field_value = check_plain($node->body);
+  } else {
+    $body_field_value = '';
+  }
+
+  //defines body field
+  if ($type->has_body) {
+    $form['body_field'] = node_body_field(
+            $node, $type->body_label, $type->min_word_count
+    );
+    $form['body_field']['body']['#default_value'] = $body_field_value;
+    $form['body_field']['body']['#description'] = t('Enter the tool description used for teasers and pages.');
+    $form['body_field']['body']['#rows'] = 6;
+    $form['body_field']['body']['#title'] = 'Tool Description';
+    $form['body_field']['#weight'] = 2;
+  }
+<<<<<<< .mine
+  
+  //TODO: remove if validated
+  //tool thumbnail
+//   $form['thumbnail'] = array(
+//       '#type' => 'fieldset',
+//       '#title' => t('Tool Thumbnail'),
+//       '#weight' => 4
+//   );
+=======
+>>>>>>> .r167
+
+  /*
+  //tool screenshot
+  $form['screenshot'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Tool Screenshot'),
+      '#weight' => 4
+  );
+
+  //get lstool screenshot path
+  /*
+  if (isset($form_state['storage']['screenshot_path'])) {
+    $screenshot_path = $form_state['storage']['screenshot_path'];
+  } else if (!empty($node->screenshot_path)) {
+    $screenshot_path = $node->screenshot_path;
+  } else {
+    $screenshot_path = '';
+  }
+
+  //set current image or just set hidden delete  
+  if ($screenshot_path != '') {
+
+    //theme image
+    $screenshot_image = theme_image(
+            $screenshot_path, $alt = '', $title = '', $attributes = NULL, $getsize = TRUE
+    );
+
+    $form['screenshot']['current_image'] = array('#value' => $screenshot_image);
+    $form['screenshot']['screenshot_delete'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Delete Screenshot'),
+        '#description' => t('Check this box to delete the current screenshot.'));
+    $form['screenshot']['screenshot_path'] = array(
+        '#type' => 'hidden',
+        '#value' => $screenshot_path,
+    );
+  } else {
+    //only set the delete value
+    $form['screenshot']['screenshot_delete'] = array(
+        '#type' => 'hidden',
+    );
+  }
+
+  $form['screenshot']['screenshot_upload'] = array(
+      '#type' => 'file',
+      '#title' => t('Screenshot Image File'),
+      '#size' => 48,
+      '#description' => t(
+              ''
+      )
+  );
+<<<<<<< .mine
+*/
+=======
+	*/
+>>>>>>> .r167
+
+
+  //defines the field set for lstool data
+  $form['lstool'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Tool Details'),
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+      '#weight' => 3,
+  );
+  $form['format']['#weight'] = 100;
+  
+  //store the widget specification id
+  $specification_id = $node->type;
+  $form['lstool']['specification_id'] = array(
+  			'#type' => 'hidden',
+  			'#value' => $specification_id,
+  );  
+
+  $default_lstool_url = '';
+
+  //get lstool url
+  if (isset($form_state['storage']['source'])) {
+    $source = $form_state['storage']['source'];
+  } else if (isset($node->source)) {
+    $source = $node->source;
+  } else {
+    $source = '';
+  }
+
+  //define lstool URL field
+  $form['lstool']['source'] = array(
+      '#type' => 'textfield',
+      '#maxlength' => 2083,
+      '#title' => t('Tool source URI'),
+      '#required' => TRUE,
+      '#description' => t('Enter the source URI of the Tool'),
+      '#default_value' => $source,
+      '#weight' => 1
+  );
+
+  //get short description
+  if (isset($form_state['storage']['short_description'])) {
+    $short_description = $form_state['storage']['short_description'];
+  } else if (isset($node->short_description)) {
+    $short_description = $node->short_description;
+  } else {
+    $short_description = '';
+  }
+
+  //define short description field
+  $form['lstool']['short_description'] = array(
+      '#type' => 'textarea',
+      '#title' => t('Short description of the Tool'),
+      '#required' => FALSE,
+      '#default_value' => $short_description,
+      '#description' => t('A short text describing what the tool is and does'),
+      '#weight' => 4
+  );
+
+  //get author
+  if (isset($form_state['storage']['author'])) {
+    $author = $form_state['storage']['author'];
+  } else if (isset($node->author)) {
+    $author = $node->author;
+  } else {
+    $author = '';
+  }
+
+  // define author field
+  $form['lstool']['author'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Tool Author'),
+      '#required' => FALSE,
+      '#default_value' => $author,
+      '#description' => t('The tool author'),
+      '#maxlength' => 255,
+      '#weight' => 5
+  );
+
+  // get author email
+  if (isset($form_state['storage']['author_email'])) {
+    $author_email = $form_state['storage']['author_email'];
+  } else if (isset($node->author_email)) {
+    $author_email = $node->author_email;
+  } else {
+    $author_email = '';
+  }
+
+  //define author email field
+  $form['lstool']['author_email'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Tool Author\'s eMail address'),
+      '#required' => FALSE,
+      '#default_value' => $author_email,
+      '#description' => t('The email address of the tool\'s Author'),
+      '#maxlength' => 255,
+      '#weight' => 6
+  );
+
+  // get license
+  if (isset($form_state['storage']['license'])) {
+    $license = $form_state['storage']['license'];
+  } else if (isset($node->license)) {
+    $license = $node->license;
+  } else {
+    $license = '';
+  }
+  
+  $form['lstool']['license'] = array(
+      '#type' => 'textfield',
+      '#title' => t('License Type'),
+      '#required' => FALSE,
+      '#default_value' => $license,
+      '#description' => t('The short-name of the license, if common type.'),
+      '#maxlength' => 255,
+      '#weight' => 7
+  );
+
+  // get license details
+  if (isset($form_state['storage']['license_details'])) {
+    $license_details = $form_state['storage']['license_details'];
+  } else if (isset($node->license_details)) {
+    $license_details = $node->license_details;
+  } else {
+    $license_details = '';
+  }
+
+  $form['lstool']['license_details'] = array(
+      '#type' => 'textarea',
+      '#title' => t('License Details'),
+      '#required' => FALSE,
+      '#default_value' => $license_details,
+      '#description' => t('The text of the tool\'s license, if not a common type.'),
+      '#weight' => 8
+  );
+  
+  //get the tool thumbnail url
+//   if (isset($form_state['storage']['thumbnail_url'])) {
+//     $thumbnail_url = $form_state['storage']['thumbnail_url'];
+//   } else if (isset($node->thumbnail_url)) {
+//     $thumbnail_url = $node->thumbnail_url;
+//   } else {
+//     $thumbnail_url = '';
+//   }
+
+  //store the lstool thumbnail url
+//   $form['lstool']['thumbnail_url'] = array(
+//       '#type' => 'hidden',
+//       '#value' => $thumbnail_url,
+//   );
+
+/*
+  //get the tool screenshot url
+  if (isset($form_state['storage']['screenshot_url'])) {
+    $screenshot_url = $form_state['storage']['screenshot_url'];
+  } else if (isset($node->thumbnail_url)) {
+    $screenshot_url = $node->screenshot_url;
+  } else {
+    $screenshot_url = '';
+  }
+
+  //store the tool screenshot url
+  $form['lstool']['screenshot_url'] = array(
+      '#type' => 'hidden',
+      '#value' => $screenshot_url,
+  );
+*/
+
+  $form['#attributes']['enctype'] = 'multipart/form-data';
+
+  return $form;
+}
+
+/**
+ * Returns a form element for the source uri
+ * @param array $form_state
+ * @param node $node
+ * @return array $form 
+ */
+function lstool_source_form($form_state, $node) {
+  
+  $form = array();
+	
+	$form['source'] = array(
+	    '#type' => 'textfield',
+	//TODO: check if this is valid!!
+	    '#value' =>  $node->source,
+		'#attributes' => array(
+			'readonly' => 'readonly',
+			'onclick' => 'this.select();',
+		),
+	  );
+	return $form;
+}
+
+/**
+ * Generates the button for "add to my tool"
+ * @param array $form_state
+ * @param node $node
+ * @return array $form 
+ */
+function lstool_obtain_form($form_state, $node) {
+  $form = array();
+  $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Add to "MY TOOLS"'),
+      '#disabled' => true,
+  );
+  return $form;
+}
+
+?>

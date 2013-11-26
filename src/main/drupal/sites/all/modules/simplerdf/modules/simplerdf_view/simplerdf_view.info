@@ -1,0 +1,12 @@
+name = Simple RDF View
+description = Display RDF documents under a node, user, etc. and add auto-discovery links for semantic crawlers to find. This module can be used in combination with (or in lieu of) RDF.
+dependencies[] = simplerdf
+package = RDF
+core = 6.x
+php = 5.2
+; Information added by drupal.org packaging script on 2012-01-04
+version = "6.x-1.0-beta5"
+core = "6.x"
+project = "simplerdf"
+datestamp = "1325651444"
+

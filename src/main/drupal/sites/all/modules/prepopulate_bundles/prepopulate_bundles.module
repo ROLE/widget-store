@@ -1,0 +1,354 @@
+<?php
+/**
+ * Implements hook_menu
+ */
+function prepopulate_bundles_menu() {
+  $items['prepopulate/object'] = array(
+	'type' => MENU_CALLBACK,
+	'page callback' => 'prepopulate_bundles_object_viewer',
+	'access callback' => 'user_access',
+	'access arguments' => array('import bundles and widgets')
+  );
+  
+  return $items;
+}
+
+
+/**
+* Implementation of hook_form_alter()
+*
+*/
+function prepopulate_bundles_form_alter(&$form, $form_state, $form_id) {
+	switch ($form_id) {
+		case 'user_register':
+		case 'user_login':
+		case 'user_login_block':
+			 
+			if($_POST['bundle']){
+				$_SESSION['prepopulate_bundles_cache'] = $_POST['bundle'];
+			}
+			break;
+	}
+
+}
+
+/**
+ * Implements hook_view
+ * 
+ * @return form from parsed POST-data
+ */
+function prepopulate_bundles_object_viewer($form, &$form_state) {
+	
+	$prepopulate_bundles_cache = $_SESSION['prepopulate_bundles_cache'];
+	
+	if(isset($_POST['bundle'])){
+		$parsed_data=prepopulate_parse_json($_POST['bundle']);
+	}else if($prepopulate_bundles_cache != null){
+		$parsed_data=prepopulate_parse_json($prepopulate_bundles_cache);
+		unset($_SESSION['prepopulate_bundles_cache']);
+	}else{
+		$parsed_data= "";
+	}
+	
+	
+	
+	foreach ($parsed_data->widgets as $key => $widget ) {
+			$nid = prepopulate_bundles_get_nid_xml($widget->source);
+			$widget->nid= $nid;
+	}
+
+	return drupal_get_form('prepopulate_bundles_form',$parsed_data);
+}
+
+/**
+ * Parse data according to the rdf ontology to data which fits to bundle / widget nodes
+ * 
+ * @return parsed data 
+ */
+function prepopulate_parse_json($post_data) {
+	$post_data=str_replace('http://www.w3.org/1999/02/22-rdf-syntax-ns#','',$post_data);
+	$post_data=str_replace('http://purl.org/dc/terms/','',$post_data);
+	$post_data=str_replace('http://purl.org/role/terms/','',$post_data);
+
+	$post_data=json_decode(html_entity_decode($post_data));
+	
+	// map RDF ontology type to internally used type of role_widgetstore module
+	foreach($post_data->widgets as $key => $widget){
+		switch ($widget->type) {
+				case "OpenSocialGadget":
+					$widget->type = "lstool_opensocial";
+					break;
+				case "lstool_w3c":
+					$widget->type = "lstool_w3c";
+					break;
+			}
+	}
+
+	return $post_data;
+}
+
+/**
+ * Implements hook_form
+ * 
+ * @return form
+ */
+function prepopulate_bundles_form($form_state,$parsed_data) {
+	drupal_add_css(drupal_get_path('module', 'prepopulate_bundles') .'/prepopulate_bundles.css');
+	$form = array();
+	
+	if (!empty($parsed_data->title)) {
+		$fieldTitle= 'Do you want to import a bundle containing the following widgets?';
+	} else {
+		$fieldTitle= 'Do you want to import the following widget/s?';
+	}
+	
+	$form['prepopulate'] = array(
+		'#type'             => 'fieldset',
+		'#title'            => t('Bundle Importer'),
+		'#description'      => t($fieldTitle)
+	);
+	
+	foreach($parsed_data->widgets as $key => $widget){
+		$node=node_load($widget->nid);
+		if(!empty($node->nid)) {
+			$filepath=$node->field_thumbnail[0]['filepath'];
+		} else {
+			$filepath=drupal_get_path('module', 'prepopulate_bundles') .'/new-110x51.png';
+		}  
+		
+		$form['prepopulate'][$key]['thumb'] = array(
+			'#prefix' => '<div class="prepopulate_bundles-tools"><div class="pp-box">',
+			'#default_value' => theme('imagecache', 'thumbnail', $filepath),
+			'#value' => theme('imagecache', 'thumbnail', $filepath),
+			'#parents' => array('prepopulate', $key, 'thumb')
+		);
+		 $form['prepopulate'][$key]['nid']= array(
+			 '#type' => 'hidden', 
+			 '#default_value' => $widget->nid,
+			 '#parents' => array('prepopulate', $key, 'nid')
+		 );
+		 $form['prepopulate'][$key]['source']= array(
+			 '#type' => 'hidden', 
+			 '#default_value' => $widget->source,
+			 '#parents' => array('prepopulate', $key, 'source')
+		 );
+		 if(empty($node->nid)) { $suffix = '';} else {$suffix='</div>';}
+		 $form['prepopulate'][$key]['checkbox'] = array(
+			'#type' => 'checkbox', 
+      		'#title' => t($widget->title),
+      		'#default_value' => TRUE,
+      		'#prefix' => '<legend>Import:</legend>',
+      		'#parents' => array('prepopulate', $key, 'checkbox')
+      	);
+		
+		$form['prepopulate'][$key]['title']= array(
+			'#type' => 'hidden', 
+			'#default_value' => $widget->title,
+			'#parents' => array('prepopulate', $key, 'title')
+	 	);
+				
+		$form['prepopulate'][$key]['toolConfiguration'] = array(
+			'#type' => 'hidden', 
+			 '#default_value' => $widget->toolConfiguration,
+			 '#parents' => array('prepopulate', $key, 'toolConfiguration')
+		);	
+				
+		$form['prepopulate'][$key]['type']= array(
+			'#type' => 'hidden', 
+			'#default_value' => $widget->type,
+			'#parents' => array('prepopulate', $key, 'type'),
+			'#suffix' => '</div>'
+		);
+				
+		if(empty($node->nid)) {
+			// get the vocabulary for "categories"
+			$tax=taxonomy_get_tree(1);
+			
+			foreach($tax as $nrTax => $category) {
+				$prefix='';
+				$suffix='';
+				if ($nrTax == 0) {
+					$prefix='<div class="pp-box"><legend>Category:</legend><div class="prepopulate_bundles-taxonomy-complete">';
+				} else if ($nrTax == 8) {
+					$suffix.='</div></div>';
+				}
+			
+				if (($nrTax % 3)  == 0) {
+					$prefix .= '<div class="prepopulate_bundles-taxonomy-box">';
+				}
+				if (($nrTax % 3)  == 2) {
+					$suffix .= '</div>';
+				}
+				$prefix = $prefix . ' <div class="prepopulate_bundles-taxonomy-item">';
+				$suffix = $suffix .' </div>';
+				
+				$form['prepopulate'][$key]['category'][$category->tid] = array(
+					'#prefix' => $prefix,
+					'#type'   => 'checkbox',
+					'#title' => t($category->name),
+	    			'#suffix' => $suffix,
+	    			'#parents' => array('prepopulate', $key, 'category', $category->tid)
+		    	);
+			}
+		}
+			
+		$form['prepopulate'][$key]['body']= array(
+			'#type' => 'hidden', 
+			'#default_value' => $widget->description,
+			'#parents' => array('prepopulate', $key, 'body'),
+			'#suffix' => '</div>'
+		);
+	}
+	
+	$form['prepopulate']['bundletitle'] = array(
+		'#type'	=> 'hidden', 
+		'#default_value' => $parsed_data->title
+	);
+	$bundle_desc =  $parsed_data->description;
+    if(strlen($bundle_desc) == 0) $bundle_desc = " ";
+	$form['prepopulate']['shortdesc'] = array(
+		'#type' => 'hidden', 
+		//'#default_value' => $parsed_data->description
+		'#default_value' => $bundle_desc
+		
+	);
+			
+	$form['submit'] = array (
+		 '#type' => 'submit',
+		 '#value' => t('Create')
+	);
+
+	return $form;
+}
+
+function prepupolate_bundles_home_submit($form, &$form_state) {
+	$errors = drupal_get_messages('error');
+		foreach($errors['error'] as $error) {
+  			if($error != 'Empty or invalide data. Nothing to import.') {
+  		 	 drupal_set_message($error, 'error');
+  			}
+		}
+	$form_state['redirect'] = '';
+}
+
+
+/**
+ * Implements hook_submit
+ * 
+ * 
+ */
+function prepopulate_bundles_form_submit($form, &$form_state) {
+	global $user;
+	$widgetNIDs=array();
+	$nid=0;
+	$terms=array();
+	
+	
+	// create and save new widgets which are not known by system yet
+	foreach($form_state['clicked_button']['#post']['prepopulate'] as $key => $widget) {
+		$tmpWidget=array();
+		// widget already exists, save nid for adding to bundle
+		 if(!empty($widget['nid'])) {
+		 	$tmpWidget['nid'] = $widget['nid'];
+			$tmpWidget['toolConfiguration'] = $widget['toolConfiguration'];
+			$widgetNIDs[]=$tmpWidget;
+		}
+		// widget is not existing, create a new one
+		else {
+			// set node to "unpublished"
+			$widget['status']= 0;
+			// set user
+			$widget['uid'] =$user->uid;
+			// node should not be promoted to front page automatically
+			$widget['promote'] = 0;
+			$nid=prepopulate_bundles_add_node($widget);
+			foreach($widget['category'] as $catID => $isTrue) {
+				$terms[] = $catID;
+			}
+			$node=node_load($nid);
+			taxonomy_node_save($node, $terms);
+			
+			$tmpWidget['nid'] = $nid;
+			$tmpWidget['toolConfiguration'] = $widget['toolConfiguration'];
+			$widgetNIDs[]=$tmpWidget;
+		}
+	}
+	
+	// create and save bundle
+	if (!empty($form['prepopulate']['bundletitle']['#value']) 
+		&& !empty($form['prepopulate']['shortdesc']['#value'])){
+			$bundleNode = array(
+			'status'=> 0,
+			'uid' => $user->uid,
+			'promote' => 0,
+		);
+		$bundleNode['title'] = $form['prepopulate']['bundletitle']['#value'];
+		$bundleNode['type'] = 'bundle';
+		$bundleNode['field_bundle_short_description'][0]['value'] = $form['prepopulate']['shortdesc']['#value'];
+		
+		// attach widgets to bundle
+		$bundleTools = array();
+		$bundleToolActivity = array();
+		
+		foreach($widgetNIDs as $key => $widgeter) {
+			$bundleTools[] = array( 'nid' => $widgeter['nid']);
+			$bundleToolActivity[] = array( 'value' => $widgeter['toolConfiguration']);
+		}
+		
+		$bundleNode['field_bundle_tool']=$bundleTools;
+		$bundleNode['field_bundle_tool_activity']=$bundleToolActivity;
+		
+		$nid=prepopulate_bundles_add_node($bundleNode);
+	}
+	if (is_null($nid)) {
+		drupal_set_error('No widgets or bundles have been added!');
+	} else{
+	// redirect to the edit page of the previously created bundle
+	drupal_goto('node/'. $nid .'/edit');	
+	}
+}
+
+/**
+ * Counts number of existing specified source XMLs in db
+ * 
+ * @return 0 or 1, depending if widget exists
+ */
+function prepopulate_bundles_check_tool_exists($tool_xml) {
+	$stmt=db_query("SELECT COUNT(*) FROM {lstool} where source = '%s';", $tool_xml);
+	return (db_result($stmt));
+}
+
+/**
+ * @return Node ID of widget speciefied by XML
+ */
+function prepopulate_bundles_get_nid_xml($tool_xml) {
+	$stmt = db_query("SELECT nid  FROM {lstool} where source = '%s';", $tool_xml);
+	$result = db_fetch_object($stmt);
+	return ($result->nid);
+}
+
+/**
+ * Implements hook_perm
+ * 
+ * @return permission 'import bundles and widgets'
+ */
+function prepopulate_bundles_perm() {
+  return array('import bundles and widgets');
+}
+
+
+/** 
+ * Generate node from array and save this node.
+ *
+ * @return Node ID of saved node. 
+ */
+function prepopulate_bundles_add_node($node) {
+	// save uid for call of node_submit(), this call overrides uid
+	$user=$node['uid'];
+	if ($node = node_submit($node)) {
+		$node->uid = $user;
+  		node_save($node);
+	}
+	
+	return $node->nid;
+}

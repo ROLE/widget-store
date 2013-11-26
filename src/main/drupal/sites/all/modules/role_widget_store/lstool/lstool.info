@@ -1,0 +1,10 @@
+; $Id$
+name = lstool
+description = Provides the content type ls_tools for Drupal.
+package = ROLE Widget Store
+core = 6.x
+php = 5.2
+
+dependencies[] = skip_validation
+dependencies[] = jquery_ui
+

@@ -1,0 +1,1035 @@
+<?php
+/**
+ * @file
+ * Main module file.
+ */
+
+/** The number of entries to limit object ID preview autocomplete matches by. */
+define('SIMPLERDF_PREVIEW_ID_COUNT', 10);
+
+/**
+ * Implements hook_perm().
+ */
+function simplerdf_perm() {
+  return array('administer simplerdf', 'administer simplerdf settings', 'administer simplerdf mappings');
+}
+
+/**
+ * Implements hook_theme().
+ */
+function simplerdf_theme() {
+  module_load_include('inc', 'simplerdf', 'includes/simplerdf.theme');
+  return _simplerdf_theme();
+}
+
+/**
+ * Implements hook_features_api().
+ */
+function simplerdf_features_api() {
+  module_load_include('inc', 'simplerdf', 'includes/simplerdf.features');
+  return _simplerdf_features_api();
+}
+
+/**
+ * Implements hook_menu().
+ */
+function simplerdf_menu() {
+  module_load_include('inc', 'simplerdf', 'includes/simplerdf.menu');
+  return _simplerdf_menu();
+}
+
+/**
+ * Implements hook_init().
+ */
+function simplerdf_init() {
+  if (variable_get('simplerdf_rel_index', FALSE)) {
+    variable_set('simplerdf_rel_index', FALSE);
+    simplerdf_rel_index(array(
+      'process' => TRUE,
+    ));
+  }
+}
+
+/**
+ * Implements hook_rdf_resources().
+ */
+function simplerdf_rdf_resources($context) {
+  if (!isset($context)) {
+    // Return resources based on path; limited but it's what arto's RDF CCK relies on so let's use that
+    $args = arg();
+    $type = $args[0];
+    $id = $args[1];
+    if (count($args) == 3 && is_numeric($id) && $id && $id == (int) $id && $args[2] == 'rdf') {
+      $id = (int) $id;  // Just to make sure
+      $types = simplerdf_get_types();
+      if ($types[$type] && is_object($object = simplerdf_load($type, $id))) {
+        // Supported type
+        // XXX Need to watch in the future if this runs into any nasty problem
+        $triples = simplerdf_get_triples($type, $id, $object);
+        // Index triples
+        $index = array();
+        foreach ($triples as $triple) {
+          $s = $triple['s'];
+          $p = $triple['p'];
+          $o = $triple['o'];
+          switch ($triple['o_type']) {
+            case 'uri':
+              $index[$s][$p][] = rdf_uri($o);
+              break;
+
+            case 'bnode':
+              $nodeID = substr($o, 2);
+              $index[$s][$p][] = rdf_bnode($nodeID);
+              break;
+
+            case 'literal':
+              $index[$s][$p][] = rdf_literal($o, $triple['o_lang'], $triple['o_datatype']);
+              break;
+          }
+        }
+        // Build resource loaders
+        $resources = array();
+        foreach ($index as $uri => $properties) {
+          $resources[$uri] = new RDF_QueryCallback('simplerdf_rdf_return_resources', array($properties));
+        }
+        return $resources;
+      }
+    }
+  }
+}
+
+/**
+ * Helper function to return processed resources.
+ */
+function simplerdf_rdf_return_resources($resources) {
+  return $resources;
+}
+
+/**
+ * Implements hook_flush_caches().
+ */
+function simplerdf_flush_caches() {
+  return array('cache_simplerdf');
+}
+
+/**
+ * Clear caches.
+ *
+ * @param string $type
+ *   Type of cache to clear; if not specified, clears all cache. If type is
+ *   'node', 'term', or 'user', caches for dependent objects are also cleared
+ *   (dependent objects must be registered through simplerdf_rel_register()).
+ *   Can be one of:
+ *   - 'node' : Node caches, with node ID optionally specified.
+ *   - 'term' : Term caches, with term ID optionally specified (only if simplerdf_taxonomy is enabled).
+ *   - 'user' : User caches, with user ID optionally specified (only if simplerdf_user is enabled).
+ *   - 'fields' : Fields cache, for subsequent rebuild, with content type optionally specified.
+ *   - 'mappings' : Mappings cache, with content type optionally specified.
+ * @param $a1
+ *   Parameter to use when clearing cache, depending on $type:
+ *   - If $type is 'node', 'term', or 'user', this can be the respective object
+ *     ID. If this is notspecified, cache for all objects of that type will be
+ *     cleared.
+ *   - If $type is 'mappings', specifying the content type clears mappings
+ *     cache for that type, or all types if not specified.
+ */
+function simplerdf_clear_cache($type = NULL, $a1 = NULL, $a2 = NULL) {
+  // Clear all caches
+  if (!$type) {
+    cache_clear_all('*', 'cache_simplerdf', TRUE);
+  }
+
+  // Fields cache
+  elseif ($type == 'fields') {
+    if ($a1) {
+      cache_clear_all("fields:$a1:$a2", 'cache_simplerdf');
+    }
+    else {
+      cache_clear_all('fields:', 'cache_simplerdf', TRUE);
+    }
+    // Force rebuild
+    _simplerdf_build_fields(NULL, TRUE);
+  }
+
+  // Mappings cache
+  elseif ($type == 'mappings') {
+    if ($a1) {
+      // Clear for type
+      cache_clear_all("mappings:$a1:$a2", 'cache_simplerdf');
+    }
+    else {
+      // Clear all
+      cache_clear_all('mappings:', 'cache_simplerdf', TRUE);
+    }
+  }
+
+  // Basic object cache
+  elseif ($type && (!isset($a1) || $a1)) {
+    if (!$a1) {
+      // Clear for all
+      cache_clear_all($type . ':', 'cache_simplerdf', TRUE);
+      // All object dependencies
+      $deps = simplerdf_rel_lookup(NULL, NULL, $type);
+    }
+    else {
+      // Clear object and dependencies
+      cache_clear_all($type . ':' . $a1 . ':', 'cache_simplerdf', TRUE);
+      $deps = simplerdf_rel_lookup(NULL, NULL, $type, $a1);
+    }
+    foreach ($deps as $dep) {
+      cache_clear_all($dep['source_type'] . ':' . $dep['source_id'] . ':', 'cache_simplerdf', TRUE);
+    }
+  }
+
+  // Invalid arguments
+  else {
+    return;
+  }
+
+  // Notify implementing modules of clearing cache
+  module_invoke_all('simplerdf_clear_cache', $type, $a1, $a2);
+}
+
+/**
+ * Alias of simplerdf_clear_cache() for all caches. This function is useful for
+ * handling submission of altered form just to clear cache.
+ */
+function simplerdf_clear_cache_all() {
+  simplerdf_clear_cache();
+}
+
+/**
+ * Implements hook_simplerdf_clear_cache().
+ */
+function simplerdf_simplerdf_clear_cache($type, $a1, $a2) {
+  if ($type == 'fields' && $a1 == 'node') {
+    if ($a2) {
+      cache_clear_all("content_fields:$a2", 'cache_simplerdf');
+    }
+    else {
+      cache_clear_all('content_fields:', 'cache_simplerdf', TRUE);
+    }
+    _simplerdf_build_content_fields(NULL, TRUE);
+  }
+}
+
+
+/************************************************
+ * Object relations.
+ ************************************************/
+
+/**
+ * Register an object dependency relation.
+ *
+ * @param $source_type
+ *   Source object type (e.g. node).
+ * @param $source_id
+ *   Source object ID.
+ * @param $target_type
+ *   Target object type (e.g. node).
+ * @param $target_id
+ *   Target object ID.
+ *
+ * @see simplerdf_rel_unregister()
+ * @see simplerdf_rel_lookup()
+ */
+function simplerdf_rel_register($source_type, $source_id, $target_type, $target_id) {
+  if ($source_type && $source_id && $target_type && $target_id) {
+    @db_query("INSERT INTO {simplerdf_rel} (source_type, source_id, target_type, target_id) VALUES ('%s', '%s', '%s', '%s')", $source_type, $source_id, $target_type, $target_id);
+  }
+}
+
+/**
+ * Unregister object relation(s).
+ *
+ * @param $source_type
+ *   Source object type (e.g. node).
+ * @param $source_id
+ *   Source object ID.
+ * @param $target_type
+ *   Target object type (e.g. node).
+ * @param $target_id
+ *   Target object ID.
+ *
+ * @see simplerdf_rel_register()
+ * @see simplerdf_rel_lookup()
+ */
+function simplerdf_rel_unregister($source_type = NULL, $source_id = NULL, $target_type = NULL, $target_id = NULL) {
+  $source_id = (int) $source_id;
+  $target_id = (int) $target_id;
+  $filters = array_filter(compact('source_type', 'source_id', 'target_type', 'target_id'));
+  if ($filter_string = _simplerdf_rel_get_filter_string($filters)) {
+    $filter_string = "WHERE $filter_string";
+    @db_query("DELETE FROM {simplerdf_rel} $filter_string");
+  }
+}
+
+/**
+ * Index all object relations.
+ */
+function simplerdf_rel_index($batch = array()) {
+  $batch += array(
+    'title' => t('Indexing object relations'),
+    'finished' => 'simplerdf_rel_index_finished',
+  );
+  $tasks = array();
+
+  $info = simplerdf_get_type_info();
+  foreach ($info['map'] as $type => $module) {
+    if (module_hook($module, $count_hook = 'simplerdf_rel_batch_' . $type . '_count') && module_hook($module, 'simplerdf_rel_batch_' . $type . '_list')) {
+      // Unregister and queue
+      // XXX: Is it too soon to clear?
+      simplerdf_rel_unregister($type);
+      $tasks[] = array(
+        'type' => $type,
+        'type singular' => $info['types'][$type]['title singular'],
+        'type plural' => $info['types'][$type]['title plural'],
+        'count callback' => $module . '_' . $count_hook,
+        'perform callback' => 'simplerdf_rel_index_perform',
+      );
+    }
+  }
+
+  simplerdf_batch_index($batch, $tasks);
+}
+
+/**
+ * Index relations for an object type.
+ */
+function simplerdf_rel_index_perform($task, &$context) {
+  $type = $task['type'];
+  $info = simplerdf_get_type_info();
+  $module = $info['map'][$type];
+  $list_callback = $module . '_simplerdf_rel_batch_' . $type . '_list';
+
+  // List objects
+  $list = $list_callback($context['sandbox']);
+  if (is_array($list)) {
+    foreach ($list as $id) {
+      $object = simplerdf_load($type, $id, TRUE);
+      simplerdf_rel_index_object($type, $id, $object);
+    }
+    $context['sandbox']['progress'] += count($list);
+  }
+
+  // Clear cache
+  simplerdf_clear_cache($type);
+}
+
+/**
+ * Object relations indexing finished.
+ */
+function simplerdf_rel_index_finished($success, $results, $operations) {
+  drupal_set_message(t('Object relations have been re-indexed.'));
+}
+
+/**
+ * Index related objects.
+ */
+function simplerdf_rel_index_object($type, $id, $object) {
+  $targets = module_invoke_all('simplerdf_rel_objects', $type, $object);
+  foreach ($targets as $target) {
+    if ($target['type'] && $target['id']) {
+      simplerdf_rel_register($type, $id, $target['type'], $target['id']);
+    }
+  }
+
+  // Trace dependent objects (sources)
+  $rels = simplerdf_rel_lookup(NULL, NULL, $type, $id);
+  $sources = array();
+  foreach ($rels as $rel) {
+    $sources[] = array(
+      'type' => $rel['source_type'],
+      'id' => $rel['source_id'],
+    );
+  }
+
+  module_invoke_all('simplerdf_rel_save', $type, $object, $sources, $targets);
+}
+
+/**
+ * Remove object.
+ */
+function simplerdf_rel_remove_object($type, $id, $object) {
+  // Trace dependent objects (sources)
+  $rels = simplerdf_rel_lookup(NULL, NULL, $type, $id);
+  $sources = array();
+  foreach ($rels as $rel) {
+    $sources[] = array(
+      'type' => $rel['source_type'],
+      'id' => $rel['source_id'],
+    );
+  }
+
+  // Trace related objects (targets)
+  $rels = simplerdf_rel_lookup($type, $id);
+  $targets = array();
+  foreach ($rels as $rel) {
+    $targets[] = array(
+      'type' => $rel['target_type'],
+      'id' => $rel['target_id'],
+    );
+  }
+
+  // Invoke and unregister
+  module_invoke_all('simplerdf_rel_remove', $type, $object, $sources, $targets);
+  simplerdf_rel_unregister(NULL, NULL, $type, $id);
+  simplerdf_rel_unregister($type, $id);
+}
+
+/**
+ * Look up object relation(s).
+ *
+ * @param $source_type
+ *   Source object type (e.g. node).
+ * @param $source_id
+ *   Source object ID.
+ * @param $target_type
+ *   Target object type (e.g. node).
+ * @param $target_id
+ *   Target object ID.
+ *
+ * @return array
+ *   Array of relation rows filtered by given arguments.
+ *
+ * @see simplerdf_rel_register()
+ * @see simplerdf_rel_unregister()
+ */
+function simplerdf_rel_lookup($source_type = NULL, $source_id = NULL, $target_type = NULL, $target_id = NULL) {
+  $source_id = (int) $source_id;
+  $target_id = (int) $target_id;
+  $filters = array_filter(compact('source_type', 'source_id', 'target_type', 'target_id'));
+  if ($filter_string = _simplerdf_rel_get_filter_string($filters)) {
+    $filter_string = "WHERE $filter_string";
+  }
+  $result = db_query("SELECT * FROM {simplerdf_rel} $filter_string");
+
+  $rels = array();
+  while ($rel = db_fetch_array($result)) {
+    $rels[] = $rel;
+  }
+  return $rels;
+}
+
+/**
+ * Prepare query filter conditions.
+ */
+function _simplerdf_rel_prepare_filters($raw_filters) {
+  $filters = array();
+  foreach (array('source_type', 'source_id', 'target_type', 'target_id') as $name) {
+    if ($raw_filters[$name]) {
+      $filters[$name] = $raw_filters[$name];
+    }
+  }
+  return $filters;
+}
+
+/**
+ * Render query filter string from condition array.
+ */
+function _simplerdf_rel_get_filter_string($filters) {
+  $string = '';
+  foreach ($filters as $name => $value) {
+    // Prepare value
+    $param = is_integer($value) ? '%d' : "'%s'";
+    if (is_integer($value)) {
+      $param = $value;
+    }
+    else {
+      $param = "'" . db_escape_string($value) . "'";
+    }
+    // Construct string
+    if (empty($string)) {
+      $string = $name . ' = ' . $param;
+    }
+    else {
+      $string .= ' AND ' . $name . ' = ' . $param;
+    }
+  }
+  return $string;
+}
+
+
+/************************************************
+ * Mapping CRUD functions.
+ ************************************************/
+
+/**
+ * Get RDF mappings for a classification of objects.
+ *
+ * @param string $type
+ *   Object type, e.g. node.
+ * @param $classifier
+ *   Classification for the type of objects.
+ *
+ * @return array
+ *   Mappings keyed by field name.
+ */
+function simplerdf_get_mappings($type, $classifier = NULL) {
+  $classifier = (string) $classifier;
+
+  $cid = "mappings:$type:$classifier";
+  if ($cache = cache_get($cid, 'cache_simplerdf')) {
+    // Fetch cached mappings
+    return $cache->data;
+  }
+  else {
+    // Build cache
+    $result = db_query("SELECT * FROM {simplerdf_mappings} WHERE type = '%s' AND classifier = '%s' ORDER BY field ASC", $type, $classifier);
+    $mappings = array();
+    while ($mapping = db_fetch_object($result)) {
+      $mappings[$mapping->field] = unserialize($mapping->properties);
+    }
+    cache_set($cid, $mappings, 'cache_simplerdf');
+    return $mappings;
+  }
+}
+
+/**
+ * Save RDF mappings for a classification of objects.
+ *
+ * @param string $type
+ *   Object type, e.g. node.
+ * @param $classifier
+ *   Classification for the type of objects.
+ * @param array $mappings
+ *   Arrays of mappings in order keyed by field name.
+ */
+function simplerdf_save_mappings($type, $classifier, array $mappings) {
+  $classifier = (string) $classifier;
+
+  $types = simplerdf_get_types();
+  $save = array();
+  if ($types[$type]) {
+    // Validate mappings
+    foreach ($mappings as $field => $properties) {
+      if (!is_array($properties)) {
+        continue;
+      }
+      else {
+        foreach ($properties as $property) {
+          if (!is_string($property)) {
+            continue 2;
+          }
+        }
+        // Push for saving
+        $save[] = array(
+          'type' => $type,
+          'classifier' => $classifier,
+          'field' => $field,
+          'properties' => $properties,
+        );
+      }
+    }
+    // Clear existing mappings first
+    db_query("DELETE FROM {simplerdf_mappings} WHERE type = '%s' AND classifier = '%s'", $type, $classifier);
+    // Save
+    foreach ($save as $mapping) {
+      drupal_write_record('simplerdf_mappings', $mapping);
+    }
+  }
+}
+
+/**
+ * Delete RDF mappings for a classification of objects.
+ *
+ * @param string $type
+ *   Object type, e.g. node.
+ * @param $classifier
+ *   Classification for the type of objects.
+ */
+function simplerdf_delete_mappings($type, $classifier) {
+  // For now, just set empty mappings
+  simplerdf_save_mappings($type, $classifier, array());
+}
+
+
+/************************************************
+ * Node and user implementations.
+ ************************************************/
+
+/**
+ * Implements hook_simplerdf_types().
+ */
+function simplerdf_simplerdf_types() {
+  return array(
+    'node' => array(
+      'title singular proper' => t('Node'),
+      'title plural proper' => t('Nodes'),
+      'title singular' => t('node'),
+      'title plural' => t('nodes'),
+    ),
+    'user' => array(
+      'title singular proper' => t('User'),
+      'title plural proper' => t('Users'),
+      'title singular' => t('user'),
+      'title plural' => t('users'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_simplerdf_classify().
+ */
+function simplerdf_simplerdf_classify($type, $object) {
+  // Classify node
+  if ($type == 'node') {
+    return $object->type;
+  }
+  // No need to classify user
+}
+
+/**
+ * Implements hook_simplerdf_node_load().
+ */
+function simplerdf_simplerdf_node_load($id, $reset = FALSE) {
+  return node_load($id, NULL, $reset);
+}
+
+/**
+ * Implements hook_simplerdf_user_load().
+ */
+function simplerdf_simplerdf_user_load($id) {
+  return user_load($id);
+}
+
+/**
+ * Implements hook_simplerdf_rel_batch_node_count().
+ */
+function simplerdf_simplerdf_rel_batch_node_count() {
+  return db_result(db_query('SELECT COUNT(*) FROM {node}'));
+}
+
+/**
+ * Implements hook_simplerdf_rel_batch_node_list().
+ */
+function simplerdf_simplerdf_rel_batch_node_list(&$sandbox) {
+  static $limit = 300;
+
+  if (!isset($sandbox['current_id'])) {
+    $sandbox['current_id'] = 0;
+  }
+
+  // Load nids
+  $result = db_query_range('SELECT nid FROM {node} WHERE nid > %d ORDER BY nid', $sandbox['current_id'], 0, $limit);
+  $list = array();
+  while ($nid = db_result($result)) {
+    $list[] = $nid;
+    $sandbox['current_id'] = $nid;
+  }
+
+  return $list;
+}
+
+/**
+ * Implements hook_simplerdf_rel_batch_user_count().
+ */
+function simplerdf_simplerdf_rel_batch_user_count() {
+  return db_result(db_query('SELECT COUNT(*) FROM {users} WHERE uid > 0'));
+}
+
+/**
+ * Implements hook_simplerdf_rel_batch_user_list().
+ */
+function simplerdf_simplerdf_rel_batch_user_list(&$sandbox) {
+  static $limit = 300;
+
+  if (!isset($sandbox['current_id'])) {
+    $sandbox['current_id'] = 0;
+  }
+
+  // Load uids
+  $result = db_query_range('SELECT uid FROM {users} WHERE uid > %d ORDER BY uid', $sandbox['current_id'], 0, $limit);
+  $list = array();
+  while ($uid = db_result($result)) {
+    $list[] = $uid;
+    $sandbox['current_id'] = $uid;
+  }
+
+  return $list;
+}
+
+/**
+ * Implements hook_nodeapi().
+ */
+function simplerdf_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  switch ($op) {
+    case 'update':
+      simplerdf_clear_cache('node', $node->nid);
+      simplerdf_rel_unregister('node', $node->nid);
+    case 'insert':
+      simplerdf_rel_index_object('node', $node->nid, $node);
+      break;
+
+    case 'delete':
+      // Clear cache
+      simplerdf_clear_cache('node', $node->nid);
+      simplerdf_rel_remove_object('node', $node->nid, $node);
+      break;
+  }
+}
+
+/**
+ * Implements hook_user().
+ */
+function simplerdf_user($op, &$edit, &$account, $category = NULL) {
+  switch ($op) {
+    case 'update':
+      simplerdf_clear_cache('user', $account->uid);
+      simplerdf_rel_unregister('user', $account->uid);
+    case 'insert':
+      simplerdf_rel_index_object('user', $account->uid, $account);
+      break;
+
+    case 'delete':
+      simplerdf_clear_cache('user', $account->uid);
+      simplerdf_rel_remove_object('user', $account->uid, $account);
+      break;
+  }
+}
+
+/**
+ * Implements hook_simplerdf_node_autocomplete().
+ */
+function simplerdf_simplerdf_node_autocomplete($string) {
+  // Match on node ID or title
+  $result = db_query_range("SELECT nid, title FROM {node} WHERE nid LIKE '%%%s%%' OR title LIKE '%%%s%%'", $string, $string, 0, SIMPLERDF_PREVIEW_ID_COUNT);
+  $matches = array();
+  while ($match = db_fetch_array($result)) {
+    $matches[$match['nid']] = "$match[title] (nid: $match[nid])";
+  }
+  return $matches;
+}
+
+/**
+ * Implements hook_simplerdf_user_autocomplete().
+ */
+function simplerdf_simplerdf_user_autocomplete($string) {
+  // Match on user ID or name
+  $result = db_query_range("SELECT uid, name FROM {users} WHERE uid LIKE '%%%s%%' OR name LIKE '%%%s%%'", $string, $string, 0, SIMPLERDF_PREVIEW_ID_COUNT);
+  $matches = array();
+  while ($match = db_fetch_array($result)) {
+    $matches[$match['uid']] = "$match[name] (uid: $match[uid])";
+  }
+  return $matches;
+}
+
+/**
+ * Implements hook_simplerdf_rel_objects().
+ */
+function simplerdf_simplerdf_rel_objects($type, $object) {
+  if ($type == 'node') {
+    // Prepare node fields
+    $node = &$object;
+    $type = content_types($node->type);
+    $fields = $type['fields'];
+    $rels = array();
+
+    // Register author link
+    if ($node->uid) {
+      $rels[] = array('type' => 'user', 'id' => $node->uid);
+    }
+
+    foreach ($fields as $field_name => $field) {
+      if (!isset($node->$field_name)) {
+        continue;
+      }
+
+      // Register nodereference links
+      if ($field['type'] == 'nodereference') {
+        foreach ($node->$field_name as $delta => $value) {
+          if ($value) {
+            $rels[] = array('type' => 'node', 'id' => $value['nid']);
+          }
+        }
+      }
+
+      // Register userreference links
+      if ($field['type'] == 'userreference') {
+        foreach ($node->$field_name as $delta => $value) {
+          if ($value) {
+            $rels[] = array('type' => 'user', 'id' => $value['uid']);
+          }
+        }
+      }
+    }
+
+    return $rels;
+  }
+}
+
+
+/************************************************
+ * Forms-related functionality.
+ ************************************************/
+
+/**
+ * Implements hook_content_types_overview_alter().
+ */
+function simplerdf_content_types_overview_alter(&$header, &$rows) {
+  module_load_include('inc', 'simplerdf', 'includes/simplerdf.admin');
+  _simplerdf_content_types_overview_alter($header, $rows);
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function simplerdf_form_alter(&$form, &$form_state, $form_id) {
+  switch ($form_id) {
+    case 'content_field_edit_form':
+    case 'node_type_form':
+      $form['#submit'][] = 'simplerdf_clear_cache_all';
+      break;
+  }
+
+  // Invoke admin form alter handlers
+  if ($form['#simplerdf_admin']) {
+    module_load_include('inc', 'simplerdf', 'includes/simplerdf.admin');
+    _simplerdf_admin_form_alter($form, $form_state, $form_id);
+  }
+}
+
+/**
+ * Autocomplete callback.
+ */
+function _simplerdf_autocomplete($kind = '', $type = '', $string = '') {
+  if ($kind && $type && $string) {
+    $matches = array();
+    foreach (module_implements('simplerdf_autocomplete') as $module) {
+      if (is_array($result = module_invoke($module, 'simplerdf_autocomplete', $kind, $type, $string))) {
+        $matches += $result;
+      }
+    }
+    drupal_json($matches);
+  }
+  exit;
+}
+
+/**
+ * Implements hook_simplerdf_autocomplete().
+ */
+function simplerdf_simplerdf_autocomplete($kind, $type, $string) {
+  if ($kind == 'preview_id') {
+    $info = simplerdf_get_type_info();
+    if ($module = $info['map'][$type]) {
+      if (module_hook($module, $hook = 'simplerdf_' . $type . '_autocomplete')) {
+        $matches = module_invoke($module, $hook, $string);
+        return array_slice($matches, 0, SIMPLERDF_PREVIEW_ID_COUNT, TRUE);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_rdf_namespaces().
+ */
+function simplerdf_rdf_namespaces() {
+  static $extra = array(
+    'content'  => 'http://purl.org/rss/1.0/modules/content/',
+    'sioc'     => 'http://rdfs.org/sioc/ns#',
+    'sioct'    => 'http://rdfs.org/sioc/types#',
+    'skos'     => 'http://www.w3.org/2004/02/skos/core#',
+  );
+
+  if (module_exists('rdf')) {
+    // Only return extras that RDF doesn't export
+    return $extra;
+  }
+  else {
+    // Define common namespaces, including those RDF defines
+    static $rdf = array(
+      '_'        => 'http://bnode.net/',
+      'rdf'      => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+      'rdfs'     => 'http://www.w3.org/2000/01/rdf-schema#',
+      'xsi'      => 'http://www.w3.org/2001/XMLSchema-instance#',
+      'xsd'      => 'http://www.w3.org/2001/XMLSchema#',
+      'owl'      => 'http://www.w3.org/2002/07/owl#',
+      'dc'       => 'http://purl.org/dc/elements/1.1/',
+      'dcterms'  => 'http://purl.org/dc/terms/',
+      'dcmitype' => 'http://purl.org/dc/dcmitype/',
+      'foaf'     => 'http://xmlns.com/foaf/0.1/',
+      'rss'      => 'http://purl.org/rss/1.0/',
+    );
+    return $rdf + $extra;
+  }
+}
+
+/**
+ * Helper function to get defined RDF namespaces.
+ *
+ * @param string $prefix
+ *   Only return the namespace with this prefix.
+ *
+ * @return
+ *   Array of namespace URIs keyed by prefixes, or a matching namespace if prefix is specified.
+ */
+function simplerdf_get_namespaces($prefix = NULL) {
+  static $namespaces;
+  if (!isset($namespaces)) {
+    $namespaces = array();
+    foreach (module_implements('rdf_namespaces') as $module) {
+      if (is_array($result = module_invoke($module, 'rdf_namespaces'))) {
+        $namespaces += $result;
+      }
+    }
+    ksort($namespaces);
+  }
+  return isset($prefix) ? $namespaces[$prefix] : $namespaces;
+}
+
+
+/************************************************
+ * RDF statement helper functions.
+ ************************************************/
+
+/**
+ * Make a statement subject.
+ *
+ * @param string $type
+ *   Either 'uri' or 'bnode'.
+ * @param string $value
+ *   Subject value, either a URI or BNode ID. If $type is 'uri', value must be
+ *   specified. If type is 'bnode' and the value is not given, a UUID will be
+ *   generated in its place.
+ *
+ * @return array
+ *   Array representing statement subject containing keys 's' and 's_type'. If
+ *   $type is not 'bnode' and $value is not given, NULL is returned.
+ *
+ * @see http://arc.semsol.org/docs/v2/structures
+ */
+function simplerdf_make_subject($type, $value = NULL) {
+  if ($type == 'bnode' || isset($value)) {
+    if ($type == 'bnode' && !isset($value)) {
+      // Generate BNode ID
+      $value = '_:' . strtr(uuid_uuid(), array('-' => ''));
+    }
+    return array(
+      's' => $value,
+      's_type' => $type,
+    );
+  }
+}
+
+/**
+ * Make a statement predicate.
+ *
+ * @param string $property
+ *   RDF property URI.
+ *
+ * @return array
+ *   Array containing predicate keyed by 'p'.
+ *
+ * @see http://arc.semsol.org/docs/v2/structures
+ */
+function simplerdf_make_predicate($property) {
+  return array('p' => $property);
+}
+
+/**
+ * Make a statement object.
+ *
+ * @param string $type
+ *   One of 'uri', 'bnode', or 'literal'.
+ * @param string $value
+ *   Subject value, either a URI or BNode ID. If $type is 'uri', value must be
+ *   specified. If type is 'bnode' and the value is not given, a UUID will be
+ *   generated in its place.
+ * @param string $datatype
+ *   (Optional) The value data type URI.
+ * @param string $lang
+ *   (Optional) Locale identifier, e.g. 'en-us'.
+ *
+ * @return array
+ *   Array containing object with keys: 'o', 'o_type', 'o_datatype', 'o_lang'.
+ *   If $type is not 'bnode' and $value is not given, NULL is returned.
+ *
+ * @see http://arc.semsol.org/docs/v2/structures
+ */
+function simplerdf_make_object($type, $value = NULL, $datatype = NULL, $lang = NULL) {
+  if ($type == 'bnode' || isset($value)) {
+    if ($type == 'bnode' && !isset($value)) {
+      // Generate BNode ID
+      $value = '_:' . strtr(uuid_uuid(), array('-' => ''));
+    }
+    $o = array(
+      'o' => $value,
+      'o_type' => $type,
+    );
+    // Insert data type
+    if ($datatype) {
+      $o['o_datatype'] = $datatype;
+    }
+    // Insert locale
+    if ($lang) {
+      $o['o_lang'] = $lang;
+    }
+    return $o;
+  }
+}
+
+/**
+ * Match a string as URL and clean the URL. This function uses the same pattern
+ * Drupal's Filter uses to match URLs from text input.
+ *
+ * @param string $text
+ *   String to match.
+ *
+ * @return
+ *   Cleaned URL, or NULL if given string is not a URL.
+ */
+function simplerdf_match_url($text) {
+  static $pattern = '`^(http://|https://|ftp://|mailto:|smb://|afp://|file://|gopher://|news://|ssl://|sslv2://|sslv3://|tls://|tcp://|udp://)([a-zA-Z0-9@:%_+*~#?&=.,/;-]*[a-zA-Z0-9@:%_+*~#&=/;-])$`i';
+  static $cache = array();
+  if ($cache[$text]) {
+    return $cache[$text];
+  }
+  elseif (!isset($cache[$text])) {
+    // Match as URL
+    if (preg_match($pattern, $text)) {
+      // Clean and cache
+      $url = check_url(decode_entities($text));
+      $cache[$text] = $url;
+      return $url;
+    }
+  }
+}
+
+/**
+ * Match a string as an email address and transform into a mailto: URI. This
+ * function uses the same pattern Drupal's Filter uses to match emails.
+ *
+ * @param string $text
+ *   String to match.
+ *
+ * @return
+ *   Email mailto: URI, or NULL if given string is not an email address.
+ */
+function simplerdf_match_email($text) {
+  static $pattern = '`^[A-Za-z0-9._-]+@[A-Za-z0-9._+-]+\.[A-Za-z]{2,4}$`i';
+  // Match as email
+  if (preg_match($pattern, $text)) {
+    return 'mailto:' . $text;
+  }
+}
+
+
+/************************************************
+ * Batch implementations.
+ ************************************************/
+
+include_once 'simplerdf.batch.inc';
+
+
+/************************************************
+ * Plugin declarations and handlers.
+ ************************************************/
+
+include_once 'simplerdf.plugin.inc';
+
+
+/************************************************
+ * Public API.
+ ************************************************/
+
+include_once 'simplerdf.api.inc';

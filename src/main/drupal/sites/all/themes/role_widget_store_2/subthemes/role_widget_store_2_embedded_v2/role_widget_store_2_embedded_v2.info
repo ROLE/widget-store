@@ -1,0 +1,37 @@
+; $Id: fusion_starter_lite.info,v 1.1.2.1 2010/06/17 07:54:57 sociotech Exp $
+
+name = ROLE Widget Store Theme 2 Embedded V2
+description = ROLE Widget Store Theme. Updated infos for adding widgets for other environments. if embedded in other environments based on the Fusion Starter Lite sub-theme. Requires <a href="http://drupal.org/project/fusion">Fusion Core</a> and the <a href="http://drupal.org/project/skinr">Skinr</a> module to enable easy point-and-click theming.
+base theme = role_widget_store_2
+core = 6.x
+engine = phptemplate
+
+stylesheets[all][] = css/embeddedv2.css
+
+scripts[] = js/openapp.js
+
+regions[sidebar_first] = sidebar first
+regions[sidebar_last] = sidebar last
+regions[header_top] = header top
+regions[header] = header
+regions[preface_top] = preface top
+regions[preface_bottom] = preface bottom
+regions[content_top] = content top
+regions[content] = content
+regions[content_bottom] = content bottom
+regions[postscript_top] = postscript top
+regions[postscript_bottom] = postscript bottom
+regions[footer] = footer
+regions[node_top] = node top
+regions[node_bottom] = node bottom
+regions[above_comments] = Above comments
+
+; Default theme settings
+settings[theme_grid] = grid12-960
+settings[theme_grid_options][] = grid12-960
+settings[theme_grid_options][] = grid12-fluid
+settings[fluid_grid_width] = fluid-100
+settings[theme_font_size] = font-size-12
+settings[sidebar_layout] = sidebars-split
+settings[sidebar_first_width] = 3
+settings[sidebar_last_width] = 3

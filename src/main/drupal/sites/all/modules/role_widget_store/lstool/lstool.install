@@ -1,0 +1,205 @@
+<?php
+// $Id$
+/**
+ * Install and Schemas
+ *
+ * @author Daniel Dahrendorf
+ * @author Andreas Diehl
+ * @package Role-Widgetstore
+ * @subpackage Drupal-Module
+ */
+
+/**
+ * Installs the tables for the lstool module
+ * @file
+ */
+
+/******************************************************************************
+ * Drupal Hooks                                                               *
+ ******************************************************************************/
+
+/**
+ * Implementation of hook_install()
+ */
+function lstool_install(){
+	//create schemas
+	drupal_install_schema('lstool');
+	drupal_install_schema('lstool_screenshots');
+        drupal_install_schema('lstool_types');
+} 
+
+/**
+ * Implementation of hook_uninstall()
+ */
+function lstool_uninstall(){
+	
+	//remove all lstool nodes
+	$res = db_query("SELECT n.nid FROM {node} n WHERE n.type = 'lstool'");
+	while ($n = db_fetch_object($res)) {
+		//node_delete($n->nid);
+	}
+	
+	//remove schemas
+	drupal_uninstall_schema('lstool');
+	drupal_uninstall_schema('lstool_screenshots');
+        drupal_uninstall_schema('lstool_types');
+	 
+} 
+
+/**
+ * Implementation of hook_schema()
+ */
+function lstool_schema() {
+  $schema['lstool'] = array(
+      'fields' => array(
+          'nid' => array(
+              'description' => 'The current node id.',
+              'type' => 'int',
+              'unsigned' => TRUE,
+              'not null' => TRUE,
+              'default' => 0
+          ),
+          'vid' => array(
+              'description' => 'The current {node_revisions}.vid version identifier.',
+              'type' => 'int',
+              'unsigned' => TRUE,
+              'not null' => TRUE,
+              'default' => 0
+          ),
+          'specification_id' => array(
+              'description' => 'The id of the lstool specification.',
+              'type' => 'varchar',
+              'length' => 127,
+              'not null' => TRUE,
+              'default' => 'opensocial'
+          ),
+          'source' => array(
+              'description' => 'The source of the lstool',
+              'type' => 'varchar',
+              'length' => 255,
+              'not null' => TRUE,
+              'default' => ''
+          ),
+          'author' => array(
+              'description' => 'The author of the lstool.',
+              'type' => 'varchar',
+              'length' => 127,
+              'not null' => TRUE,
+              'default' => ''
+          ),
+          'author_email' => array(
+              'description' => 'The email of the author of the lstool.',
+              'type' => 'varchar',
+              'length' => 127,
+              'not null' => TRUE,
+              'default' => ''
+          ),
+          'thumbnail_path' => array(
+              'description' => 'The path or url of the lstool thumbnail.',
+              'type' => 'varchar',
+              'length' => 127,
+              'not null' => TRUE,
+              'default' => ''
+          ),
+          'short_description' => array(
+              'description' => 'A short description of the tool.',
+              'type' => 'varchar',
+              'length' => 255,
+              'not null' => TRUE,
+              'default' => ''
+          ),
+          'version' => array(
+              'description' => 'Version number of the tool',
+              'type' => 'varchar',
+              'length' => 255,
+              'not null' => TRUE,
+              'default' => ''
+          ),
+          'license' => array(
+              'description' => 'License information',
+              'type' => 'varchar',
+              'length' => 255,
+              'not null' => TRUE,
+              'default' => ''
+          ),
+          'license_details' => array(
+              'description' => 'Additional information, if required',
+              'type' => 'text'
+          ),
+      ),
+      'indexes' => array(
+      //no indexes 
+      ),
+      'unique keys' => array(
+          'vid' => array('vid')
+      ),
+      'primary key' => array('vid')
+  );
+
+
+
+
+
+
+  $schema['lstool_screenshots'] = array(
+      'fields' => array(
+          'nid' => array(
+              'description' => 'The primary identifier for a node.',
+              'type' => 'int',
+              'unsigned' => TRUE,
+              'not null' => TRUE,
+              'default' => 0
+          ),
+          'vid' => array(
+              'description' => 'The current {node_revisions}.vid version identifier.',
+              'type' => 'int',
+              'unsigned' => TRUE,
+              'not null' => TRUE,
+              'default' => 0
+          ),
+          'sort_order' => array(
+              'description' => 'The sort order of the screenshot, 0 for main image',
+              'type' => 'int',
+              'unsigned' => TRUE,
+              'not null' => TRUE,
+              'default' => 0
+          ),
+          'screenshot_path' => array(
+              'description' => 'The path or url of the tool screenshot.',
+              'type' => 'varchar',
+              'length' => 255,
+              'not null' => FALSE,
+              'default' => NULL
+          ),
+      ),
+      'indexes' => array(
+      //no indexes 
+      ),
+      'primary key' => array('nid')
+  );
+
+  $schema['lstool_types'] = array(
+      'fields' => array(
+          'name' => array(
+              'description' => 'Name of class and node type',
+              'type' => 'varchar',
+              'length' => 32,
+              'not null' => TRUE
+          ),
+          'display' => array(
+              'description' => 'The type, displayed to the user',
+              'type' => 'varchar',
+              'length' => 255,
+              'not null' => TRUE
+          ),
+      ),
+      'indexes' => array(
+      //no indexes 
+      ),
+      'primary key' => array(
+          'name'
+      )
+  );
+
+  return $schema;
+}

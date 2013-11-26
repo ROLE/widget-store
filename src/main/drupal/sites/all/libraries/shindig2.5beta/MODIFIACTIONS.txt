@@ -1,0 +1,47 @@
+This Shindig source code has been modified to work on the ROLE server.
+Th ROLE server has some difficulties, with the newer 2.5beta version, 
+which not occured in Shindig 2.0. Most probable these "bugs" were induced by 
+the use of PHP 5.3.3. On the local development maschine running PHP 5.3.8 none 
+of these behaviors occured.
+
+Further modifications have been made to add opensocial features or re-add opensocial features.
+
+Changelog (modifiactions done fto work on ROLE productive with PHP 5.3.3)
+- Problem: config was not loaded:
+- Changes:
+	- [SHINDIGROOT]/config/container.php:
+		return array	-> 		$shindigConfig = array(
+	- [SHINDIGROOT]/src/common/Config.php
+		line 35+36:
+		 	require realpath(dirname(__FILE__) . "/../../config") . '/container.php';
+    		self::$config = $shindigConfig;
+    - added "somewhere" namespace (do not know anymore where, if problem occurs see error.log)
+
+- Problem: OAuth not working:
+- Changes:
+   	- Error msgs: " Class 'apache\\shindig\\gadgets\\oauth\\EndPoint' not found in /var/www/vhosts/dev.role-widgetstore.eu/httpdocs/sites/all/libraries/shindig2.5beta/src/apache/shindig/gadgets/oauth/OAuthService.php on line 123" in 
+   	- Dark hack:
+   		- in  [SHINDIGROOT]/src/apache/shindig/gadgets/oauth/OAuthService.php:
+   		 	line 3 added : include 'Endpoint.php';
+     
+- Problem: Re-added feature "opensocial-0.8"
+- Changes: 
+   	-  [SHINDIGROOT]/features/src/main/javascript/features/features.txt:
+   		added line: features/opensocial-0.8/feature.xml
+ 
+- Problem: added feature "openapp":
+- Changes: 
+	-  [SHINDIGROOT]/features/src/main/javascript/features/features.txt:
+    	added line: features/openapp/feature.xml
+    - added directory [SHINDIGROOT]/features/src/main/javascript/features/openapp
+    - added file [SHINDIGROOT]/features/src/main/javascript/features/openapp/feature.xml:
+    	<feature>
+ 			<name>openapp</name>
+  			<dependency>globals</dependency>
+  			<gadget></gadget>
+  			<container></container>
+		</feature>
+	- added file [SHINDIGROOT]/features/src/main/javascript/features/openapp/openapp.js:
+	- added file [SHINDIGROOT]/features/src/main/javascript/features/openapp/taming.js:
+		both files contain data form an example, bot are not needed, because removed reference in feature.xml
+		

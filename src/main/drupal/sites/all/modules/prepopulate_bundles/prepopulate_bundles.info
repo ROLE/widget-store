@@ -1,0 +1,8 @@
+name = Prepopulate Bundles
+description = Allows bundles and widgets  to be prepopulated from the URL.
+core = 6.x
+
+version = "6.x-2.2"
+core = "6.x"
+datestamp = "11012013"
+

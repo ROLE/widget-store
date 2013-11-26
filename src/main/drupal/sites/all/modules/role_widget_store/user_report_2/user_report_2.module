@@ -1,0 +1,20 @@
+<?php
+
+
+/* ###################################################################################
+ * Drupal Hooks
+ * ###################################################################################
+ */
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function user_report_2_form_alter(&$form, $form_state, $form_id) {
+    if (arg(2) != 'edit') {
+     //set the contest reference to the nid of the contest (3rd argument)
+      if (arg(3) != '') {
+        $form['field_report_subject'][0]['#default_value']['nid'] = arg(3);
+        
+     }
+    }
+}

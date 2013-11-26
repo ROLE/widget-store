@@ -1,0 +1,73 @@
+<?php
+// $Id$
+/**
+ * Install and Schema
+ *
+ * @author Andreas Diehl
+ * @package Role-Widgetstore
+ * @subpackage Drupal-Module
+ */
+
+/**
+ * Installs the tables for the _opensocial module
+ * @file
+ */
+
+/******************************************************************************
+ * Drupal Hooks                                                               *
+ ******************************************************************************/
+
+/**
+ * Implementation of hook_install()
+ */
+function lstool_w3c_install() {
+	// create schemas
+	drupal_install_schema('lstool_w3c');
+  // register module
+  $sql = 'INSERT INTO {lstool_types} (name, display) VALUES ("%s", "%s")';
+  db_query(db_rewrite_sql($sql), 'lstool_w3c', 'W3C');
+} 
+
+/**
+ * Implementation of hook_uninstall()
+ */
+function lstool_w3c_uninstall(){
+	// remove schemas
+	drupal_uninstall_schema('lstool_w3c');
+  // unregister module
+  $sql = 'DELETE FROM {lstool_types} WHERE name = "%s"';
+  db_query(db_rewrite_sql($sql), 'lstool_w3c');
+} 
+
+/**
+ * Implementation of hook_schema()
+ */
+function lstool_w3c_schema(){
+  $schema['lstool_w3c'] = array(
+		'fields' => array(
+			'vid' => array(
+        'description' => 'The current {node_revisions}.vid version identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+			),
+			'height' => array(
+        'description' => 'The height of the Widget',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+			),
+		),
+		'indexes' => array(
+                  //no indexes 
+		),
+    'unique keys' => array(
+      'vid'     => array('vid')
+    ),
+    'primary key' => array('vid')
+  );
+
+  return $schema;
+}

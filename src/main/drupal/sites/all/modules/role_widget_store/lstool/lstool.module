@@ -1,0 +1,405 @@
+<?php
+// $Id$
+/**
+ * @file
+ * The lstool module.
+ * Common Module Functions
+ *
+ * @author Daniel Dahrendorf
+ * @author Andreas Diehl
+ * @package Role-Widgetstore
+ * @subpackage Drupal-Module
+ */
+
+/******************************************************************************
+ * API                                                                        *
+ ******************************************************************************/
+
+//require_once dirname(__FILE__) . '/classes/lstool.php';
+require_once dirname(__FILE__) . '/lstool_helper.php';
+
+/******************************************************************************
+ * CONSTANTS                                                                  *
+ ******************************************************************************/
+// TODO: deprecated, should be removed!
+//define('LSTOOL_DEFAULT_TOOL_SPECIFICATION','opensocial');
+
+/******************************************************************************
+ * Includes                                                                   *
+ ******************************************************************************/
+
+require_once dirname(__FILE__) . '/lstool.form.inc';
+require_once dirname(__FILE__) . '/lstool.theme.inc';
+require_once dirname(__FILE__) . '/lstool.cckfields.inc';
+
+/******************************************************************************
+ * Drupal Hooks                                                               *
+ ******************************************************************************/
+
+/**
+ * Implementation of hook_help().
+ *
+ * Defines the help page for the module
+ */
+function lstool_help($path, $arg) {
+  //TODO: Provide a nice help page
+
+  if ($path == 'admin/help#lstool') {
+    $output = 'This module provides the basic functionality needed by ls-tools.';
+    return $output;
+  }
+}
+
+/**
+ * Implementation of hook_disable().
+ *
+ */
+function lstool_disable() {
+
+}
+
+/**
+ * Implementation of hook_enable().
+ *
+ */
+function lstool_enable() {
+
+}
+
+/**
+ * Implementation of hook_views_api().
+ *
+ * Specifies the location of the views to import and triggers the import
+ */
+function lstool_views_api() {
+  return array(
+    'api' => '2', 'path' => drupal_get_path('module', 'lstool'),
+  );
+}
+
+function lstool_register_new_tooltype($tool_type) {
+
+  //add thumbnail field to the new tool type
+  ls_tool_add_media_data_group_to_tool_type($tool_type);
+  ls_tool_add_thumbnail_field_to_tool_type($tool_type);
+  ls_tool_add_screenshots_field_to_tool_type($tool_type);
+}
+
+/**
+ * Implementation of hook_menu().
+ * This will be called if the user does not properly setup url-redirect
+ */
+function lstool_menu() {
+  $items = array();
+  // handles the /gadgets/* url in case the user hasn't set the htaccess and
+  // then displays an error message.
+  $items['gadgets/%'] = array(
+      'title' => '', 'page callback' => 'lstool_no_htaccess',
+      'access arguments' => array(
+        'access content'
+      ), 'type' => MENU_CALLBACK
+  );
+  // menu entry for the central tool adding page
+  $items['lstool'] = array(
+      'title' => 'Create LSTOOL', 'page callback' => 'lstool_select_type',
+      'access arguments' => array(
+        'create content'
+      ), 'type' => MENU_NORMAL_ITEM
+  );
+  return $items;
+}
+
+/**
+ *  Implementation of hook_default_presets().
+ *
+ *  Imports all default presets
+ */
+function lstool_imagecache_default_presets() {
+  $presets = array();
+
+  $presets['tool_400x400'] = array(
+      'presetname' => 'tool_400x400',
+      'actions' => array(
+          0 => array(
+              'weight' => '0', 'module' => 'imagecache_coloractions',
+              'action' => 'imagecache_convert',
+              'data' => array(
+                'format' => 'image/png', 'width' => '1280',
+              ),
+          ),
+          1 => array(
+              'weight' => '1', 'module' => 'imagecache',
+              'action' => 'imagecache_scale',
+              'data' => array(
+                'width' => '400', 'height' => '400', 'upscale' => '1',
+              ),
+          ),
+          2 => array(
+              'weight' => '2', 'module' => 'imagecache_canvasactions',
+              'action' => 'canvasactions_definecanvas',
+              'data' => array(
+                  'RGB' => array(
+                    'HEX' => '',
+                  ), 'under' => TRUE,
+                  'exact' => array(
+                      'width' => '400', 'height' => '400', 'xpos' => 'right',
+                      'ypos' => 'center',
+                  ),
+                  'relative' => array(
+                      'leftdiff' => '', 'rightdiff' => '', 'topdiff' => '',
+                      'bottomdiff' => '',
+                  ),
+              ),
+          ),
+      ),
+  );// end tool400x400
+
+  $presets['tool_list_50x50'] = array(
+      'presetname' => 'tool_list_50x50',
+      'actions' => array(
+          0 => array(
+              'weight' => '0', 'module' => 'imagecache_coloractions',
+              'action' => 'imagecache_convert',
+              'data' => array(
+                'format' => 'image/png', 'width' => '1280',
+              ),
+          ),
+          1 => array(
+              'weight' => '1', 'module' => 'imagecache',
+              'action' => 'imagecache_scale',
+              'data' => array(
+                'width' => '48', 'height' => '48', 'upscale' => '1',
+              ),
+          ),
+          2 => array(
+              'weight' => '2', 'module' => 'imagecache_canvasactions',
+              'action' => 'canvasactions_roundedcorners',
+              'data' => array(
+                  'radius' => '5',
+                  'independent_corners_set' => array(
+                      'independent_corners' => '0',
+                      'radii' => array(
+                        'tl' => '0', 'tr' => '0', 'bl' => '0', 'br' => '0',
+                      ),
+                  ),
+              ),
+          ),
+          3 => array(
+              'weight' => '3', 'module' => 'imagecache_canvasactions',
+              'action' => 'canvasactions_definecanvas',
+              'data' => array(
+                  'RGB' => array(
+                    'HEX' => '#333333',
+                  ), 'under' => TRUE,
+                  'exact' => array(
+                    'width' => '', 'height' => '', 'xpos' => '', 'ypos' => '',
+                  ),
+                  'relative' => array(
+                      'leftdiff' => '1', 'rightdiff' => '1', 'topdiff' => '1',
+                      'bottomdiff' => '1',
+                  ),
+              ),
+          ),
+          4 => array(
+              'weight' => '4', 'module' => 'imagecache_canvasactions',
+              'action' => 'canvasactions_roundedcorners',
+              'data' => array(
+                  'radius' => '5',
+                  'independent_corners_set' => array(
+                      'independent_corners' => '0',
+                      'radii' => array(
+                        'tl' => '0', 'tr' => '0', 'bl' => '0', 'br' => '0',
+                      ),
+                  ),
+              ),
+          ),
+      ),
+  );// end tool_list_50x50  
+
+  return $presets;
+}
+
+/******************************************************************************
+ * Module Hooks                                                               *
+ ******************************************************************************/
+
+/**
+ * Generates the central tool adding page, calls the form to be added and
+ * passes it to drupal.
+ * @return string rendered form
+ */
+function lstool_select_type() {
+  $form_state = array(
+    'storage' => NULL, 'submitted' => FALSE,
+  );
+  drupal_prepare_form('lstool_select_form', $form, $form_state);
+  return drupal_get_form('lstool_select_form');
+}
+
+/**
+ * Generates the form for the central tool adding page, method to be
+ * called by form api
+ * @return array $form
+ */
+function lstool_select_form() {
+  $tooltypes = array();
+  foreach (lstoolhelper::getTypes() as $type) {
+    $tooltypes[$type['name']] = t($type['display']);
+  }
+  $form['#submit'][] = 'lstool_form_submit';
+  $form['lstool']['lstooltype'] = array(
+      '#type' => 'radios', '#title' => t('LS-Tool Type'),
+      '#options' => $tooltypes,
+      '#description' => t('Please choose the type of tool you wish to add.'),
+      '#required' => true
+  );
+  $form['#attributes']['enctype'] = 'multipart/form-data';
+  $form['lstool']['next'] = array(
+      '#type' => 'submit', '#value' => 'Next', '#id' => 'next_button',
+      '#skip_required_validation' => FALSE,
+  );
+  return $form;
+}
+
+/**
+ * Loads the lstool and assigns all values to it; returns an stdClass-Object
+ * with all properties of the lstool.
+ * @param node $node
+ * @return stdClass
+ */
+// function lstool_load_prepare(&$node) {
+//   jquery_ui_add('ui.tabs');
+//   drupal_add_css('sites/all/modules/jquery_ui/jquery.ui/themes/default/ui.all.css');
+//   $obj = lstoolhelper::getObject($node->vid);
+//   return $obj;
+// }
+
+/**
+ * Prepares the view for the dependant module; should be called first.
+ *
+ */
+function lstool_view_prepare($node, $teaser = FALSE, $page = FALSE) {
+  //prepare node for displaying
+  $node = node_prepare($node, $teaser);
+
+  //filter user data
+  $node->lstool_author = check_plain($node->lstool_author);
+  $node->lstool_author_email = check_plain($node->lstool_author_email);
+
+  //sort what should appear not in the teaser
+  if ($teaser) {
+    $node->content['body']['#value'] = theme('lstool_body', $node->teaser);
+
+  } else {
+    $node->content['body']['#value'] = theme('lstool_body', $node->body);
+
+    $node->content['lstool_application'] = array(
+      '#value' => theme('lstool_application', $node),
+    );
+
+    //themed screenshot
+    $node->content['lstool_screenshot'] = array(
+      '#value' => theme('lstool_screenshot', $node), '#weight' => 3
+    );
+  }
+
+  //specification of the lstool
+  $node->content['lstool_specification'] = array(
+    '#value' => theme('lstool_specification', $node, $teaser), '#weight' => -4
+  );
+
+  //themed lstool author
+  $node->content['lstool_author'] = array(
+    '#value' => theme('lstool_author', $node), '#weight' => -2
+  );
+
+  //themed lstool author email
+  $node->content['lstool_author_email'] = array(
+    '#value' => theme('lstool_author_email', $node), '#weight' => -1
+  );
+
+  // theme license
+  $node->content['lstool_license'] = array(
+    '#value' => theme('lstool_license', $node), '#weight' => 5
+  );
+
+  // theme license_details
+  $node->content['lstool_license_details'] = array(
+    '#value' => theme('lstool_license_details', $node), '#weight' => 6
+  );
+
+  //themed lstool thumbnail
+  $node->content['lstool_thumbnail'] = array(
+    '#value' => theme('lstool_thumbnail', $node, $teaser),
+  );
+
+  return $node;
+}
+
+/**
+ * Prepares themes for displaying the lstool. Provides all basic
+ * theme definitions.
+ *
+ */
+function lstool_theme_prepare() {
+  return array(
+      'lstool_body' => array(
+          'arguments' => array(
+            'body' => '', 'teaser' => 0
+          ), 'file' => 'lstool.theme.inc'
+      ),
+      'lstool_screenshot' => array(
+          'arguments' => array(
+            'node'
+          ), 'file' => 'lstool.theme.inc'
+      ),
+      'lstool_specification' => array(
+          'arguments' => array(
+            'node', 'teaser' => 0
+          ), 'file' => 'lstool.theme.inc'
+      ),
+      'lstool_author' => array(
+          'arguments' => array(
+            'node'
+          ), 'file' => 'lstool.theme.inc'
+      ),
+      'lstool_author_email' => array(
+          'arguments' => array(
+            'node'
+          ), 'file' => 'lstool.theme.inc'
+      ),
+      'lstool_license' => array(
+          'arguments' => array(
+            'node'
+          ), 'file' => 'lstool.theme.inc'
+      ),
+      'lstool_license_details' => array(
+          'arguments' => array(
+            'node', 'teaser' => 0
+          ), 'file' => 'lstool.theme.inc'
+      ),
+      'lstool_thumbnail' => array(
+          'arguments' => array(
+            'node', 'teaser' => 0
+          ), 'file' => 'lstool.theme.inc'
+      ),
+  );
+}
+
+/**
+ * Returns the error message so the user knows he should set up htaccess
+ * and mod_rewrite properly.
+ * @return string Error Message
+ */
+function lstool_no_htaccess() {
+  $error_message = '
+  <h1>
+    Incorrect drupal configuration for lstool
+  </h1>
+  <p>
+  The site administrator of this site has not altered the .htaccess-file in the
+  way specified by the README, or mod_rewrite is not activated.
+  </p>
+ ';
+  return $error_message;
+}

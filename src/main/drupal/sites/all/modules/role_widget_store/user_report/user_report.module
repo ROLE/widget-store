@@ -1,0 +1,185 @@
+<?php
+
+function _user_report_delete_views(){
+  require_once drupal_get_path('module', 'views') . '/views.module';
+  
+  $views = array();
+  
+  //get path to the rule export files
+  $path = drupal_get_path('module', 'user_report'). "/views/*.inc";
+  
+  $deleted = '';
+  $del = 0;
+  $fail = 0;
+  
+  //part taken from rules_admin_form_import_submit@rules_admin.export.inc
+  if (glob($path)) {
+  	foreach(glob($path) as $exported_view) {
+  		$filename = basename($exported_rule);
+  		$name = substr($filename, 0, strrpos($filename, '.'));
+  			
+  		eval(file_get_contents($exported_view));
+  
+  		if (isset($view) && is_object($view) ) {
+  			$view = views_ui_cache_load($view->name);
+		    $view->delete();
+		    views_object_cache_clear('view', $view->name);
+		    
+		    $deleted .= '<li><em>"'.$view->name.'"</em></li>';
+		    $del++;
+  		}
+  		else {
+  			$fail++;
+  		}		
+	    
+	    if($del > 0){
+	    	drupal_set_message($del.' Views deleted: <ul>'.$deleted.'</ul>');
+	    		
+		    if($failed > 0){
+		    	drupal_set_message(t('Deletion of '.$fail.' views failed.'), 'error');
+		    }
+	    }else{
+	    	drupal_set_message(t('Deletion of <u>all</u> views failed.'), 'error');
+	    }
+	    
+  	}
+  }
+	
+}
+
+
+/* ###################################################################################
+ * Drupal Hooks
+ * ###################################################################################
+ */
+
+/**
+ * Implementation of hook_enable().
+ *
+ * runs when enabling the module
+ */
+function user_report_enable() {
+  _user_report_import_cck_nodes();
+  //_user_report_import_rules();
+  //_widget_contest_create_specification_status_workflow();
+
+  //taxonmies are moved to the installation profile
+  //_widget_contest_create_taxonomies();
+
+  $widget_settings = 'a:23:{s:13:"default_value";a:1:{i:0;a:3:{s:3:"nid";N;s:14:"_error_element";s:53:"default_value_widget][field_bundle_tools][0][nid][nid";s:7:"actions";a:2:{s:6:"browse";s:6:"Browse";s:6:"remove";s:6:"Remove";}}}s:17:"default_value_php";N;s:18:"autocomplete_match";s:8:"contains";s:4:"size";s:2:"60";s:10:"create_ref";i:0;s:15:"content_preview";s:7:"preview";s:24:"content_preview_position";s:5:"below";s:12:"dialog_title";s:14:"Tools Explorer";s:9:"theme_css";s:8:"<module>";s:10:"dialog_api";s:10:"modalframe";s:18:"dialog_dialogClass";s:0:"";s:23:"dialog_bgiframe@boolean";s:1:"0";s:16:"dialog_width@int";s:3:"800";s:17:"dialog_height@int";s:3:"600";s:15:"dialog_position";s:6:"center";s:19:"dialog_minWidth@int";s:0:"";s:20:"dialog_minHeight@int";s:0:"";s:19:"dialog_maxWidth@int";s:0:"";s:20:"dialog_maxHeight@int";s:0:"";s:24:"dialog_draggable@boolean";s:1:"0";s:24:"dialog_resizable@boolean";s:1:"0";s:11:"dialog_show";s:4:"null";s:11:"dialog_hide";s:4:"null";}';
+  
+  db_query("UPDATE {content_node_field_instance} SET widget_settings = '%s' WHERE field_name = 'field_report_subject' AND type_name = 'user_report'", $widget_settings);
+}
+
+/**
+ * Implementation of hook_disable().
+ *
+ * runs when disabling the module
+ */
+function user_report_disable() {
+	//_user_report_delete_views();
+}
+
+/**
+ * Create new content types (using CCK)
+ */
+function _user_report_import_cck_nodes() {
+
+  //get path to the rule export files
+  $path = drupal_get_path('module', 'user_report') . "/content_types/*.inc";
+
+  //part taken from rules_admin_form_import_submit@rules_admin.export.inc
+  if (glob($path)) {
+    foreach (glob($path) as $exported_cck_node_type) {
+      $filename = basename($exported_cck_node_type);
+      $name = substr($filename, 0, strrpos($filename, '.'));
+
+      eval(file_get_contents($exported_cck_node_type));
+
+      if (isset($content) && is_array($content)) {
+
+        $form_state['values']['type_name'] = '<create>';
+        $form_state['values']['macro'] = '$content = '
+            . var_export($content, TRUE) . ';';
+
+        // form provided by content_copy.module
+        drupal_execute('content_copy_import_form', $form_state);
+        module_load_include('module', 'content');
+        content_clear_type_cache();
+
+        drupal_set_message(
+            t('Imported CCK node: %label.',
+                array(
+                  '%label' => $content['type']['name']
+                )));
+      } else {
+        drupal_set_message(t('Import of CCK nodes failed.'), 'error');
+      }
+
+    }
+  }
+}
+
+/**
+ * Implementation of hook_views_api().
+ * 
+ * Specifies the location of the views to import and triggers the import
+ */
+function user_report_views_api() {
+  return array(
+    'api' => '2', 'path' => drupal_get_path('module', 'user_report'),
+  );
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function user_report_form_alter(&$form, $form_state, $form_id) {
+    if (arg(2) != 'edit') {
+     //set the contest reference to the nid of the contest (3rd argument)
+      if (arg(3) != '') {
+        $form['field_report_subject'][0]['#default_value']['nid'] = arg(3);
+        
+        /*if($form['#parameters'][0] == 'user_report_node_form'){
+	        $subject = node_load(arg(3));
+       		$form['#parameters'][1]['post']['field_report_subject'][0]['nid']['nid'] = $subject->title.' [nid:'.$subject->nid.']';
+	    }*/
+      	//$form['#after_build'][] = '_user_report_specification_form_after_build';
+		//echo '<pre>' . print_r($form, true) . '</pre>';
+     }
+    }else{
+       //$form['#after_build'][] = '_user_report_specification_form_after_build';
+    }
+}
+
+/**
+ * Custom after_build callback handler for the widget specification form
+ */
+function _user_report_specification_form_after_build($form, &$form_state) {
+
+  //disable field widget contest
+  _user_report_fix_disabled($form['field_report_subject']);
+
+  return $form;
+}
+
+/**
+ * Recursively set the disabled attribute of a CCK field
+ * and all its dependent FAPI elements.
+ */
+function _user_report_fix_disabled(&$elements) {
+  foreach (element_children($elements) as $key) {
+    if (isset($elements[$key]) && $elements[$key]) {
+
+      // Recurse through all children elements.
+      _user_report_fix_disabled($elements[$key]);
+    }
+  }
+
+  if (!isset($elements['#attributes'])) {
+    $elements['#attributes'] = array();
+  }
+  $elements['#attributes']['disabled'] = 'disabled';
+}
+
+

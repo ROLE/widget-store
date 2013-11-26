@@ -1,0 +1,97 @@
+<?php
+/**
+ * @file
+ * Module installer.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function simplerdf_sparql_requirements($phase) {
+  if (file_exists($arc_file = './sites/all/libraries/arc/ARC2.php')) {
+    require_once $arc_file;
+  }
+
+  $t = get_t();
+
+  $requirements = array();
+  switch ($phase) {
+    case 'install':
+      if (!class_exists('ARC2')) {
+        // Missing ARC2
+        $requirements['simplerdf_sparql_arc2'] = array(
+          'title' => $t('Simple RDF SPARQL: ARC2'),
+          'description' => $t('The ARC2 library is missing. Please install it under the sites/all/libraries folder.'),
+          'severity' => REQUIREMENT_ERROR,
+        );
+      }
+      break;
+    case 'runtime':
+      if (class_exists('ARC2')) {
+        // Show ARC2 version
+        $requirements['simplerdf_sparql_arc2'] = array(
+          'title' => $t('Simple RDF SPARQL: ARC2'),
+          'value' => ARC2::getVersion(),
+          'severity' => REQUIREMENT_OK,
+        );
+      }
+      else {
+        // Missing ARC2
+        $requirements['simplerdf_sparql_arc2'] = array(
+          'title' => $t('Simple RDF SPARQL: ARC2'),
+          'value' => $t('Not found'),
+          'description' => $t('The ARC2 library is missing. Please install it under the sites/all/libraries folder.'),
+          'severity' => REQUIREMENT_ERROR,
+        );
+      }
+      break;
+  }
+  return $requirements;
+}
+
+/**
+ * Implements hook_disable().
+ */
+function simplerdf_sparql_disable() {
+  // Remove lock file
+  $lock_file = file_directory_path() . '/simplerdf_sparql/lock';
+  @unlink($lock_file);
+}
+
+/**
+ * Implements hook_install().
+ */
+function simplerdf_sparql_install() {
+  variable_set('simplerdf_sparql_reindex_auto', TRUE);
+  variable_set('simplerdf_sparql_path', 'simplerdf/sparql');
+  variable_set('simplerdf_sparql_menu_type', MENU_CALLBACK);
+  variable_set('simplerdf_sparql_arc2_read_key', NULL);
+  variable_set('simplerdf_sparql_arc2_write_key', md5(time()));  // Reasonably random string
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function simplerdf_sparql_uninstall() {
+  variable_del('simplerdf_sparql_reindex_auto');
+  variable_del('simplerdf_sparql_path');
+  variable_del('simplerdf_sparql_menu_type');
+  variable_del('simplerdf_sparql_arc2_read_key');
+  variable_del('simplerdf_sparql_arc2_write_key');
+
+  // Uninstall ARC2 tables if they exist
+  module_load_include('inc', 'simplerdf_sparql', 'simplerdf_sparql.store');
+  if ($store = simplerdf_sparql_store_get_store()) {
+    // Use ARC2 to uninstall
+    $store->drop();
+  }
+  elseif ($config = simplerdf_sparql_store_config()) {
+    // Uninstall known tables manually (might be incomplete)
+    $store_name = $config['store_name'];
+    foreach (array('triple', 'g2t', 'id2val', 's2val', 'o2val', 'setting') as $tbl) {
+      if (db_table_exists($table = db_escape_table($store_name . '_' . $tbl))) {
+        db_query("DROP TABLE $table");
+      }
+    }
+  }
+}

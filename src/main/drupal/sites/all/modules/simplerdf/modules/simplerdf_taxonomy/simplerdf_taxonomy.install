@@ -1,0 +1,75 @@
+<?php
+/**
+ * @file
+ * Module installer.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function simplerdf_taxonomy_schema() {
+  $t = get_t();
+
+  $schema['simplerdf_taxonomy_term'] = array(
+    'description' => $t('RDF extensions for taxonomy terms.'),
+
+    'fields' => array(
+      'tid' => array(
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => $t('Term ID, corresponds to a term in the {term_data} table.'),
+      ),
+      'remote_uri' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => $t('Term remote URI; a term with a remote URI is used in RDF as an external term for mapping.'),
+      ),
+    ),
+
+    'primary key' => array('tid'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function simplerdf_taxonomy_install() {
+  drupal_install_schema('simplerdf_taxonomy');
+  variable_set('simplerdf_rel_index', TRUE);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function simplerdf_taxonomy_uninstall() {
+  drupal_uninstall_schema('simplerdf_taxonomy');
+
+  // Clean taxonomy mappings
+  module_load_install('simplerdf');
+  simplerdf_install_delete_mappings('term');
+}
+
+/**
+ * Implements hook_update_N() for 6001.
+ * Trigger taxonomy term object relations indexing.
+ */
+function simplerdf_taxonomy_update_6001(&$sandbox) {
+  variable_set('simplerdf_taxonomy_rel_index', TRUE);
+  return array();
+}
+
+/**
+ * Implements hook_update_N() for 6002.
+ */
+function simplerdf_taxonomy_update_6002(&$sandbox) {
+  variable_del('simplerdf_taxonomy_rel_index');
+  variable_del('simplerdf_taxonomy_term_view_path');
+  // NOTE: mappings are moved by Simple RDF itself
+  return array();
+}

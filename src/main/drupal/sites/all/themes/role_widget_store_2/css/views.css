@@ -1,0 +1,1055 @@
+/* Color adjustments
+-------------------------------------------------------------- */
+
+
+
+
+
+/* Frontpage Panel
+-------------------------------------------------------------- */
+
+.panels-flexible-column.homepage_2_1{
+  width: 630px;
+}
+
+.panels-flexible-column.homepage_2_2{
+  width: 310px;
+}
+
+.panels-flexible-column.homepage_3_1,
+.panels-flexible-column.homepage_3_2{
+  width: 470px;
+}
+
+.panels-flexible-column.homepage_2_1 .panels-flexible-region,
+.panels-flexible-column.homepage_2_2 .panels-flexible-region,
+.panels-flexible-column.homepage_3_1 .panels-flexible-region,
+.panels-flexible-column.homepage_3_2 .panels-flexible-region{
+  width:100%;
+}
+
+
+/* Frontpage Slider
+-------------------------------------------------------------- */
+
+.view-frontpage-slider .nivo-caption{
+  background: transparent;
+  
+  position: absolute;
+  left: 0px;
+  bottom: 46px;
+}
+
+.nivo-caption p {
+  padding: 0;
+}
+
+.view-frontpage-slider .nivo-caption .frontpage-slider-title{
+  height: 60px;
+  width: 297px;
+  float: left;
+  
+  margin: 0 5px 0 2px;
+  
+  background: url("../images/slider-title-background.png");
+  
+  position:relative;
+}
+
+.view-frontpage-slider .nivo-caption .frontpage-slider-title a:link,
+.view-frontpage-slider .nivo-caption .frontpage-slider-title a:visited,
+.view-frontpage-slider .nivo-caption .frontpage-slider-title a:hover,
+.view-frontpage-slider .nivo-caption .frontpage-slider-title a:active{
+  position:absolute;
+  bottom: 10px;
+  right: 20px;
+  
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  text-decoration: none;
+}
+
+.view-frontpage-slider .nivo-caption .frontpage-slider-description{ 
+  height: 60px;
+  width: 634px;
+  
+  float: left;
+  position:relative;
+  margin: 0 2px 0 0px;
+  
+  background: url("../images/slider-description-background.png");
+
+}
+
+.view-frontpage-slider .nivo-caption .frontpage-slider-description p{ 
+  width: 594px;
+  
+  position:absolute;
+  bottom: 10px;
+  left: 20px;
+  
+  font-size: 12px;
+  color: #333;
+  line-height: 1.3em;
+}
+
+
+.view-frontpage-slider .nivo-controlNav {
+  position: absolute;
+  left: 47%;
+  bottom: 10px;
+}
+
+.view-frontpage-slider .nivo-controlNav a {
+  display: block;
+  width: 10px;
+  height: 10px;
+  background: url("../images/slider-item-menu.png") no-repeat;
+  text-indent: -9999px;
+  border: 0;
+  margin-right: 3px;
+  float: left;
+}
+
+.view-frontpage-slider .nivo-controlNav a.active {
+  background: url("../images/slider-item-menu-active.png") no-repeat;
+}
+
+.view-frontpage-slider .nivo-directionNav{
+  display:none;
+}
+
+/* Frontpage Tool list
+-------------------------------------------------------------- */
+
+.pane-frontpage-tool-list h2,
+.pane-frontpage-bundle-list h2{
+  width:450px;
+  height:28px;
+  
+  display:block;
+  padding: 13px 0 0 10px;
+  margin: 0;
+
+  
+  
+  font-size: 12px;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.pane-frontpage-tool-list h2{
+  background: url("../images/frontpage_tool_list_header.png") no-repeat;
+}
+
+.pane-frontpage-bundle-list h2{
+  background: url("../images/frontpage_bundle_list_header.png") no-repeat;
+}
+
+.pane-frontpage-tool-list h2 span,
+.pane-frontpage-bundle-list h2 span{
+  font-size: 18px;
+  color: #333;
+  padding-left: 10px;
+}
+
+.view-frontpage-tool-list .view-content,
+.view-frontpage-bundle-list .view-content{
+  width:440px;
+  height:300px;
+  
+  padding: 10px 10px 0 10px;
+}
+
+.view-frontpage-tool-list .view-content{
+  border-bottom: #6A970C solid 2px;
+}
+  
+.view-frontpage-bundle-list .view-content{
+ border-bottom: #336699 solid 2px;
+}
+  
+.view-frontpage-tool-list .view-content{
+  background: url("../images/frontpage_tool_list_body.png") no-repeat bottom; 
+}
+.view-frontpage-bundle-list .view-content{
+  background: url("../images/frontpage_bundle_list_body.png") no-repeat bottom; 
+}
+
+.view-frontpage-tool-list .item-list ul,
+.view-frontpage-bundle-list .item-list ul{
+  padding: 0;
+}
+
+.view-frontpage-tool-list .item-list ul li,
+.view-frontpage-bundle-list .item-list ul li{
+  height: 150px;
+  
+  list-style: none;
+  overflow: hidden;
+}
+
+.view-frontpage-tool-list .views-field-field-thumbnail-fid,
+.view-frontpage-bundle-list .views-field-field-thumbnail-fid{
+  width:110px;
+  height:110px;
+  
+  float:left;
+  position: static;  
+  display:table;    
+}
+
+.view-frontpage-tool-list .views-field-field-thumbnail-fid .field-content,
+.view-frontpage-bundle-list .views-field-field-thumbnail-fid .field-content{
+  width: 100%; 
+  height:110px;
+  
+  display: table-cell; 
+  vertical-align: middle;   
+  position: static; 
+}
+
+.view-frontpage-tool-list .views-field-type,
+.view-frontpage-tool-list .views-field-title,
+.view-frontpage-tool-list .views-field-body,
+.view-frontpage-tool-list .views-field-view-node,
+.view-frontpage-bundle-list .views-field-type,
+.view-frontpage-bundle-list .views-field-title,
+.view-frontpage-bundle-list .views-field-field-bundle-short-description-value,
+.view-frontpage-bundle-list .views-field-view-node{
+  margin-left: 140px;
+}
+
+.view-frontpage-tool-list .views-field-type .lstool_opensocial,
+.view-frontpage-tool-list .views-field-type .lstool_w3c,
+.view-frontpage-tool-list .views-field-type .web_tool{
+  height:18px;
+  
+  padding:12px 0 0 40px;
+  
+  color: #608F30;
+  text-transform: uppercase; 
+  font-weight: bold;
+}
+
+.view-frontpage-tool-list .views-field-type .lstool_opensocial{
+  background: url("../images/icon_opensocial.png") no-repeat;
+}
+
+.view-frontpage-tool-list .views-field-type .lstool_w3c{
+  background: url("../images/icon_w3c.png") no-repeat;
+}
+
+.view-frontpage-tool-list .views-field-type .web_tool{
+  background: url("../images/icon_webtool.png") no-repeat;
+}
+
+.view-frontpage-bundle-list .views-field-type .bundle{
+  height:18px;
+  
+  padding:12px 0 0 85px;
+  
+  color: #336699;
+  text-transform: uppercase; 
+  font-weight: bold;
+  
+  background: url("../images/icon_bundle.png") no-repeat;
+}
+
+.view-frontpage-tool-list .views-field-title a:link,
+.view-frontpage-tool-list .views-field-title a:visited,
+.view-frontpage-tool-list .views-field-title a:hover,
+.view-frontpage-bundle-list .views-field-title a:link,
+.view-frontpage-bundle-list .views-field-title a:visited,
+.view-frontpage-bundle-list .views-field-title a:hover{
+  
+  color: #333333;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.view-frontpage-tool-list .views-field-view-node,
+.view-frontpage-bundle-list .views-field-view-node{
+  text-align: right;
+}
+
+.view-frontpage-tool-list .views-field-view-node a:link,
+.view-frontpage-tool-list .views-field-view-node a:visited,
+.view-frontpage-tool-list .views-field-view-node a:hover,
+.view-frontpage-bundle-list .views-field-view-node a:link,
+.view-frontpage-bundle-list .views-field-view-node a:visited,
+.view-frontpage-bundle-list .views-field-view-node a:hover{
+  font-weight: bold;
+  color: #333;
+  background: url("../images/list-style-image.png") no-repeat 0px 2px;
+  padding-left: 15px;
+  width: auto;
+}
+
+.view-frontpage-tool-list .pager .pager-next,
+.view-frontpage-tool-list .pager .pager-last,
+.view-frontpage-tool-list .pager .pager-first,
+.view-frontpage-tool-list .pager .pager-previous,
+.view-frontpage-bundle-list .pager .pager-next,
+.view-frontpage-bundle-list .pager .pager-last,
+.view-frontpage-bundle-list .pager .pager-first,
+.view-frontpage-bundle-list .pager .pager-previous{
+  display: none;
+}
+
+.view-frontpage-tool-list .pager,
+.view-frontpage-bundle-list .pager{
+  width: 290px;
+  height:20px;
+  
+  float: right;
+  margin-right: 20px;
+   
+  text-align: right;
+}
+
+.view-frontpage-tool-list .pager{
+  background: url("../images/frontpage_tool_list_pager.png");
+}
+.view-frontpage-bundle-list .pager{
+  background: url("../images/frontpage_bundle_list_pager.png");
+}
+
+
+.view-frontpage-tool-list .pager .pager-item,
+.view-frontpage-tool-list .pager .pager-current,
+.view-frontpage-bundle-list .pager .pager-item,
+.view-frontpage-bundle-list .pager .pager-current{
+  width: 10px;
+  height: 10px;
+  
+  display: inline-block;
+  padding:0;
+  margin:0px 6px 0 0;
+  
+  background: url("../images/pager_item.png") no-repeat;
+  border: none;
+  
+  text-indent: 9999px;
+}
+
+.view-frontpage-tool-list .pager .pager-item a,
+.view-frontpage-bundle-list .pager .pager-item a{
+  width: 10px;
+  height: 10px;
+  
+  display: block;
+  
+  border: none;
+  
+}
+
+
+.view-frontpage-tool-list .pager .pager-current,
+.view-frontpage-tool-list .pager .pager-item a:hover,
+.view-frontpage-bundle-list .pager .pager-current,
+.view-frontpage-bundle-list .pager .pager-item a:hover{
+  background: url("../images/pager_item_current.png") no-repeat;
+}
+
+
+.ui-tabs-panel .view{
+  height: 100%;
+  overflow-y: scroll;
+}
+
+/* Profile tool/bundle list
+-------------------------------------------------------------- */
+.ui-tabs-panel .view{
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.ui-tabs-panel .view-content{
+  padding: 0 10px 0 10px;
+}
+
+.ui-tabs-panel .views-table{
+  color: #FFFFFF;
+}
+
+.ui-tabs-panel .views-table a{
+  color: #FFFFFF;
+}
+
+.ui-tabs-panel .views-table tr.odd,
+.ui-tabs-panel .views-table tr.even{
+  height: 100px;
+  
+  background: none;
+  background: url("../images/list_item_background.png") no-repeat;
+}
+
+.ui-tabs-panel .views-table tr.odd td,
+.ui-tabs-panel .views-table tr.even td{
+  height: 100px;
+  
+  padding-bottom: 10px;
+  
+  background: none;
+  border: 0; 
+}
+
+.ui-tabs-panel .views-table .views-row-first{
+  padding-top: 12px;
+}
+
+.ui-tabs-panel .views-table th,
+.ui-tabs-panel .views-table tr{
+  border: 0;
+  padding:0;
+}
+
+.ui-tabs-panel .views-table thead{
+  border-bottom: 2px solid #588E30;
+  color: #588E30;
+}
+
+.ui-tabs-panel .views-table .views-field-field-thumbnail-fid{
+  width:128px;
+  padding-right:10px;
+  text-align: center;
+}
+
+.ui-tabs-panel .views-table .views-field-title{
+  width:auto;
+  padding-right:10px;
+  padding-left:10px;
+}
+
+.ui-tabs-panel .views-table .views-field-changed,
+.ui-tabs-panel .views-table .views-field-value{
+  width:140px;
+  padding-right:10px;
+  padding-left:10px;
+}
+
+.ui-tabs-panel .views-table .views-field-status{
+  width:60px;
+  padding-right:10px;
+  padding-left:10px;
+}
+.ui-tabs-panel .views-table .views-field-comment-count{
+  width:128px;
+  padding-left:10px;
+}
+
+/* color changes for bundles and tools */
+.ui-tabs-panel .light-green-table .views-table thead{
+  border-bottom: 2px solid #6A970C;
+  color: #6A970C;
+}
+
+.ui-tabs-panel .blue-table .views-table thead{
+  border-bottom: 2px solid #A3C0DF;
+  color: #A3C0DF;
+}
+
+/* Tool category list
+-------------------------------------------------------------- */
+.view-tool-categories ul{
+  list-style: none;
+  padding: 0;
+}
+
+.view-tool-categories ul li{
+  list-style: none;
+}
+
+
+.view-tool-categories .views-field-description a:link,
+.view-tool-categories .views-field-description a:visited{
+  height: 240px;
+  width: 260px;
+  
+  padding: 30px 20px;
+  margin-right:20px;
+  margin-bottom:20px;
+  float: left;
+  display: block;
+  position: relative;
+  
+  background: url("../images/tool_category_default.png");
+}
+
+.view-tool-categories .views-row-3 .views-field-description a:link,
+.view-tool-categories .views-row-3 .views-field-description a:visited,
+.view-tool-categories .views-row-6 .views-field-description a:link,
+.view-tool-categories .views-row-6 .views-field-description a:visited,
+.view-tool-categories .views-row-9 .views-field-description a:link,
+.view-tool-categories .views-row-9 .views-field-description a:visited{
+  margin-right:0px;
+}
+
+.view-tool-categories .views-field-description a h2{
+  text-transform: uppercase;
+}
+
+.view-tool-categories .views-field-description a .term-description{
+  width:170px;
+  
+  display:block;
+  position: absolute;
+  top: 100px;
+  left: 20px;
+  color: #999;
+}
+
+.view-tool-categories .views-field-description a:hover,
+.view-tool-categories .views-field-description a:active{
+  background: url("../images/tool_category_default_hover.png");
+  
+  text-decoration: none;
+}
+
+.view-tool-categories .views-field-description a:hover h2,
+.view-tool-categories .views-field-description a:active h2{
+  color: #6A970C;
+}
+
+.view-tool-categories .views-field-description a:hover .term-description,
+.view-tool-categories .views-field-description a:active .term-description{
+  color: #333333;
+}
+
+.view-tool-categories .views-field-description a.plan_organise:link,
+.view-tool-categories .views-field-description a.plan_organise:visited{
+  background: url("../images/tool_category_plan_organise.png");
+}
+
+.view-tool-categories .views-field-description a.plan_organise:hover,
+.view-tool-categories .views-field-description a.plan_organise:active{
+  background: url("../images/tool_category_plan_organise_hover.png");
+}
+
+.view-tool-categories .views-field-description a.search_get_recommendation:link,
+.view-tool-categories .views-field-description a.search_get_recommendation:visited{
+  background: url("../images/tool_category_search_recommendations.png");
+}
+
+.view-tool-categories .views-field-description a.search_get_recommendation:hover,
+.view-tool-categories .views-field-description a.search_get_recommendation:active{
+  background: url("../images/tool_category_search_recommendations_hover.png");
+}
+.view-tool-categories .views-field-description a.collaborate_communicate:link,
+.view-tool-categories .views-field-description a.collaborate_communicate:visited{
+  background: url("../images/tool_category_collaborate_communicate.png");
+}
+
+.view-tool-categories .views-field-description a.collaborate_communicate:hover,
+.view-tool-categories .views-field-description a.collaborate_communicate:active{
+  background: url("../images/tool_category_collaborate_communicate_hover.png");
+}
+
+.view-tool-categories .views-field-description a.explore_view:link,
+.view-tool-categories .views-field-description a.explore_view:visited{
+  background: url("../images/tool_category_explore_view.png");
+}
+
+.view-tool-categories .views-field-description a.explore_view:hover,
+.view-tool-categories .views-field-description a.explore_view:active{
+  background: url("../images/tool_category_explore_view_hover.png");
+}
+
+.view-tool-categories .views-field-description a.train_test:link,
+.view-tool-categories .views-field-description a.train_test:visited{
+  background: url("../images/tool_category_train_test.png");
+}
+
+.view-tool-categories .views-field-description a.train_test:hover,
+.view-tool-categories .views-field-description a.train_test:active{
+  background: url("../images/tool_category_train_test_hover.png");
+}
+
+.view-tool-categories .views-field-description a.create_manipulate:link,
+.view-tool-categories .views-field-description a.create_manipulate:visited{
+  background: url("../images/tool_category_create_manipulate.png");
+}
+
+.view-tool-categories .views-field-description a.create_manipulate:hover,
+.view-tool-categories .views-field-description a.create_manipulate:active{
+  background: url("../images/tool_category_create_manipulate_hover.png");
+}
+
+.view-tool-categories .views-field-description a.reflect_evaluate:link,
+.view-tool-categories .views-field-description a.reflect_evaluate:visited{
+  background: url("../images/tool_category_reflect_evaluate.png");
+}
+
+.view-tool-categories .views-field-description a.reflect_evaluate:hover,
+.view-tool-categories .views-field-description a.reflect_evaluate:active{
+  background: url("../images/tool_category_reflect_evaluate_hover.png");
+}
+
+.view-tool-categories .views-field-description a.developer_tools:link,
+.view-tool-categories .views-field-description a.developer_tools:visited{
+  background: url("../images/tool_category_developer.png");
+}
+
+.view-tool-categories .views-field-description a.developer_tools:hover,
+.view-tool-categories .views-field-description a.developer_tools:active{
+  background: url("../images/tool_category_developer_hover.png");
+}
+
+.view-tool-categories .views-field-description a.demo:link,
+.view-tool-categories .views-field-description a.demo:visited{
+  background: url("../images/tool_category_demo.png");
+}
+
+.view-tool-categories .views-field-description a.demo:hover,
+.view-tool-categories .views-field-description a.demo:active{
+  background: url("../images/tool_category_demo_hover.png");
+}
+
+
+/* ------------------------------------------------------------------------
+ * View: jcarousel
+ * ------------------------------------------------------------------------
+ */ 
+
+
+.view-content .jcarousel-container {
+  margin: auto;
+  text-align: center;
+}
+
+.view-content .jcarousel-container-horizontal {
+  width: 100%;
+  height: 400px;
+  padding: 0px 0px;
+}
+
+.view-content .jcarousel-container-vertical {
+  width: 102px;
+  height: 440px;
+  padding: 40px 20px;
+}
+
+.view-content .jcarousel-navigation-before {
+  padding-top: 30px;
+}
+
+.view-content .jcarousel-navigation-after {
+  padding-bottom: 30px;
+}
+
+.view-content .jcarousel-clip-horizontal {
+  width: auto;
+  overflow: hidden;
+  margin: 0 0px 0 0px;
+  height: 400px;
+}
+
+.view-content .jcarousel-clip-vertical {
+  height: 440px;
+  overflow: hidden;
+}
+
+.view-content .jcarousel-item {
+  padding: 0;
+  height: 400px;
+  overflow: hidden;
+  list-style: none;
+}
+
+.view-content .jcarousel-item-horizontal {
+  margin: 0 auto;
+  position: relative;
+}
+
+/* width adjustment */
+.grid12-8-inner .view-content .jcarousel-item-horizontal{
+  width: 596px !important;
+  
+}
+
+.view-content .jcarousel-item-vertical {
+  margin: 4px 0;
+}
+
+.view-content .jcarousel-item-placeholder {
+  background: url(../images/throbber.gif) no-repeat center center;
+  color: #000;
+}
+
+.view-content .jcarousel-item-horizontal .views-field-field-idea-images-fid,
+.view-content .jcarousel-item-horizontal .views-field-field-screenshot-mockups-fid,
+.view-content .jcarousel-item-horizontal .views-field-field-screenshots-fid
+  {
+  /*display: inline-block;*/
+  vertical-align: middle;
+}
+
+.view-content .jcarousel-item-horizontal .views-field-field-idea-images-data,
+.view-content .jcarousel-item-horizontal .views-field-field-screenshot-mockups-data,
+.view-content .jcarousel-item-horizontal .views-field-field-screenshots-data
+  {
+  /*width: 200px;*/
+  
+  display: inline-block;
+  vertical-align: middle;
+  padding: 3px 10px 20px 10px;
+  
+  /*border: 1px solid #999999;*/
+  
+  text-align: left;
+  color: #fff; 
+}
+
+/**
+ * Buttons
+ */
+.view-content .jcarousel-next,.view-content .jcarousel-prev {
+  display: block;
+  width: 30px;
+  height: 120px;
+}
+
+/**
+ *  Horizontal Buttons
+ */
+.view-content .jcarousel-prev-horizontal {
+  position: absolute;
+  top: 120px;
+  left: 0px;
+  background: url(../images/button_slider_left.png) no-repeat left center;
+  display: block;
+}
+
+.view-content .jcarousel-prev-horizontal:hover {
+  background: url(../images/button_slider_left_hover.png) no-repeat left;
+}
+
+.view-content .jcarousel-prev-horizontal:active {
+  background: url(../images/button_slider_hover.png) no-repeat left center;
+}
+
+.view-content .jcarousel-prev-disabled-horizontal,.view-content .jcarousel-prev-disabled-horizontal:hover,.view-content .jcarousel-prev-disabled-horizontal:active
+  {
+  cursor: default;
+  background: none;
+}
+
+.view-content .jcarousel-next-horizontal {
+  position: absolute;
+  top: 120px;
+  right: 0px;
+  background: url(../images/button_slider_right.png) no-repeat right
+    center ;
+  display: block;
+}
+
+.view-content .jcarousel-next-horizontal:hover {
+  background: url(../images/button_slider_right_hover.png) no-repeat right center;
+}
+
+.view-content .jcarousel-next-horizontal:active {
+  background: url(../images/button_slider_right_hover.png) no-repeat right center;
+}
+
+.view-content .jcarousel-next-disabled-horizontal,.view-content .jcarousel-next-disabled-horizontal:hover,.view-content .jcarousel-next-disabled-horizontal:active
+  {
+  cursor: default;
+  background: none;
+}
+
+/* ------------------------------------------------------------------------
+ * View: Recommendation Block
+ * ------------------------------------------------------------------------
+ */ 
+
+.above-comments .block-apachesolr h2{
+  
+  padding: 0 10px 5px 10px;
+   margin-bottom: 0;
+  
+  border-bottom: 2px solid #6A970C;
+  
+}
+
+.above-comments .block-apachesolr .view-content{
+  height:300px;
+  
+  padding: 10px 0px 0 0px; 
+}
+
+.above-comments .block-apachesolr .view-content{
+  height: 190px;
+  
+  border-bottom: #6A970C solid 2px;
+  background: url("../images/frontpage_tool_list_body.png") bottom repeat-x;
+}
+  
+  
+.above-comments .block-apachesolr .item-list ul{
+  padding: 0;
+}
+
+.above-comments .block-apachesolr .item-list ul li{
+  /*width: 140px;*/
+  /*height: 160px;*/
+  
+  float: left;
+  margin: 0 10px 0 10px;
+  
+  list-style: none;
+  overflow: hidden;
+}
+
+.above-comments .block-apachesolr .item-list ul li.views-row-first{
+  margin-left: 0;
+}
+  
+.above-comments .block-apachesolr .item-list ul li.views-row-last{
+  margin-right: 0;
+}
+
+.above-comments .block-apachesolr .views-field-title{
+  width: 120px;
+  
+  padding: 0 10px 0 10px;
+  
+  text-align: center;
+}
+
+.above-comments .block-apachesolr .views-field-title a:link,
+.above-comments .block-apachesolr .views-field-title a:visited{
+  color: #333;
+}
+
+.above-comments .block-apachesolr .pager .pager-next,
+.above-comments .block-apachesolr .pager .pager-last,
+.above-comments .block-apachesolr .pager .pager-first,
+.above-comments .block-apachesolr .pager .pager-previous{
+  display: none;
+}
+
+.above-comments .block-apachesolr .pager{
+  width: 290px;
+  height:20px;
+  
+  float: right;
+  margin-right: 20px;
+   
+  text-align: right;
+}
+
+.above-comments .block-apachesolr .pager{
+  background: url("../images/frontpage_tool_list_pager.png");
+}
+
+.above-comments .block-apachesolr ul.pager li{
+  float: none;
+  margin:0;
+}
+
+.above-comments .block-apachesolr .pager .pager-item a,
+.above-comments .block-apachesolr .pager .pager-current{
+  width: 10px;
+  height: 10px;
+  
+  display: inline-block;
+  padding:0;
+  margin:4px 6px 0 0;
+  
+  background: url("../images/pager_item.png") no-repeat;
+  border: none;
+  
+  text-indent: 9999px;
+}
+
+.above-comments .block-apachesolr .pager .pager-current,
+.above-comments .block-apachesolr .pager .pager-item a:hover{
+  background: url("../images/pager_item_current.png") no-repeat;
+}
+
+/*
+ * Bundle Tools View
+ ------------------------------------------------------------------------------*/
+div.view-node-bundle-tool-list{
+  height: 100%;
+  
+  overflow-y: scroll;
+}
+
+
+.view-node-bundle-tool-list ul{
+  list-style: none;
+  padding: 0;
+}
+
+.view-node-bundle-tool-list ul li{
+  height: 90px;
+  width: 100%;
+  
+  margin-bottom:20px;
+  padding-top: 10px;
+  
+  clear:both;
+  list-style: none;
+  background: url("../images/list_item_background.png") no-repeat;  
+}
+
+.view-node-bundle-tool-list ul li .views-field-field-thumbnail-fid{
+  
+  float: left;
+  padding: 0 10px 10px 10px;
+}
+
+.view-node-bundle-tool-list ul li .views-field-title a:link,
+.view-node-bundle-tool-list ul li .views-field-title a:visited{
+   
+   font-weight: bold; 
+}
+
+.view-node-bundle-tool-list ul li .views-field-field-bundle-tool-activity-value{
+  color: #FFFFFF;
+}
+/*
+ * Bundle Screencast View
+ ------------------------------------------------------------------------------*/
+.view-node-generic-screencast-slider .views-field-field-screencasts-embed{
+  padding-top:20px;
+}
+
+/*
+ * Bundle learning resources View
+ ------------------------------------------------------------------------------*/
+div.view-node-bundle-learning-resources{
+  height: 100%;
+  overflow-y: scroll;
+}
+
+
+.view-node-bundle-learning-resources ul{
+  list-style: none;
+  padding: 0;
+}
+
+.view-node-bundle-learning-resources ul li{
+  height: 90px;
+  width: 100%;
+  
+  margin-bottom:20px;
+  padding-top: 10px;
+  
+  clear:both;
+  list-style: none;
+  background: url("../images/list_item_background.png") no-repeat;  
+}
+
+.view-node-bundle-learning-resources ul li .filefield-file img{
+  width: 80px;
+  height: 80px;
+  
+  float: left;
+  padding: 0 10px 10px 10px; 
+}
+
+.view-node-bundle-learning-resources ul li .filefield-file a{
+  display:none
+}
+
+.view-node-bundle-learning-resources ul li .filefield-file a.filefield-icon{
+  display:block;
+}
+
+.view-node-bundle-learning-resources ul li .views-field-field-additional-content-video-embed img{
+  height: 60px;
+  width: 80px;
+  
+  float: left;
+  padding: 10px 10px 10px 10px;  
+}
+
+.view-node-bundle-learning-resources ul li .views-field-field-additional-content-image-fid img{
+ 
+  float: left;
+  padding: 0px 10px 10px 10px;
+}
+
+.view-node-bundle-learning-resources ul li .views-field-field-additional-content-title-value{
+  color: #6699CC;
+  font-weight: bold;
+}
+
+.view-node-bundle-learning-resources ul li .views-field-field-additional-content-descrip-value{
+  color: #FFFFFF;
+}
+
+.view-node-bundle-learning-resources ul li .views-field-field-additional-content-link-url a{
+  width: 80px;
+  height: 80px;
+  
+  float: left;
+  padding: 0 10px 10px 10px;
+  
+  background: url("../images/link_icon.png") no-repeat 10px 0px;
+  
+  text-indent: -9999px;
+}
+
+/*
+ * USer report view
+ ------------------------------------------------------------------------------*/
+div.view-node-generic-user-report-list{
+  height: 100%;
+  
+  overflow-y: scroll;
+}
+
+
+.view-node-generic-user-report-list ul{
+  list-style: none;
+  padding: 0;
+}
+
+.view-node-generic-user-report-list ul li{
+  height: 90px;
+  width: 100%;
+  
+  margin-bottom:20px;
+  padding-top: 10px;
+  
+  clear:both;
+  list-style: none;
+  background: url("../images/list_item_background.png") no-repeat;  
+}
+
+.view-node-generic-user-report-list ul li .views-field-picture{
+  
+  float: left;
+  padding: 0 10px 10px 10px;
+}
+
+.view-node-generic-user-report-list ul li .views-field-title a:link,
+.view-node-generic-user-report-list ul li .views-field-title a:visited{
+   
+   font-weight: bold; 
+}
+
+.view-node-generic-user-report-list ul li .views-field-body{
+  color: #FFFFFF;
+}
+
+
+.view-showcase-tools .node.teaser,
+.view-showcase-bundles .node.teaser{
+  margin-bottom: 10px;
+}
+
+.view-showcase-tools .node.teaser .grid12-3-inner,
+.view-showcase-bundles .node.teaser .grid12-3-inner{
+  width: 460px;
+}
+
+.view-showcase-user-reports .views-field-field-short-description-value{
+  padding-bottom: 20px;
+}

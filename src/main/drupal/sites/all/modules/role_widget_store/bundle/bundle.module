@@ -1,0 +1,299 @@
+<?php
+
+/* ###################################################################################
+ * Drupal Hooks
+ * ###################################################################################
+ */
+
+/**
+ * Implementation of hook_enable().
+ *
+ * runs when enabling the module
+ */
+function bundle_enable() {
+  _bundle_import_cck_nodes();
+
+  
+  //DD: HACK the cck node reference explorer field does not export/import its settings correctly 
+  //these must be added after the cck import
+  $widget_settings = 'a:24:{s:9:"multistep";N;s:13:"default_value";a:1:{i:0;a:3:{s:3:"nid";N;s:14:"_error_element";s:52:"default_value_widget][field_bundle_tool][0][nid][nid";s:7:"actions";a:2:{s:6:"browse";s:6:"Browse";s:6:"remove";s:6:"Remove";}}}s:17:"default_value_php";N;s:18:"autocomplete_match";s:8:"contains";s:4:"size";s:2:"60";s:10:"create_ref";i:0;s:15:"content_preview";s:7:"preview";s:24:"content_preview_position";s:5:"below";s:12:"dialog_title";s:13:"Tool Explorer";s:9:"theme_css";s:8:"<module>";s:10:"dialog_api";s:10:"modalframe";s:18:"dialog_dialogClass";s:0:"";s:23:"dialog_bgiframe@boolean";s:1:"0";s:16:"dialog_width@int";s:3:"800";s:17:"dialog_height@int";s:3:"600";s:15:"dialog_position";s:6:"center";s:19:"dialog_minWidth@int";s:0:"";s:20:"dialog_minHeight@int";s:0:"";s:19:"dialog_maxWidth@int";s:0:"";s:20:"dialog_maxHeight@int";s:0:"";s:24:"dialog_draggable@boolean";s:1:"0";s:24:"dialog_resizable@boolean";s:1:"0";s:11:"dialog_show";s:4:"null";s:11:"dialog_hide";s:4:"null";}';
+  $field_name = "field_bundle_tool";
+  $type_name = "bundle";
+    
+  $query = "UPDATE {content_node_field_instance} SET widget_settings = '%s' WHERE field_name = '%s' AND type_name = '%s'";
+  
+  db_query($query, $widget_settings, $field_name, $type_name);
+
+  /*Configure Multistep extra fields*/
+
+	variable_set("multistep_extra_author_bundle", '0');
+	variable_set("multistep_extra_body_field_bundle", '2');
+	variable_set("multistep_extra_comment_settings_bundle", '0');
+	variable_set("multistep_extra_detailed_question_bundle", '0');
+	variable_set("multistep_extra_menu_bundle", '0');
+	variable_set("multistep_extra_options_bundle", '0');
+	variable_set("multistep_extra_path_bundle", '0');
+	variable_set("multistep_extra_revision_information_bundle", '0');
+	variable_set("multistep_extra_taxonomy_3_bundle", '5');
+	variable_set("multistep_extra_title_bundle", '1');
+	variable_set("multistep_extra_workflow_bundle", '0');;
+  
+}
+
+/**
+ * Implementation of hook_disable().
+ *
+ * runs when disabling the module
+ */
+function bundle_disable() {
+
+  //DO NOT delete content types automatically
+  //_widget_contest_delete_cck_nodes();
+}
+
+/**
+ * Implementation of hook_views_api().
+ * 
+ * Specifies the location of the views to import and triggers the import
+ */
+function bundle_views_api() {
+  return array(
+    'api' => '2', 'path' => drupal_get_path('module', 'bundle'),
+  );
+}
+
+function bundle_perm() {
+  $perms = array();
+
+  return $perms;
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function bundle_form_alter(&$form, $form_state, $form_id) {
+   drupal_add_js(drupal_get_path('module', 'bundle').'/js/bundle_artefacts.js');
+	
+  // a switch structure can be used if you have a lot of forms that need altering
+  if($form_id ==  'bundle_node_form') {
+    // node form for content type
+    $form['#after_build'][] = '_bundle_form_after_build';  // form_after_build being a custom callback method
+  }
+}
+
+/**
+ *  Implementation of hook_default_presets().
+ *
+ *  Imports all default presets
+ */
+function bundle_imagecache_default_presets() {
+  $presets = array();
+
+  $presets['bundle_400x400'] = array(
+      'presetname' => 'bundle_400x400',
+      'actions' => array(
+          0 => array(
+              'weight' => '0', 'module' => 'imagecache_coloractions',
+              'action' => 'imagecache_convert',
+              'data' => array(
+                'format' => 'image/png', 'width' => '1280',
+              ),
+          ),
+          1 => array(
+              'weight' => '1', 'module' => 'imagecache',
+              'action' => 'imagecache_scale',
+              'data' => array(
+                'width' => '400', 'height' => '400', 'upscale' => '1',
+              ),
+          ),
+          2 => array(
+              'weight' => '2', 'module' => 'imagecache_canvasactions',
+              'action' => 'canvasactions_definecanvas',
+              'data' => array(
+                  'RGB' => array(
+                    'HEX' => '',
+                  ), 'under' => TRUE,
+                  'exact' => array(
+                      'width' => '400', 'height' => '400', 'xpos' => 'right',
+                      'ypos' => 'center',
+                  ),
+                  'relative' => array(
+                      'leftdiff' => '', 'rightdiff' => '', 'topdiff' => '',
+                      'bottomdiff' => '',
+                  ),
+              ),
+          ),
+      ),
+  );// end bundle400x400
+
+  $presets['bundle_list_50x50'] = array(
+      'presetname' => 'bundle_list_50x50',
+      'actions' => array(
+          0 => array(
+              'weight' => '0', 'module' => 'imagecache_coloractions',
+              'action' => 'imagecache_convert',
+              'data' => array(
+                'format' => 'image/png', 'width' => '1280',
+              ),
+          ),
+          1 => array(
+              'weight' => '1', 'module' => 'imagecache',
+              'action' => 'imagecache_scale',
+              'data' => array(
+                'width' => '48', 'height' => '48', 'upscale' => '1',
+              ),
+          ),
+          2 => array(
+              'weight' => '2', 'module' => 'imagecache_canvasactions',
+              'action' => 'canvasactions_roundedcorners',
+              'data' => array(
+                  'radius' => '5',
+                  'independent_corners_set' => array(
+                      'independent_corners' => '0',
+                      'radii' => array(
+                        'tl' => '0', 'tr' => '0', 'bl' => '0', 'br' => '0',
+                      ),
+                  ),
+              ),
+          ),
+          3 => array(
+              'weight' => '3', 'module' => 'imagecache_canvasactions',
+              'action' => 'canvasactions_definecanvas',
+              'data' => array(
+                  'RGB' => array(
+                    'HEX' => '#333333',
+                  ), 'under' => TRUE,
+                  'exact' => array(
+                    'width' => '', 'height' => '', 'xpos' => '', 'ypos' => '',
+                  ),
+                  'relative' => array(
+                      'leftdiff' => '1', 'rightdiff' => '1', 'topdiff' => '1',
+                      'bottomdiff' => '1',
+                  ),
+              ),
+          ),
+          4 => array(
+              'weight' => '4', 'module' => 'imagecache_canvasactions',
+              'action' => 'canvasactions_roundedcorners',
+              'data' => array(
+                  'radius' => '5',
+                  'independent_corners_set' => array(
+                      'independent_corners' => '0',
+                      'radii' => array(
+                        'tl' => '0', 'tr' => '0', 'bl' => '0', 'br' => '0',
+                      ),
+                  ),
+              ),
+          ),
+      ),
+  );// end bundle_list_50x50
+
+  $presets['bundle_tool_list_110x110'] = array(
+      'presetname' => 'bundle_tool_list_110x110',
+      'actions' => array(
+          0 => array(
+              'weight' => '1', 'module' => 'imagecache',
+              'action' => 'imagecache_scale',
+              'data' => array(
+                'width' => '110', 'height' => '110', 'upscale' => '1',
+              ),
+          ),
+          
+      ),
+  );// end bundle400x400  
+
+  return $presets;
+}
+
+/* ###################################################################################
+ * Custom Module Functions
+ * ###################################################################################
+ */
+
+
+/**
+* Add non CKK fields into CCK groups (using CCK)
+*/
+function _bundle_form_after_build($form, &$form_state) {
+  $form['group_basic_information']['title'] = $form['title'];
+  unset($form['title']);
+
+  $form['group_detailed_description']['body_field'] = $form['body_field'];
+  unset($form['body_field']);
+  
+ //var_dump($form['group_categorisation']);die();
+  
+  return $form;
+}
+
+
+/**
+ * Create new content types (using CCK)
+ */
+function _bundle_import_cck_nodes() {
+
+  //get path to the rule export files
+  $path = drupal_get_path('module', 'bundle') . "/content_types/*.inc";
+
+  //part taken from rules_admin_form_import_submit@rules_admin.export.inc
+  if (glob($path)) {
+    foreach (glob($path) as $exported_cck_node_type) {
+      $filename = basename($exported_cck_node_type);
+      $name = substr($filename, 0, strrpos($filename, '.'));
+
+      eval(file_get_contents($exported_cck_node_type));
+
+      if (isset($content) && is_array($content)) {
+
+        $form_state['values']['type_name'] = '<create>';
+        $form_state['values']['macro'] = '$content = '
+            . var_export($content, TRUE) . ';';
+
+        // form provided by content_copy.module
+        drupal_execute('content_copy_import_form', $form_state);
+
+        module_load_include('module', 'content');
+        content_clear_type_cache();
+
+        //drupal_set_message(t('Imported CCK node: %label.',array('%label' => $content['type']['name'])));
+      } else {
+        drupal_set_message(t('Import of CCK nodes failed.'), 'error');
+      }
+
+    }
+  }
+}
+
+/**
+ * Create new content types (using CCK)
+ */
+function _bundle_delete_cck_nodes() {
+
+  //get path to the rule export files
+  $path = drupal_get_path('module', 'widget_contest') . "/bundle/*.inc";
+
+  //part taken from rules_admin_form_import_submit@rules_admin.export.inc
+  if (glob($path)) {
+    foreach (glob($path) as $exported_cck_node_type) {
+      $filename = basename($exported_cck_node_type);
+      $name = substr($filename, 0, strrpos($filename, '.'));
+
+      eval(file_get_contents($exported_cck_node_type));
+
+      if (isset($content) && is_array($content)) {
+
+        node_type_delete($content['type']['name']);
+
+        drupal_set_message(
+            t('Deleted CCK node: %label.',
+                array(
+                  '%label' => $content['type']['name']
+                )));
+      } else {
+        drupal_set_message(t('Deletion of CCK nodes failed.'), 'error');
+      }
+
+    }
+  }
+}
+

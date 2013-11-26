@@ -1,0 +1,7 @@
+name = "RDF Taxonomy Import"
+description = "Imports Resource Description Framework (RDF) metadata for Functionality terms for the Drupal taxonomy"
+core = 6.x
+php = 5.2
+version = 6.x-1.2
+dependencies[] = taxonomy
+package = "Taxonomy"

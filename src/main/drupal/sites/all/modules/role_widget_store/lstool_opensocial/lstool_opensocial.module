@@ -1,0 +1,369 @@
+<?php
+// $Id$
+/**
+ * Common Module Functions
+ *
+ * @author Andreas Diehl
+ * @package Role-Widgetstore
+ * @subpackage Drupal-Module
+ */
+
+/**
+ * @file
+ * The lstool_opensocial module, extends lstool
+ *
+ */
+
+/******************************************************************************
+ * API                                                                        *
+******************************************************************************/
+require_once dirname(__FILE__) . '/../lstool/lstool_helper.php';
+require_once dirname(__FILE__) . '/lstool_opensocial_helper.php';
+
+/******************************************************************************
+ * CONSTANTS                                                               *
+******************************************************************************/
+
+
+/******************************************************************************
+ * Drupal Hooks                                                               *
+******************************************************************************/
+require_once dirname(__FILE__) . '/lstool_opensocial.form.inc';
+require_once dirname(__FILE__) . '/lstool_opensocial.edit.inc';
+
+
+
+/******************************************************************************
+ * Module Hooks                                                               *
+******************************************************************************/
+
+/**
+ * Implementation of hook_node_info().
+ * This adds a lstool-type for every registered module.
+ */
+function lstool_opensocial_node_info() {
+
+	$types['lstool_opensocial'] = array(
+            'name' => t('OpenSocial'),
+            'module' => 'lstool_opensocial',
+            'description' => t('This module adds the OpenSocial tool type'), 	//TODO: provide a nice description
+            'has_title' => TRUE,
+            'title_label' => t('tool name'),
+            'has_body' => TRUE,
+            'body_label' => t('tool description'),
+	);
+
+	return $types;
+}
+
+/**
+ * Implementation of hook_help().
+ *
+ * Defines the help page for the module
+ */
+function lstool_opensocial_help($path, $arg) {
+	//TODO: Provide a nice help page
+
+	if($path == 'admin/help#lstool_opensocial') {
+		$output = 'This module adds the OpenSocial tool type';
+		return $output;
+	}
+}
+
+/**
+* Implementation of hook_perm().
+*
+* Register new permissions
+*/
+function lstool_opensocial_perm() {
+	$perms = array(
+		'administer opensocial tools', 
+		'create opensocial tools',
+		'edit own opensocial tools',
+		'edit all opensocial tools',
+		'delete own opensocial tools',
+		'delete all opensocial tools',
+	);
+
+	return $perms;
+}
+
+/**
+ * Implementation of hook_access().
+ *
+ * Grant permissions
+ */
+function lstool_opensocial_access($op, $node, $account) {
+
+	switch ($op) {
+		case 'create':
+			return user_access('create opensocial tools', $account);
+			//only allow to update a node if the user is allowed to edit all tools
+			//or she created the lstool
+		case 'update':
+			if (user_access('edit all opensocial tools', $account)
+			|| (user_access('edit own opensocial tools', $account)
+			&& ($account->uid == $node->uid))) {
+				return TRUE;
+			}
+			break;
+			//only allow to delete a node if the user is allowed to edit all toolss
+			//or she created the tool
+		case 'delete':
+			if (user_access('delete all opensocial tools', $account)
+			|| (user_access('delete own opensocial tools', $account)
+			&& ($account->uid == $node->uid))) {
+				return TRUE;
+			}
+			break;
+	}
+}
+
+
+
+/**
+ * Implementation of hook_enable().
+ *
+ * Set up default imagefield and imagecache settings.
+ */
+function lstool_opensocial_enable() {
+
+	lstool_register_new_tooltype('lstool_opensocial');
+
+}
+
+
+
+/**
+ * Implementation of hook_load().
+ *
+ */
+function lstool_opensocial_load(&$node){
+
+	jquery_ui_add('ui.tabs');
+	drupal_add_css('sites/all/modules/jquery_ui/jquery.ui/themes/default/ui.all.css');
+
+	$additions = new stdClass();
+	$additions = loadGeneralToolDataFromDB($node->vid, $additions);
+	$additions = loadOpenSocialToolDataFromDB($node->vid, $additions);
+
+	return $additions;
+}
+
+/**
+ * Implementation of hook_view()
+ */
+function lstool_opensocial_view($node, $teaser = FALSE, $page=FALSE) {
+	// get common things done first
+
+	$node = lstool_view_prepare($node, $teaser, $page);
+
+	// now module specific things
+	if(!$teaser){
+		//themed preview
+		$node->content['lstool_opensocial_preview'] = array(
+            '#value' =>theme('lstool_opensocial_preview', $node),
+            '#weight' => 4
+		);
+
+		//themed panel which allows the user to add the lstool to container
+		$node->content['lstool_opensocial_embed_code'] = array(
+	            '#value' =>theme('lstool_opensocial_embed_code', $node),
+	            '#weight' => 1
+		);
+		
+		//themed panel which allows the user to add the lstool to container
+		$node->content['lstool_opensocial_source'] = array(
+			            '#value' =>theme('lstool_opensocial_source', $node),
+			            '#weight' => 2
+		);
+	}
+
+	//themed panel which allows the user to add the lstool to container
+	$node->content['lstool_opensocial_add_to_container'] = array(
+		'#value' =>theme('lstool_opensocial_add_to_container', $node, $teaser),
+                '#weight' => -3
+	);
+
+	return $node;
+}
+
+/**
+ * Implementation of hook_theme()
+ */
+function lstool_opensocial_theme() {
+	// get basic theme
+	$theme = lstool_theme_prepare();
+
+	// extend it if necessary
+	$theme['lstool_opensocial_preview'] = array(
+      'arguments' => array('node'),
+      'file' => 'lstool_opensocial.theme.inc');
+
+	$theme['lstool_opensocial_add_to_container'] = array(
+      'arguments' => array('node', 'teaser' => 0),
+      'file' => 'lstool_opensocial.theme.inc');
+
+	$theme['lstool_opensocial_embed_code'] = array(
+      'arguments' => array('node'),
+      'file' => 'lstool_opensocial.theme.inc');
+	
+	$theme['lstool_opensocial_source'] = array(
+	      'arguments' => array('node'),
+	      'file' => 'lstool_opensocial.theme.inc'
+	);
+	
+	return $theme;
+}
+
+/**
+* Implementation of hook_menu()
+*/
+function lstool_opensocial_menu() {
+	// Need to pass User ID here:
+	$items['admin/settings/opensocial_tools'] = array(
+		'title' => 'Opensocial Tools',
+		'page callback' => 'lstool_opensocial_admin',
+		'access arguments' => array('administer opensocial tools'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+	return $items;
+}
+
+
+/******************************************************************************
+ * Module Functions                                                             *
+******************************************************************************/
+
+/**
+ * Callback function for admin menu
+ * It creates the form from admin page
+ */
+function lstool_opensocial_admin() {
+	$output.= drupal_get_form('lstool_opensocial_admin_form');
+	
+	return $output;
+}
+
+
+/**
+ * Returns the url of the tool
+ *
+ * @param type $node
+ * @param type $attributes
+ * @return type
+ */
+
+function lstool_opensocial_get_embed_url($node, $attributes = array()) {
+	$serverbase = 'http://'.$_SERVER['SERVER_NAME'] . '/gadgets/';
+	// define param defaults
+	$params = array (
+	    'container' => 'default',
+	    'mid' => 1,
+	    'nocache' => 1,
+	    'country' => 'ALL',
+	    'lang' => 'ALL',
+	    'view' => 'home',
+	    'parent' => 'http://'.$_SERVER['SERVER_NAME'],
+		'url' => $node->source
+	);
+
+	// build url
+	$url = $serverbase;
+	$url .= 'ifr?';
+	foreach ($params as $paramName => $paramValue) {
+		// check override
+		if (in_array($paramName, $attributes))
+		$paramValue = $attributes[$paramName];
+
+		$url .= urlencode($paramName) . '=' . urlencode($paramValue) . '&';
+	}
+
+	// make url more beautiful
+	if (substr($url, -1) == '&')
+	$url = substr($url, 0, -1);
+
+	return $url;
+}
+
+
+/**
+ *
+ * @param string $url deprecated, do not use
+ * @return array metadata
+ */
+function lstool_opensocial_fetch_metadata($url = NULL) {
+	global $base_url;
+	$shindigUrl = $base_url;
+	//$shindigServer = getShindigServer();
+	//$shindigUrl = $shindigServer->customURL ? $shindigServer->customURL : $shindigServer->defaultURL;
+	if ($url)
+
+	//cycle throught all possible views
+	$views = array('home', 'canvas', 'profile', 'default');
+
+	foreach ($views as $view) {
+		$request = json_encode(
+			array(
+				'context' => array(
+					'country' => 'US',
+					'language' => 'en',
+					'view' => $view,
+					'container' => 'default'
+				),
+				'gadgets' => array(
+					array(
+						'url' => $url,
+						'moduleId' => '1'
+					)
+				)
+			)
+		);
+
+		$shindig_server = $_SERVER['SERVER_NAME'];
+
+		//$ch = curl_init('http://' . $shindig_server . '/gadgets/metadata?st=1:1:1:1:1:1:1');
+		$ch = curl_init($shindigUrl . '/gadgets/metadata?st=1:1:1:1:1:1:1');
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_AUTOREFERER, 1);
+		curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 4);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, urlencode($request));
+
+		$content = curl_exec($ch);
+
+		if (!isset(json_decode($content)->gadgets[0]->errors)) {
+			break;
+		}
+	}
+
+	$result = json_decode($content);
+	
+	return $result;
+}
+
+function lstool_opensocial_save_features($node) {
+	// get list of all possible "Requires Feature" term names
+	$voc = lstool_opensocial_get_vocabulary_by_name(lstool_opensocial_voc_name());
+	
+	$nodeterms=taxonomy_get_tree($voc->vid);
+    $terms= array();
+    foreach($nodeterms as $nt) {
+    	$tmpName=$nt->name;
+    	if ($node->$tmpName) {
+    		$term=taxonomy_get_term($nt->tid);
+    		$terms[$term->tid]=$term->tid;
+		}
+    }
+
+	$node->taxonomy[$voc->vid] = $terms;
+	//taxonomy_node_save($node, $terms);
+}
+
+
+
+
+

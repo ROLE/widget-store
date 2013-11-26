@@ -1,0 +1,1992 @@
+div#plus_minus {
+	font-weight: bold;
+}
+div#tts_info_button {
+	font-weight: bold;
+}
+.multistep-progress-bar {
+  height: 2.5em;
+}
+
+
+/* Search button 
+/-------------------------------------------------------------- */
+
+div#taxonomy-tag-suggestor-intern label,
+div#taxonomy-tag-suggestor-extern label{
+  border: 0px;
+  margin: 2px;
+  padding: 3px 10px;
+  background-color: #898886;
+  color: #FFFFFF;
+  text-transform: uppercase;
+}
+
+/* Taxonomy Tag Suggester: Serach Fields 
+/-------------------------------------------------------------- */
+#tags-extern,
+#tags-intern {
+	width: 300px;	
+}
+
+/* Taxonomy Tag Suggester: Drag n Drop Areas
+/-------------------------------------------------------------- */
+.tts-dropzone{
+	margin-top: 10px;
+}
+
+/* Taxonomy Tag Suggester: Tags 
+/-------------------------------------------------------------- */
+
+.ttstaginternal {
+	padding: 0 5px 0 5px;
+	font-size: 13px;
+	font-family: Tahoma;
+	float: left;
+}
+
+#plus_minus{
+	background: url("../images/limiter.png") no-repeat;
+	background-position: right;
+	padding: 0 10px 0 10px;
+}
+
+#tts_info_button {
+	background: url("../images/limiter.png") no-repeat;
+	background-position-x: left;
+	color: #6699CC;
+}
+
+div.hoverscroll div.fixed-arrow.left {
+	background-image: url('../images/arrow-left.png');
+	background-color: transparent;
+}
+
+div.hoverscroll div.fixed-arrow.right {
+	background-image: url('../images/arrow-right.png');
+	background-color: transparent;
+}
+
+/* own code test
+ * 
+ */
+#content-top-inner {
+	margin: 0 0 0 0;
+}
+
+/* deactivate button parts for search
+/-------------------------------------------------------------- */
+.imagecache-static_page_thumb {
+	margin: 0 0 0 25px;
+}
+
+ .search-form{
+ 	margin: 0px;
+ 	position: absolute;
+ 	top: 10px;
+ }
+ .search-form input.form-submit,
+ .search-form input.form-submit:hover {
+ 	background-image: none;
+ 	margin: 0px;
+ 	position: absolute;
+ }
+ 
+/* CAPTCHA
+/-------------------------------------------------------------- */
+#captcha_desc{
+	position:relative;
+	top: -15px;
+}
+fieldset.captcha {
+	border: 0px;
+	margin: 0px;
+	padding: 0px;
+}
+
+fieldset.captcha legend{
+	color: #6A970C;
+	font-weight: bold;
+}
+fieldset.captcha div.description {
+	display: none;
+}
+
+
+#content-messages{
+	margin-bottom: 0px;
+}
+
+#block-menu-menu-postscript-bottom-links1{
+	width: auto;
+	background-image: url(../images/footer/footer_bar_limiter.png);
+	background-repeat:no-repeat;
+	background-position: right;
+	background-position-y: 30%;
+	margin-left:0px;
+}
+#block-menu-menu-postscript-bottom-links2{
+	width: auto;
+	background-image: url(../images/footer/footer_bar_limiter.png);
+	background-repeat:no-repeat;
+	background-position: right;
+	background-position-y: 30%;
+	margin-left:0px;
+}
+#block-menu-menu-postscript-bottom-links3{
+	width: auto;
+	background-image: url(../images/footer/footer_bar_limiter.png);
+	background-repeat:no-repeat;
+	background-position: right;
+	background-position-y: 30%;
+	margin-left:0px;
+}
+#block-menu-menu-postscript-bottom-links4{
+	width: auto;
+	background-image: url(../images/footer/footer_bar_limiter.png);
+	background-repeat:no-repeat;
+	background-position: right;
+	background-position-y: 30%;
+	margin-left:0px;
+}
+
+.postscript-bottom-inner .menu a {
+	font-size:10px;
+	color: #333333;	
+}
+
+.postscript-bottom-inner .menu li.leaf {
+	margin-left:0px;
+	line-height: 1.2em;
+}
+
+.postscript-bottom-inner .menu .leaf  {
+	clear:both;	
+}
+
+.header-group-inner #block-menu-secondary-links .content.clearfix{
+	float:right;
+}
+
+.header-group-inner .leaf.first {
+	border-width: 1px;
+	border-left-style: solid;
+}
+
+.header-group-inner .leaf  {
+	font-size:12px;
+	padding: 20px 0px 0px 0px;
+	height: 21px;
+	margin: 0;
+	border-color: #999999;
+	border-width: 1px;
+	border-right-style: solid;
+}
+
+.header-group-inner .leaf:hover,
+.header-group-inner .leaf:hover {
+	background: url('../images/top_bar_1/over.png');
+}
+
+.header-group-inner .leaf a {
+	padding: 0px 10px 0px 10px;
+	text-decoration: none;
+	color: #333333;
+}
+
+.block block-menu grid16-4 {
+	font-size: 80%;
+	padding: 10px 10px 0px 10px;
+	line-height: 100%;
+}
+
+#main-inner {
+	padding: 10px 0px 0px 0px;
+
+}
+
+.content-region-inner{
+	 background-color:#FFFFFF;
+}
+
+.fusion-multicol-menu .inner ul.menu li.first {
+	margin-left: 50px;
+}
+
+.fusion-inline-menu .inner ul.menu {
+	text-align: right;
+} 
+
+.fusion-inline-menu .inner ul.menu li {
+	padding: 25px 5px 2px 4px;
+}
+
+.fusion-inline-menu .inner ul.menu li a {
+	color:#999999;
+}
+
+.footer-logo-bar {
+	font-size: 85%;
+	color:#FFFFFF;
+}
+
+#european-footer-logo-bar {
+	padding: 4px 2px 0px 2px;
+}
+
+#framework-footer-logo-bar {
+	padding: 4px 2px 0px 2px;
+}
+
+#imc-footer-logo-bar {
+	padding: 2px;
+	float: right;
+}
+
+#imc-footer-logo-bar a{
+	color: #FFFFFF;
+}
+
+#imc-footer-logo-bar a:hover{
+	text-decoration: none;
+}
+
+#text-footer-logo-bar {
+	padding: 4px 2px 0px 10px;
+}
+
+/* Basic Typography & Colors
+-------------------------------------------------------------- */
+/* Add general site styling here for typography and background */
+body {
+ 	font-size: 75%;   /* also set in fusion_starter.info: settings[base-font-size] = font-size-12 */
+	font-family: Tahoma;
+	color: #333;
+}
+
+/* Default link styles - separate a:visited for a different visited link style */
+a,
+a:link,
+a:visited {
+  color: #6A970C;
+}
+
+/* Hover/active link styles. Don't forget :focus for accessibility */
+a:hover,
+a:focus,
+a:active {
+  color: #000;
+}
+
+
+
+/* Specific Typography
+-------------------------------------------------------------- */
+#site-name {
+	font-size: 19px;
+}
+#site-name a{
+	color:#333333;
+}
+
+.footer-message {
+  font-size: 92%;
+}
+
+
+/* HTML Elements
+-------------------------------------------------------------- */
+
+html{
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  
+}
+
+.cleaner{
+  clear: both;
+}
+
+
+/* Site Info
+-------------------------------------------------------------- */
+/* Wrapper around logo, site name, and slogan */
+.header-site-info {
+	margin-bottom: 10px;
+}
+
+.header-site-info span {
+  display: block;
+}
+
+/* Add float here to put logo and site name side by side, also add margins as
+  needed */
+#logo {
+	float: left;
+}
+
+#site-name-wrapper {
+	margin: 32px 0 0 10px;
+}
+
+/* Link and hover styles for site name */
+#site-name a:link,
+#site-name a:visited,
+#site-name a:hover,
+#site-name a:active {
+}
+
+/* Typography for site slogan */
+#slogan {
+}
+
+
+/* Grid
+-------------------------------------------------------------- */
+/* grid widths */
+.grid12-1-inner {width: 60px;}
+.grid12-2-inner {width: 140px;}
+.grid12-3-inner {width: 220px;}
+.grid12-4-inner {width: 300px;}
+.grid12-5-inner {width: 380px;}
+.grid12-6-inner {width: 460px;}
+.grid12-7-inner {width: 540px;}
+.grid12-8-inner {width: 620px;}
+.grid12-9-inner {width: 700px;}
+.grid12-10-inner {width: 7800px;}
+.grid12-11-inner {width: 860px;}
+.grid12-12-inner {width: 940px;}
+
+.grid12-inner{
+  margin-left: 10px;
+  margin-right: 10px;
+  
+    
+  float:left;
+}
+
+.grid12-inner.first{
+  margin-left: 0px;
+}
+
+.grid12-inner.last{
+  margin-right: 0px;
+}
+
+/* Regions
+
+  Classes (.region-name) should always be used instead of IDs (#region-name) so
+  that Skinr styles can override them with a class later
+-------------------------------------------------------------- */
+
+/* All Regions
+-------------------------------------------------------------- */
+/* By default this wrapper is set to 100% width and centered -- override here to
+  narrow wrapper or align left or right */
+.page {
+  height: 100%;
+  
+	
+}
+
+/* The 0 values here remove padding and spacing at the bottom of the page.
+  Remove to add a gap at the very bottom of the page */
+.page-inner {
+  height: auto !important;
+  height: 100%;
+  min-height: 100%;
+  
+  position: relative;
+  margin-bottom: 0;
+  padding: 0;
+  
+  border: 0;
+  background: url(../images/segment.jpg) top center no-repeat;
+}
+
+
+/* Header Regions
+-------------------------------------------------------------- */
+/* Header Top region to the bottom of Header region */
+/* For full-width header background, add background image/color here */
+.header-group-wrapper {
+}
+
+.header-group {
+}
+
+/* Header Top region which sits above the header */
+/* Works well with inline login or inline menu block style */
+.header-top-wrapper {
+}
+
+.header-top {
+	float: left;
+}
+
+.header-top a{
+	color: #333333;
+}
+
+
+/* Primary Menu
+/-------------------------------------------------------------- */
+/* Add general styles for primary menu here, such as typography, borders, floats,
+  or spacing above/below */
+.primary-menu {
+}
+
+/* styles for Superfish primary menu */
+.primary-menu-inner ul.sf-menu {
+}
+
+/* Link style for top level menu items, add padding here */
+.primary-menu-inner ul.sf-menu a,
+.primary-menu-inner ul.sf-menu a:visited  {
+}
+
+.primary-menu-inner ul.sf-menu a:hover,
+.primary-menu-inner ul.sf-menu a:active,
+.primary-menu-inner ul.sf-menu a:focus {
+}
+
+/* These are the top level menu items, add border-right here for separators */
+.primary-menu-inner ul.sf-menu li {
+}
+
+/* Add border-right: 0; here to remove separator on last menu item */
+.primary-menu-inner ul.sf-menu li.last {
+}
+
+/* Style for container of dropdown, add background or border */
+.primary-menu-inner ul.sf-menu ul {
+}
+
+/* Style for individual dropdown menu items, add border-bottom for separators */
+.primary-menu-inner ul.sf-menu li li {
+  background-color: #fff;
+}
+
+.primary-menu-inner ul.sf-menu li li.last {
+
+}
+
+.primary-menu-inner ul.sf-menu li li li {
+}
+
+/* Style for hover of dropdown menu items (add background-color here) */
+.primary-menu-inner ul.sf-menu li ul li:hover,
+.primary-menu-inner ul.sf-menu li ul li.sfHover {
+}
+
+
+/* Secondary menu
+-------------------------------------------------------------- */
+/* This menu usually appears in the header as a set of simple text links */
+.secondary-menu {
+	height: 50px;
+	margin-bottom: 0px;
+}
+
+#secondary-menu-inner { 
+	float:right;
+}
+
+/* Set general style for menu here -- background, alignment, etc. */
+.secondary-menu-inner ul.links {
+}
+
+/* Add a border-right here for a separator */
+.secondary-menu-inner ul.links li {
+	font-size:12px;
+	padding: 20px 0px 30px 0px;
+	height: 21px;
+	margin: 0;
+	border-color: #999999;
+	border-width: 1px;
+	border-right-style: solid;
+}
+
+.secondary-menu-inner ul.links li:hover,
+.secondary-menu-inner ul.links li:focus,
+.secondary-menu-inner ul.links li:active {
+	background: url('../images/top_bar_1/over.png');
+}
+
+.secondary-menu-inner ul.links li.first {
+	border-width: 1px;
+	border-left-style: solid;
+}
+
+.secondary-menu-inner ul.links li.last {
+}
+
+/* Styles for links */
+.secondary-menu-inner ul.links li a:link,
+.secondary-menu-inner ul.links li a:visited {
+  padding: 0px 10px 0px 10px;
+	text-decoration: none;
+	color: #333333;
+	position: relative;
+	top: 30px;
+}
+
+.secondary-menu-inner ul.links li a:hover,
+.secondary-menu-inner ul.links li a:focus,
+.secondary-menu-inner ul.links li a.active {
+}
+
+
+/* Header - Search
+-------------------------------------------------------------- */
+.search-box {
+}
+
+.search-box-inner {
+}
+
+.search-box-inner form#search-theme-form {
+}
+
+.search-box-inner input#edit-search-theme-form-header {
+}
+
+
+/*  Preface Regions
+-------------------------------------------------------------- */
+/* The Preface Top region sits between the header and the Main Area
+ (columns, sidebars, and main content).  The Preface Bottom region
+ is inside the Main Area. */
+.preface-top-wrapper {
+	background: url(../images/top_bar.png) repeat-x bottom;
+
+}
+
+
+.preface-top {
+}
+
+.preface-top-inner {
+}
+
+.preface-top .block {
+  overflow:visible;
+  margin:0;
+}
+
+.preface-top .block .content{
+}
+
+
+#preface-top-inner .inner ul.menu {
+	height: 40px;
+	padding: 0px;
+	background-image: url(../images/footer/footer_bar_limiter.png);
+	background-repeat:no-repeat;
+	background-position: left;
+}
+
+#preface-top-inner .leaf.first a{
+}
+
+#preface-top-inner .leaf a {
+	background-image: url(../images/footer/footer_bar_limiter.png);
+	background-repeat:no-repeat;
+	background-position: right;
+}
+
+#preface-top-inner .inner ul.menu li {
+	margin-left: 0px;
+	padding: 0;
+	height: 35px;
+	margin-top: 5px;
+}
+
+
+#preface-top-inner .inner ul.menu > li:first-child {
+	background: url(../images/top_bar_2/under_tools.png) bottom no-repeat;
+	
+}
+#preface-top-inner .inner ul.menu > li:first-child a:hover,
+#preface-top-inner .inner ul.menu > li:first-child a.active {
+	background: url(../images/top_bar_2/over_tools.png)  ;
+	text-decoration:none;
+}
+
+#preface-top-inner .inner ul.menu > li:first-child+li {
+	background: url(../images/top_bar_2/under_bundles.png) bottom no-repeat;
+}
+#preface-top-inner .inner ul.menu > li:first-child+li a:hover,
+#preface-top-inner .inner ul.menu > li:first-child+li a.active {
+	background: url(../images/top_bar_2/over_bundles.png);
+	text-decoration:none;
+}
+
+#preface-top-inner .inner ul.menu > li:first-child+li+li{
+	background: url(../images/top_bar_2/under_showcase.png) bottom no-repeat;
+}
+#preface-top-inner .inner ul.menu > li:first-child+li+li a:hover,
+#preface-top-inner .inner ul.menu > li:first-child+li+li a.active{
+	background: url(../images/top_bar_2/over_showcase.png);
+	text-decoration:none;
+}
+
+#preface-top-inner .inner ul.menu > li:first-child+li+li+li  {
+	background: url(../images/top_bar_2/under_widget_contest.png) bottom no-repeat;
+}
+
+
+#preface-top-inner .inner ul.menu li a:link,
+#preface-top-inner .inner ul.menu li a:visited{
+	text-transform: uppercase;
+	width:100px;
+	text-align: center;
+	padding:10px 0 0 0;
+	height:30px;
+	font-size: 1.1em;
+	font-weight:normal;
+	color: #FFFFFF;
+	display: block;	
+}
+
+#preface-top-inner .inner ul.menu li a:active,
+#preface-top-inner .inner ul.menu li a:hover,
+#preface-top-inner .inner ul.menu li a.active{
+	padding-top:15px;		
+	margin-top:-5px;
+	display: block;
+}
+
+
+#preface-top-inner .inner ul.menu > li:first-child+li+li+li a.active,
+#preface-top-inner .inner ul.menu > li:first-child+li+li+li a:hover{	
+	background: url(../images/top_bar_2/over_widget_contest.png);
+	text-decoration: none;
+}
+
+.preface-bottom {
+}
+
+.preface-bottom-inner {
+}
+
+
+/*  Main Area (content + sidebars + preface bottom + postscript top)
+-------------------------------------------------------------- */
+.main-wrapper {
+  margin-bottom: 61px;
+  
+  overflow: hidden;
+}
+
+
+/* Sidebar Regions
+-------------------------------------------------------------- */
+/* Sidebar widths can be controlled through theme settings */
+.sidebar-first {
+}
+
+.sidebar-last {
+}
+
+
+/* Content Regions
+-------------------------------------------------------------- */
+
+.main,
+.main-group,
+.main-content,
+.content-group,
+.content-region{
+  overflow:visible; /* set for showing content tabs */
+}
+
+
+.content-top {
+}
+
+.content {
+}
+
+.content-inner {
+  min-height: 300px;
+  margin-bottom: 50px;
+}
+
+.content-content {
+
+}
+
+.content-content .inner {
+
+}
+
+.content-bottom {
+}
+
+
+
+/* This region only appears on full node pages. It's useful for ads or other
+  content between the body of the node and its comments */
+.node-bottom {
+}
+
+.content-region-inner{
+   background-color:#FFFFFF;
+   overflow:visible; /* set for showing content tabs */
+   position: relative; /* set for showing content tabs */
+}
+
+/*  Postscript & Footer Regions
+-------------------------------------------------------------- */
+.postscript-top {
+}
+
+.postscript-top-inner {
+}
+
+.postscript-bottom-wrapper {
+	background-image: url(../images/footer/footer_bar1.png);
+	position: absolute;
+  	bottom: 50px;
+}
+
+.postscript-bottom {
+}
+
+.postscript-bottom-inner {
+}
+
+.postscript-bottom-links {
+	font-size: 80%;
+	padding: 10px 10px 0px 10px;
+	float: left;
+		line-height: 100%;
+}
+
+.postscript-bottom-links a{
+		color:#000000;
+}
+
+#postscript-bottom-links-tools {
+	color:#6A970C;
+}
+#postscript-bottom-links-bundles {
+	color:#6699CC;
+}
+#postscript-bottom-links-showcase {
+	color:#212121;
+}
+#postscript-bottom-links-widgetcontest {
+	color:#6A970F;
+}
+
+.footer-wrapper {
+	height: 50px;
+	width: 100%;
+
+  position: absolute;
+  bottom: 0px;
+
+	border-top-style: solid;
+	border-width:1px;
+	background-image: url(../images/footer/footer_bar2.png);
+}
+
+.footer {
+}
+
+.footer-inner {
+}
+
+.footer-message-wrapper {
+}
+
+.footer-message {
+}
+
+.footer-message-inner {
+}
+
+.footer-message-text {
+}
+.footer-logo-bar {
+	float: left;
+}
+
+
+/* Page titles
+/-------------------------------------------------------------- */
+/* Page and full node titles */
+h1.title {
+  color: #000;
+  font-size: 18px;
+  text-transform:uppercase;
+  
+  padding: 10px 0 10px 10px;
+  
+  border-bottom: 2px solid #99CC33;
+  margin-bottom: 0px;  
+}
+
+div.title-flag-wrapper{
+  margin-bottom: 10px;
+}
+
+div.title-flag{
+  height: 20px;
+  width: 150px;
+  
+  float:left;
+  margin-left:10px;
+  
+  background: url("../images/title_flag_green.png") no-repeat 0px 0px;
+}
+
+.title-flag .page-type-icon{
+  width:150px;
+  height:30px;
+ 
+  padding-left: 40px;
+ 
+  color: #FFFFFF;
+  font-weight: bold;
+  text-transform: uppercase; 
+}
+
+div.title-flag-wrapper ul{
+  list-style: none;
+  padding: 2px 0px 0px 165px;
+}
+
+div.title-flag-wrapper ul li{
+  list-style: none;
+  float:left;
+}
+
+div.title-flag-wrapper .twitter,
+div.title-flag-wrapper .facebook,
+div.title-flag-wrapper .linkedin,
+div.title-flag-wrapper .googleplus{
+  height: 16px;
+  width: 16px;
+  
+  margin-right: 5px;
+  display: block; 
+}
+
+div.title-flag-wrapper .twitter{
+  background: url("../images/twitter_gray.png");
+}
+
+div.title-flag-wrapper .facebook{
+  background: url("../images/facebook_gray.png");
+}
+
+div.title-flag-wrapper .linkedin{
+  background: url("../images/linkedin_gray.png");
+}
+
+div.title-flag-wrapper .googleplus{
+  width:25px;
+  
+  background: url("../images/googleplus_gray.png");
+}
+
+/* Default node styles
+/-------------------------------------------------------------- */
+/* Change unpublished and preview colors for dark background themes */
+.node-unpublished {
+  background-color: #fff4f4;
+}
+.preview .node {
+  background-color: #ffffea;
+}
+
+/* Typography for node titles */
+.node h2.title {
+  border-bottom: none;
+
+}
+
+/* Colors and styles for linked node titles, ie. teaser listing at /node */
+h2.title a:link,
+h2.title a:visited {
+}
+
+h2.title a:hover,
+h2.title a:focus,
+h2.title a:active {
+}
+
+/* Separators and padding for node teasers */
+.teaser {
+}
+
+/* Author/date info */
+.meta {
+}
+
+.submitted {
+}
+
+/* Links for nodes (taxonomy, commenting, read more, etc) */
+.node ul.links li {
+}
+.node ul.links a {
+}
+
+/* Only more/read more links */
+div.node .read-more a,
+div.node .more-link a {
+  font-weight: bold;
+  color: #333;
+  background: url("../images/list-style-image.png") no-repeat 0px 2px;
+  padding-left: 15px;
+  width: auto;
+}
+
+/* Drupal Messages
+/-------------------------------------------------------------- */
+/* General style for all errors/messages (border, padding, etc.) */
+div.content-messages div.messages,
+div.content-help div.help {
+	border-width: 2px;
+	font-size: 12px;
+	font-weight: bold;
+	padding: 15px 10px 15px 10px;
+}
+
+/* Status messages: green */
+div.content-messages-inner div.status {
+/* font definitions*/
+	color: #618A0E;
+	
+	/* border definitions and background color: both gradient*/
+	border-top-color: #679A33;
+	border-bottom-color: #6A970C;
+		/* Chrome,Safari4+ */
+			background-image: 	-webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFFFFF), to(#CCE599));	
+			border-left-color: 	-webkit-gradient(linear, 0% 0%, 0% 100%, from(#679A33), to(#6A970C));
+			border-right-color: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#679A33), to(#6A970C));
+		/* Chrome10+,Safari5.1+ */
+			background-image: 	-webkit-linear-gradient(top,#FFFFFF 50%, #CCE599 100%);
+			border-left-color: 	-webkit-linear-gradient(top,#679A33, #6A970C);
+			border-right-color: -webkit-linear-gradient(top,#679A33, #6A970C);
+		/* FF3.6+ */
+			background-image: 	-moz-linear-gradient(top, #FFFFFF 50%, #CCE599 100%);	
+			border-left-color: 	-moz-linear-gradient(top, #679A33, #6A970C);
+			border-right-color: -moz-linear-gradient(top, #679A33, #6A970C);
+		/* IE6-9 */
+			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FFFFFF', endColorstr='#CCE599',GradientType=0 );
+		
+		/* IE10+ */
+			background-image: 	-ms-linear-gradient(top, #FFFFFF 50%, #CCE599 100%);
+			border-left-color: 	-ms-linear-gradient(top, #679A33, #6A970C);
+			border-right-color: -ms-linear-gradient(top, #679A33, #6A970C);
+		/* Opera 11.10+ */
+			background-image: 	-o-linear-gradient(top, #FFFFFF 50%, #CCE599 100%);
+			border-left-color: 	-o-linear-gradient(top, #679A33, #6A970C);
+			border-right-color: -o-linear-gradient(top, #679A33, #6A970C);
+		/* W3C */
+			background-image: 	linear-gradient(to bottom, #FFFFFF 50%,#CCE599 100%);
+		
+			
+}
+
+/* Warning messages: yellow */
+div.content-messages-inner div.warning {
+	/* font definitions*/
+	color: #333333;
+	
+	/* border definitions and background color: both gradient*/
+	border-top-color: #E2AF00;
+	border-bottom-color: #FFCC00;
+		/* Chrome,Safari4+ */
+			background-image: 	-webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFFFFF), to(#FFE57F));
+			border-left-color: 	-webkit-gradient(linear, 0% 0%, 0% 100%, from(#E2AF00), to(#FFCC00));
+			border-right-color: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#E2AF00), to(#FFCC00));
+		/* Chrome10+,Safari5.1+ */
+			background-image: 	-webkit-linear-gradient(top,#FFFFFF 50%, #FFE57F 100%);
+			border-left-color: 	-webkit-linear-gradient(top,#E2AF00, #FFCC00);
+			border-right-color: -webkit-linear-gradient(top,#E2AF00, #FFCC00);
+		/* FF3.6+ */
+			background-image: 	-moz-linear-gradient(top, #FFFFFF 50%, #FFE57F 100%);
+			border-left-color: 	-moz-linear-gradient(top, #E2AF00, #FFCC00);
+			border-right-color: -moz-linear-gradient(top, #E2AF00, #FFCC00);
+		/* IE6-9 */
+			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FFFFFF', endColorstr='#FFE57F',GradientType=0 );
+		
+		/* IE10+ */
+			background-image: 	-ms-linear-gradient(top, #FFFFFF 50%, #FFE57F 100%);
+			border-left-color: 	-ms-linear-gradient(top, #E2AF00, #FFCC00);
+			border-right-color: -ms-linear-gradient(top, #E2AF00, #FFCC00);
+		/* Opera 11.10+ */
+			background-image: 	-o-linear-gradient(top, #FFFFFF 50%, #FFE57F 100%);
+			border-left-color: 	-o-linear-gradient(top, #E2AF00, #FFCC00);
+			border-right-color: -o-linear-gradient(top, #E2AF00, #FFCC00);
+		/* W3C */
+		background-image: 	linear-gradient(to bottom, #FFFFFF 50%,#FFE57F 100%);
+}
+
+/* Error messages: red */
+div.content-messages-inner div.error {
+	/* font definitions*/
+	color: #800000;
+	
+	/* border definitions and background color: both gradient*/
+	border-top-color: #B80D0D;
+	border-bottom-color: #FF0000;
+		/* Chrome,Safari4+ */
+			background-image: 	-webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFFFFF), to(#E0C0C0));
+			border-left-color: 	-webkit-gradient(linear, 0% 0%, 0% 100%, from(#B80D0D), to(#FF0000));
+			border-right-color: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#B80D0D), to(#FF0000));
+		/* Chrome10+,Safari5.1+ */
+			background-image: 	-webkit-linear-gradient(top,#FFFFFF 50%, #E0C0C0 100%);
+			border-left-color: 	-webkit-linear-gradient(top,#B80D0D, #FF0000);
+			border-right-color: -webkit-linear-gradient(top,#B80D0D, #FF0000);
+		/* FF3.6+ */
+			background-image: 	-moz-linear-gradient(top, #FFFFFF 50%, #E0C0C0 100%);
+			border-left-color: 	-moz-linear-gradient(top, #B80D0D, #FF0000);
+			border-right-color: -moz-linear-gradient(top, #B80D0D, #FF0000);
+		/* IE6-9 */
+			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FFFFFF', endColorstr='#E0C0C0',GradientType=0 );
+		
+		/* IE10+ */
+			background-image: 	-ms-linear-gradient(top, #FFFFFF 50%, #E0C0C0 100%);
+			border-left-color: 	-ms-linear-gradient(top, #B80D0D, #FF0000);
+			border-right-color: -ms-linear-gradient(top, #B80D0D, #FF0000);
+		/* Opera 11.10+ */
+			background-image: 	-o-linear-gradient(top, #FFFFFF 50%, #E0C0C0 100%);
+			border-left-color: 	-o-linear-gradient(top, #B80D0D, #FF0000);
+			border-right-color: -o-linear-gradient(top, #B80D0D, #FF0000);
+		/* W3C */
+			background-image: 	linear-gradient(to bottom, #FFFFFF 50%,#E0C0C0 100%);
+		
+}
+
+
+/* Help messages: blue */
+div.content-help-inner div.help {
+	/* font definitions*/
+	color: #336699;
+	
+	/* border definitions and background color: both gradient*/
+	border-top-color: #4878AE;
+	border-bottom-color: #6699CC;
+		/* Chrome,Safari4+ */
+			background-image: 	-webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFFFFF), to(#B2CCE5));
+			border-left-color: 	-webkit-gradient(linear, 0% 0%, 0% 100%, from(#4878AE), to(#6699CC));
+			border-right-color: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#4878AE), to(#6699CC));
+		/* Chrome10+,Safari5.1+ */
+			background-image: 	-webkit-linear-gradient(top,#FFFFFF 50%, #B2CCE5 100%);
+			border-left-color: 	-webkit-linear-gradient(top,#4878AE, #6699CC);
+			border-right-color: -webkit-linear-gradient(top,#4878AE, #6699CC);
+		/* FF3.6+ */
+			background-image: 	-moz-linear-gradient(top, #FFFFFF 50%, #B2CCE5 100%);
+			border-left-color: 	-moz-linear-gradient(top, #4878AE, #6699CC);	
+			border-right-color: -moz-linear-gradient(top, #4878AE, #6699CC);
+		/* IE6-9 */
+			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FFFFFF', endColorstr='#B2CCE5',GradientType=0 );
+		
+		/* IE10+ */
+			background-image: 	-ms-linear-gradient(top, #FFFFFF 50%, #B2CCE5 100%);
+			border-left-color: 	-ms-linear-gradient(top, #4878AE, #6699CC);
+			border-right-color: -ms-linear-gradient(top, #4878AE, #6699CC);
+		/* Opera 11.10+ */
+			background-image: 	-o-linear-gradient(top, #FFFFFF 50%, #B2CCE5 100%);
+			border-left-color: 	-o-linear-gradient(top, #4878AE, #6699CC);
+			border-right-color: -o-linear-gradient(top, #4878AE, #6699CC);
+		/* W3C */
+			background-image: 	linear-gradient(to bottom, #FFFFFF 50%,#B2CCE5 100%);
+		
+}
+
+/* Error that appears when a required form field is not filled out */
+.form-item input.error,
+.form-item textarea.error,
+.form-item select.error {
+  border: 1px solid #aa1144;
+}
+
+/* "New" text and required form field asterisk (default = red) */
+.marker,
+.form-required {
+  color: #aa1144;
+}
+
+
+/* Default block title styles
+/-------------------------------------------------------------- */
+h2.block-title {
+}
+
+
+/* Breadcrumbs
+-------------------------------------------------------------- */
+.breadcrumbs {
+}
+
+.breadcrumbs a:link,
+.breadcrumbs a:visited {
+}
+
+
+/* Tab Menus
+/-------------------------------------------------------------- */
+#content-tabs { 
+  height: auto;
+  width: auto;
+  
+  margin: 0;
+  padding: 0;
+  
+  position: absolute;
+  right:0px;
+  
+  overflow: visible;
+  
+  
+}
+
+#content-tabs-inner {
+  margin: 0;
+} 
+
+#content-tabs ul.primary,
+#content-tabs ul.secondary {
+  min-width:300px;
+  
+  border: none;
+ 
+  clear: both;
+  float: left; /* LTR */
+  margin: 0;
+  padding: 0 10px;
+  
+}
+
+#content-tabs ul.primary{
+  position: absolute;
+  left: 100%;
+  z-index: 1000;
+  
+  transform: rotate(90deg);
+  transform-origin: left bottom;
+  -ms-transform: rotate(90deg);
+  -ms-transform-origin: left bottom;
+  -moz-transform: rotate(90deg);
+  -moz-transform-origin: left bottom;
+  -webkit-transform: rotate(90deg);
+  -webkit-transform-origin: left bottom;
+  -o-transform: rotate(90deg);
+  -o-transform-origin: left bottom;
+}
+
+#content-tabs ul.secondary {
+  margin-top: 13px;
+  position: relative;
+  z-index: 1000;
+
+  text-transform: lowercase;
+}
+
+#content-tabs ul.primary li,
+#content-tabs ul.secondary li {
+  margin: 0;
+  padding: 5px 10px;
+  
+  background: #CCCCCC;
+  border: 1px solid #999999;
+  display: inline;
+  float: left; /* LTR */
+  list-style: none;
+  -webkit-border-top-left-radius: 3px;
+  -webkit-border-top-right-radius: 3px;
+  -moz-border-radius-topleft: 3px;
+  -moz-border-radius-topright: 3px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+#content-tabs ul.primary li a:link,
+#content-tabs ul.primary li a:visited,
+#content-tabs ul.secondary li a:link,
+#content-tabs ul.secondary li a:visited {
+  background-color: transparent;
+  border: none;
+  
+  color: #000;
+  float: left; /* LTR */
+  font-weight: bold;
+  margin: 0;
+  
+  text-decoration: none;
+  white-space: nowrap;
+  
+
+}
+
+#content-tabs ul.secondary li a:link,
+#content-tabs ul.secondary li a:visited {
+
+}
+
+#content-tabs ul.secondary li.active,
+#content-tabs ul.primary li.active{
+  color: #000;
+  background: #AAAAAA;  
+}
+
+#content-tabs ul.secondary li a.active:link,
+#content-tabs ul.secondary li a.active:visited,
+#content-tabs ul.primary li a.active:link,
+#content-tabs ul.primary li a.active:visited {
+ padding-bottom: 0px;
+ 
+ border: none;
+ 
+}
+
+#content-tabs ul.primary li a:hover,
+#content-tabs ul.primary li a:focus,
+#content-tabs ul.secondary li a:hover,
+#content-tabs ul.secondary li a:focus {
+  /*border-bottom: 4px solid #777;*/
+ border: none;
+ 
+  color: #777;
+  /*padding-bottom: 2px;*/
+ padding-bottom: 0px;
+}
+
+/* Pagers
+-------------------------------------------------------------- */
+ul.pager {
+}
+
+ul.pager li {
+}
+
+ul.pager a,
+ul.pager li.pager-current {
+  border-color: #333;
+}
+
+ul.pager li.pager-current {
+  background-color: #777;
+  color: #fff;
+}
+
+ul.pager a:hover,
+ul.pager a:active,
+ul.pager a:focus {
+  background-color: #777;
+  border-color: #333;
+  color: #fff;
+}
+
+/* Forms
+/-------------------------------------------------------------- */
+/* Typography and backgrounds for all form buttons */
+form input.form-submit {
+  border: 0px;
+  margin: 2px;
+  padding: 3px 10px;
+  background-image: url('../images/button.png');
+  color: #FFFFFF;
+  text-transform: uppercase;
+}
+
+/* Hover style for form buttons */
+form input.form-submit:hover,
+form input.form-submit.hover,
+form input.form-submit:focus {
+	background-image: url('../images/button_hover.png');
+}
+
+/* Typography, background, borders, padding for form fields */
+.form-item input,
+.form-item select,
+.form-item textarea {
+}
+
+/* Remove backgrounds and border on radios and checkboxes */
+.form-item .form-radio,
+.form-item .form-checkbox {
+  background: none;
+  border: none !important;
+}
+
+.form-item label {
+  color:#6A970C;
+  margin-bottom: 5px;
+  
+}
+
+.form-item .form-required{
+  color: #000;
+}
+
+.form-item .description{
+  font-size: 12px;
+  margin-top: 3px;
+  margin-left: 3px;
+  
+}
+ 
+
+
+/* Fieldset wrapper around groups of form elements -- add border here */
+fieldset {
+}
+
+/* Typography and spacing for legend of fieldsets */
+fieldset legend {
+}
+
+/* Link style for legend of fieldsets */
+fieldset legend,
+legend.collapse-processed,
+legend.collapse-processed a:link,
+legend.collapse-processed a:visited {
+}
+
+/* Custom icons on (open) collapsible fieldsets */
+html.js fieldset.collapsible legend a:link,
+html.js fieldset.collapsible legend a:visited {
+}
+
+/* Custom icons on (closed) collapsible fieldsets */
+html.js fieldset.collapsed legend a:link,
+html.js fieldset.collapsed legend a:visited {
+}
+
+
+/* Tables
+-------------------------------------------------------------- */
+table {
+}
+
+/* Body of tables */
+tbody {
+  border: 0;
+}
+
+/* Header of tables */
+thead th,
+th {
+
+}
+
+tbody th {
+
+}
+
+/* Alternating row background styles */
+tr.even,
+tr.even td {
+  background-color: #eee;
+  border-bottom: 1px solid #ccc;
+}
+
+tr.odd,
+tr.odd td {
+  background-color: #fff;
+  border-bottom: 1px solid #ccc;
+}
+
+td{
+  padding: 0 0 5px 0;
+}
+
+td.active {
+}
+
+tr.drag td,
+tr.drag-previous td {
+  color: #000;
+}
+
+
+/* Maintenance Page
+/-------------------------------------------------------------- */
+/* Maintenance page tpl file in Fusion Core has simplified layout, but you can
+  also add specific styles, such as a background, just for your offline page */
+.in-maintenance  {
+}
+
+/*--------------------------------------------------------------*/
+/* Admin styles
+/-------------------------------------------------------------- */
+.admin-links ul.links{
+  background: none;
+}
+
+.admin-links ul.links li{
+  margin-left: 0;
+}
+
+
+/*--------------------------------------------------------------*/
+/* Module styles
+/-------------------------------------------------------------- */
+
+/* Search
+/-------------------------------------------------------------- */
+.content-content .search-form{
+  display: none;
+}
+
+.content-content .box > h2.title{
+  display: none;
+}
+
+.search-results div.node {
+  padding-top: 10px;
+  margin-bottom: 20px;
+}
+
+/* Panels
+/-------------------------------------------------------------- */
+
+.panel-region-separator{
+  height: 20px;
+}
+
+.panels-flexible-row{
+  margin-bottom: 20px;
+}
+
+/* Book
+/-------------------------------------------------------------- */
+.book-navigation .menu {
+  border-top: 1px solid #ccc;
+}
+
+.book-navigation .page-links {
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+
+
+/* Comments
+/-------------------------------------------------------------- */
+/* Style for each individual comment */
+div.comments {
+  
+}
+
+div.comments h2{ 
+  padding: 0px 10px 5px 10px;
+  
+  border-bottom: #6A970C 2px solid;
+}
+
+div.comments .content{
+  padding: 0 10px 0 10px;
+}
+
+/* Subject (title) of each comment */
+div.comment h3.title {
+  border-bottom: 1px solid #999999;
+}
+
+/* Links (edit, reply, delete) for each comment */
+div.comment div.links a,
+div.comment ul.links a {
+}
+
+/* Alternating styles for even/odd comments */
+.comments div.odd {
+  
+}
+
+.comments div.even {
+  
+}
+
+/* A special highlight style for a comment by the author of the node */
+.comments div.comment-by-author {
+  border: 1px solid #6A970C;
+}
+
+/* Comment signatures */
+.signature {
+  border-top: 1px solid #d6ddb9;
+}
+
+/* User avatars in comments */
+.comment-wrapper .picture img {
+}
+
+.comments .box{
+  border: 1px solid #999999;
+}
+
+/* Forum
+/-------------------------------------------------------------- */
+#forum .description {
+}
+
+.forum-topic-navigation {
+  border-top: 1px solid #888;
+  border-bottom: 1px solid #888;
+}
+
+
+/* Poll
+/-------------------------------------------------------------- */
+div.poll div.bar {
+  background-color: #ddd;
+}
+
+div.poll div.bar div.foreground {
+  background-color: #999;
+}
+
+
+/* Profiles
+/-------------------------------------------------------------- */
+.profile .picture {
+  float: left;
+}
+
+/* Styles for sub-headings on user profiles */
+.profile dt {
+  background-color: #ccc;
+}
+
+.profile .content_counters{
+  float:right;
+}
+.profile .bundle_counter,
+.profile .tool_counter{
+  height: 60px; 
+  
+  margin-bottom: 10px;
+}
+
+.profile .counter_number{
+  width:70px;
+  height: 40px;
+  
+  float:left;
+  padding: 20px 0 0 0;
+  
+  font-size: 46px;
+  font-weight: bold;
+  text-align: right;
+  
+  background: url("../images/profile_counter_number_bg.png");
+}
+.profile .counter_text{
+  width:50px;
+  height: 40px;
+  
+  float:left;
+  padding: 10px;
+  
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  
+  background: url("../images/profile_counter_text_bg.png");  
+}
+
+.profile .tool_counter .counter_text span, 
+.profile .tool_counter .counter_number{
+  color: #588E30;
+}
+.profile .bundle_counter .counter_text span,
+.profile .bundle_counter .counter_number{
+  color: #336699;
+}
+
+.profile .user-data table{
+  font-size:14px;
+}
+
+.profile .user-data table td{
+  padding-bottom: 20px;
+   
+}
+
+.profile .user-data table td.first{
+  color: #588E30;
+  font-weight: bold;
+  
+  width: 150px; 
+}
+
+.profile h3{
+  color: #588E30;
+}
+
+/* Fivestar
+/-------------------------------------------------------------- */
+
+div.fivestar-widget-static .star,
+div.fivestar-widget .star a{
+  background: url(../images/fivestar_stars.png); 
+}
+
+div.fivestar-widget-static .star span.off{
+  background: url(../images/fivestar_stars.png); 
+}
+
+div.fivestar-widget-static .star span.on{
+  background: url(../images/fivestar_stars.png) no-repeat 0 -32px;
+}
+
+/* User avatars in comments */
+.comments .fivestar-form-item .description{
+  display: none;
+}
+
+.comments .fivestar-widget-static{
+  display: none;
+}
+
+
+/* Views Tag Cloud
+/-------------------------------------------------------------- */
+.views-cloud{
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.views-cloud a:link{
+   display: inline-block;
+   padding: 5px;
+   line-height: 35px;
+}
+.views-cloud .views-cloud-size-1 a:link,
+.views-cloud .views-cloud-size-1 a:visited{
+  font-size: 26px;
+  font-weight:normal;
+  color: #999;
+  text-transform:none;
+}
+
+.views-cloud .views-cloud-size-2 a:link,
+.views-cloud .views-cloud-size-2 a:visited{
+  font-size: 26px;
+  font-weight:normal;
+  color: #333;
+  text-transform:none;
+}
+
+.views-cloud .views-cloud-size-3 a:link,
+.views-cloud .views-cloud-size-3 a:visited{
+  font-size: 26px;
+  font-weight:normal;
+  color: #336699;
+  text-transform:none;  
+}
+
+.views-cloud .views-cloud-size-4 a:link,
+.views-cloud .views-cloud-size-4 a:visited{
+  font-size: 26px;
+  font-weight:bold;
+  color: #999;
+  text-transform:uppercase;  
+}
+
+.views-cloud .views-cloud-size-5 a:link,
+.views-cloud .views-cloud-size-5 a:visited{
+  font-size: 52px;
+  font-weight:bold;
+  color: #336699;
+  text-transform:none;  
+}
+
+.views-cloud .views-cloud-size-6 a:link,
+.views-cloud .views-cloud-size-6 a:visited{
+  font-size: 52px;
+  font-weight:normal;
+  color: #999;
+  text-transform:uppercase;  
+}
+
+.views-cloud .views-cloud-size-7 a:link,
+.views-cloud .views-cloud-size-7 a:visited{
+  font-size: 52px;
+  font-weight:bold;
+  color: #336699;
+  text-transform:none;  
+}
+
+
+/* Tabs
+/-------------------------------------------------------------- */
+
+div.ui-tabs{
+  width: 100%;
+}
+
+ul.ui-tabs-nav li{
+  width:120px;
+  height: 24px;
+   
+  background: url("../images/tab_green.png");
+  
+  text-align: center;
+  text-transform: uppercase;
+}
+
+ul.ui-tabs-nav li.ui-tabs-selected{
+  background: url("../images/tab_green_active.png");
+}
+
+.ui-tabs-nav li.ui-tabs-selected a:link,
+.ui-tabs-nav li.ui-tabs-selected a:visited{
+  color: #fff;
+}
+
+ul.ui-tabs-nav li.blue-tab{
+  background: url("../images/tab_blue.png");
+}
+
+ul.ui-tabs-nav li.ui-tabs-selected.blue-tab{
+  background: url("../images/tab_blue_active.png");
+}
+
+ul.ui-tabs-nav li a:link,
+ul.ui-tabs-nav li a:visited{
+  height: 20px;
+  
+  padding-top: 4px;
+  
+  font-size: 12px;
+  color: #333333;
+}
+
+.ui-tabs .ui-tabs-panel{
+  height: 420px;
+  
+  border: 2px solid #999999;
+  background: #666666;
+  
+ 
+}
+
+.ui-tabs .ui-tabs-panel-inner{
+  height: 100%;
+}
+/* Ubercart - catalog
+/-------------------------------------------------------------- */
+
+/* Horizontal list of subcategories in catalog */
+ul.uc-categories {
+}
+
+.uc-categories li a {
+  font-weight: bold;
+  padding: 0 5px 0 3px;
+}
+
+/* Product and category names */
+.catalog-grid-title a:link,
+.catalog-grid-title a:visited,
+.category a:link,
+.category a:visited {
+}
+
+.catalog-grid-title a:hover,
+.catalog-grid-title a:focus,
+.category a:hover,
+.category a:focus {
+}
+
+/* Sell price in Ubercart catalog */
+.category-grid-products .catalog-grid-sell-price {
+}
+
+/* Ubercart - add to cart buttons
+/-------------------------------------------------------------- */
+
+/* Add to cart buttons */
+input.node-add-to-cart,
+input.list-add-to-cart {
+}
+
+/* Hover and focus styles, with .hover class added for IE6 support */
+input.node-add-to-cart:hover,
+input.node-add-to-cart.hover,
+input.node-add-to-cart:focus,
+input.list-add-to-cart:hover,
+input.list-add-to-cart.hover,
+input.list-add-to-cart:focus {
+}
+
+/* Ubercart - product nodes
+/-------------------------------------------------------------- */
+
+#field-group {
+}
+
+#price-group {
+}
+
+/* Product images */
+.product-image a img {
+}
+
+.product-image a:hover img,
+.product-image a:focus img {
+}
+
+/* Display price on full product nodes */
+.full-node .product-group .uc-price-display {
+}
+
+/* Product attributes on full nodes */
+.full-node .product-group .attributes {
+}
+
+/* Ubercart - general / checkout
+/-------------------------------------------------------------- */
+
+/* For optional "Powered by Ubercart" footer message */
+#store-footer {
+}
+
+#store-footer a:link,
+#store-footer a:visited {
+}
+
+/* View cart/Checkout links in Ubercart cart block */
+.cart-block-summary-links ul.links li a {
+}
+
+.cart-block-summary-links ul.links li.cart-block-checkout a:link,
+.cart-block-summary-links ul.links li.cart-block-checkout a:visited {
+}
+
+/* Key checkout process buttons: Checkout, Continue, and Submit Order */
+#uc-cart-view-form #edit-checkout,
+#uc-cart-checkout-form #edit-continue,
+#uc-cart-checkout-review-form #edit-submit {
+}
+
+/* Table on final order review page */
+.order-review-table {
+}
+
+#cart-form-products table th {
+  border-bottom: 3px solid #dec2c3;
+}
+
+
+/* footer-top*/
+.footer-top-container{
+	padding: 5px 15px 0px 15px;
+	background: url('../images/footer/footer_bar_limiter.png') no-repeat;
+	background-position: top right;
+	float: left;
+	height: 90px;
+	overflow: hidden;
+}
+
+div.footer-top-container div.title{
+	margin-bottom: 5px;
+}
+
+div.footer-top-container.last {
+	background: none;
+}
+
+.footer-top-container-inner {
+	clear: both;
+}
+
+#footer-top #footer-tools-title a:link,
+#footer-top #footer-tools-title a:visited{
+	color: #6A970C;
+	text-decoration: none;
+}
+#footer-top #footer-tools-desc a:hover{
+	color: #6A970C;
+	text-decoration: none;
+}
+
+#footer-top #footer-bundles-title a:link,
+#footer-top #footer-bundles-title a:visited{
+	color: #6699CC;
+	text-decoration: none;
+}
+#footer-top #footer-bundles-desc a:hover{
+	color: #6699CC;
+	text-decoration: none;
+}
+
+.footer-top-container .header{
+	margin: 0px 0px 5px 0px;
+	padding: 0px 0px 5px 0px;
+	border-bottom-style: solid;
+	border-bottom-color: #899498;
+	border-width: 1px; 
+}
+
+
+#footer-top a,
+#footer-top a:link,
+#footer-top a:visited{
+	clear: both;
+	font-size: 10px;
+	color: #333333;
+}
+
+
+.footer-top-container table .left{
+	padding: 0px 20px 5px 0px;
+}
+
+.footer-top-limiter{
+	margin-top: 160px;
+}
+
+.footer-top-container div.description a,
+.footer-top-container div.description a:link,
+.footer-top-container div.description a:visited{
+	font-size: 0.8em;
+}
+
+.footer-top-wrapper {
+	padding:10px 0px 0px 0px;
+	background: url('../images/footer/footer_bar1.png') repeat;
+	height: 80px;
+	width: 100%;
+	position: absolute;
+  bottom: 50px;
+  line-height: 80%;
+  
+  text-align: center;
+}
+
+
+/* Skinr
+/-------------------------------------------------------------- */
+
+/* This is a sample Skinr style to get you started. See fusion_starter.info */
+.fusion-example-stylename .inner {
+  /* When setting the background color, also set foreground colors for text and
+    links, even if it's similar to the default body style. Remember, this block
+    style may be used in regions with other foreground colors, thus making text
+    invisible if left unspecified */
+  background-color: #ccc;
+  color: #000;
+  /* All padding and borders should go on the .inner div, so as not to break
+    the widths of the grid */
+  border: 3px solid #000;
+  padding: 10px;
+}
+
+/* COLOR ADJUSTMENTS
+/-------------------------------------------------------------- */
+
+

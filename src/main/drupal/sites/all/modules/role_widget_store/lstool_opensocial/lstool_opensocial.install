@@ -1,0 +1,127 @@
+<?php
+// $Id$
+/**
+ * Install and Schema
+ *
+ * @author Andreas Diehl
+ * @package Role-Widgetstore
+ * @subpackage Drupal-Module
+ */
+
+/**
+ * Installs the tables for the _opensocial module
+ * @file
+ */
+
+/******************************************************************************
+ * Drupal Hooks                                                               *
+ ******************************************************************************/
+
+/**
+ * Implementation of hook_install()
+ */
+function lstool_opensocial_install() {
+	// create schemas
+	drupal_install_schema('lstool_opensocial');
+  // register module
+  $sql = 'INSERT INTO {lstool_types} (name, display) VALUES ("%s", "%s")';
+  db_query(db_rewrite_sql($sql), 'lstool_opensocial', 'OpenSocial');
+} 
+
+/**
+ * Implementation of hook_uninstall()
+ */
+function lstool_opensocial_uninstall(){
+	// remove schemas
+	drupal_uninstall_schema('lstool_opensocial');
+		
+	// unregister module
+	$sql = 'DELETE FROM {lstool_types} WHERE name = "%s"';
+	db_query(db_rewrite_sql($sql), 'lstool_opensocial');
+	
+	// drop shindig_server table
+	db_query('DROP TABLE IF EXISTS {shindig_server}');
+} 
+
+/**
+ * Implementation of hook_schema()
+ */
+function lstool_opensocial_schema(){
+  $schema['lstool_opensocial'] = array(
+		'fields' => array(
+			'vid' => array(
+        'description' => 'The current {node_revisions}.vid version identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+			),
+			'height' => array(
+        'description' => 'The height of the Widget',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+			),
+		),
+		'indexes' => array(
+                  //no indexes 
+		),
+    'unique keys' => array(
+      'vid'     => array('vid')
+    ),
+    'primary key' => array('vid')
+  );
+
+  $schema['shindig_server'] = lstool_opensocial_shindig_schema();
+  
+  return $schema;
+}
+
+/**
+ * Implementation of hook_update_N()
+ * Creates a new table with a single record. You're not allowed to add or delete records!
+ */
+function lstool_opensocial_update_6101() {
+ 	$schema['shindig_server'] = lstool_opensocial_shindig_schema();
+  
+	$ret = array();
+	db_create_table($ret, 'shindig_server', $schema['shindig_server']);
+	
+	$ret[] = update_sql("INSERT INTO {shindig_server} VALUES ()");
+  
+	return $ret;
+}
+
+function lstool_opensocial_shindig_schema(){
+	return array(
+		// Table description.
+		'description' => t('Retains the default and custom Shindig Server URLs'),
+		// Fields definitions
+		'fields' => array(
+			'id' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+				'default' => 1,
+				'description' => t('ID of the record'),
+			),
+			'defaultURL' => array(
+				'type' => 'varchar',
+				'length' => 255,
+				'not null' => TRUE,
+				'default' => 'http://' . $_SERVER['SERVER_NAME'],
+				'description' => t('The default URL of Shindig Server. This will be used in case the custom URl is missing.'),
+			),
+			'customURL' => array(
+				'type' => 'varchar',
+				'length' => 255,
+				'not null' => FALSE,
+				'default' => '',
+				'description' => t('The custom URL of Shindig Server. This will be used in case this is a valid URL.'),
+			),
+		),
+		// Index declarations.
+		'primary key' => array('id'),
+	);
+}

@@ -1,0 +1,14 @@
+; $Id: menu_html.info,v 1.1 2008/11/29 16:13:42 killes Exp $
+name = Menu HTML
+description = Allows menu items to contain html.
+dependencies[] = menu
+core = 6.x
+
+
+
+; Information added by drupal.org packaging script on 2010-04-13
+version = "6.x-1.1"
+core = "6.x"
+project = "menu_html"
+datestamp = "1271178013"
+

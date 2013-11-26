@@ -1,0 +1,10 @@
+core = "6.x"
+description = "Customize 403 and 404 error pages"
+name = "Errors"
+
+; Information added by drupal.org packaging script on 2011-09-16
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "errors"
+datestamp = "1316174834"
+

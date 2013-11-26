@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * Implementation of hook_boot().
+ * Modifies the filters of apache solr to show results even on an empty query
+ */
+function apachesolr_empty_query_boot() {
+
+  // check for search page
+  $search_path = 'search/apachesolr_search';
+  if (isset($_GET['q'])
+      && substr($_GET['q'], 0, strlen($search_path)) == $search_path) {
+
+    // get search phrase
+    $search_phrase = substr($_GET['q'], strlen($search_path) + 1);
+
+    // get filters
+    if (isset($_GET['filters'])) {
+      $filters = $_GET['filters'];
+    }
+
+    // check if filters AND search phrase do not exist
+    if (empty($filters) && empty($search_phrase)) {
+
+      // set fake filter
+      $_GET['filters'] = 1;
+
+    }
+  }
+
+}

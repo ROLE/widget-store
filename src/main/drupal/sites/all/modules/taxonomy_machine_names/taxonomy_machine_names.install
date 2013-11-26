@@ -1,0 +1,45 @@
+<?php
+
+require_once('taxonomy_machine_names.module');
+
+/**
+ * Implementation of hook_install()
+ *
+ */
+function taxonomy_machine_names_install() {
+
+  // yes, we are adding a field to a core table. this isn't an ideal sitaution,
+  // but the alternatives are not as fun. this is the "cleanest" approach given
+  // there is no support for hook_taxonomy() (view), and all the taxonomy get
+  // functions have a t.* query.
+  $return = array();
+
+  db_add_field($return, 'vocabulary', 'machine_name', array(
+    'type'   => 'varchar',
+    'length' => 32,
+  ));
+  db_add_unique_key($return, 'vocabulary', 'machine_name', array('machine_name') );
+
+  // let's attempt to generate machine names for everyone! very simplistic,
+  // should probably add more uniqueness guarantee to this at a later date.
+  $result = db_query("SELECT v.name, v.vid FROM {vocabulary} v WHERE machine_name IS NULL");
+  while ($get = db_fetch_object($result) ) {
+    db_query("UPDATE {vocabulary} SET machine_name = '%s' WHERE vid = %d", taxonomy_machine_names_generate_machine_name($get->name), $get->vid);
+  }
+
+  return $return;
+
+}
+
+
+/**
+ * Implementation of hook_uninstall()
+ *
+ */
+function taxonomy_machine_names_uninstall() {
+
+  $return = array();
+  db_drop_field($return, 'vocabulary', 'machine_name');
+  return $return;
+
+}

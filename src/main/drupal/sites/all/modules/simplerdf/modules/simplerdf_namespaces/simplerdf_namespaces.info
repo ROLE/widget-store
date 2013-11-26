@@ -1,0 +1,11 @@
+name = Simple RDF Namespaces
+description = Define custom namespaces in addition to default ones (including those provided by other RDF modules).
+dependencies[] = simplerdf
+package = RDF
+core = 6.x
+; Information added by drupal.org packaging script on 2012-01-04
+version = "6.x-1.0-beta5"
+core = "6.x"
+project = "simplerdf"
+datestamp = "1325651444"
+

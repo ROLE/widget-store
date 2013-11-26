@@ -1,0 +1,246 @@
+/* Contact Block
+-------------------------------------------------------------- */
+
+.gray-block{
+  background: url("../images/block_gray_background.png") top #CDD5D7;
+  border-bottom: #B8BFC1 solid 2px;
+  border-top: #B8BFC1 solid 2px;
+  padding: 5px 5px 0 5px;
+  
+  color: #333333;
+}
+
+.gray-block .content a:link,
+.gray-block .content a:visited{
+  font-weight: bold;
+  color: #333;
+  background: url("../images/list-style-image.png") no-repeat;
+  padding-left: 15px;
+  width: auto;
+}
+
+/* Search Blocks
+-------------------------------------------------------------- */
+
+.page-taxonomy .sidebar-first,
+.page-search .sidebar-first{
+  height: 100%;
+  
+  padding-bottom: 9999px;
+  margin-bottom: -9999px;
+  
+  background: rgb(122, 122, 122); /* Fall-back for browsers that don't support rgba */
+  background: rgba(122, 122, 122, .5);
+  
+}
+
+.page-taxonomy .sidebar-first-inner,
+.page-search .sidebar-first-inner{
+
+}
+/*
+block-apachesolr
+block-apachesolr_search
+*/
+
+.page-taxonomy .sidebar-first .block .inner,
+.page-search .sidebar-first .block .inner{
+  padding: 15px 0px 0 0px;
+}
+
+.page-taxonomy .sidebar-first .block a,
+.page-search .sidebar-first .block a{
+  color: #333;
+}
+
+.page-taxonomy .sidebar-first .block h2.block-title,
+.page-search .sidebar-first .block h2.block-title{
+  
+  padding-left: 10px;
+  
+  border-bottom: 1px solid #6A970C;
+  
+  font-size: 12px;
+  text-transform: uppercase;
+  font-stretch: expanded;
+}
+
+.page-taxonomy .sidebar-first .block h3,
+.page-search .sidebar-first .block h3{
+  padding-left: 10px;
+  
+  font-size: 12px;
+}
+
+.page-taxonomy .sidebar-first .block ul,
+.page-search .sidebar-first .block ul{
+  padding-left: 10px;
+}
+
+.page-taxonomy .sidebar-first .block ul li,
+.page-search .sidebar-first .block ul li{
+  list-style: none;
+}
+
+.page-taxonomy .sidebar-first .block ul li a,
+.page-search .sidebar-first .block ul li a{
+  padding-left: 14px;
+}
+
+.page-taxonomy .sidebar-first .block ul li img,
+.page-search .sidebar-first .block ul li img{
+  display: none;
+}
+
+.page-taxonomy .sidebar-first .block a.apachesolr-unclick,
+.page-search .sidebar-first .block a.apachesolr-unclick{
+  height: 10px;
+  width: 10px;
+  
+  padding-right: 0px;
+  padding-left: 0px;
+  
+  background: url("../images/icon_search_unclick.png") no-repeat;
+  display: inline-block;
+  
+  text-indent: -9999px;
+}
+
+.page-taxonomy .sidebar-first .block a.active,
+.page-search .sidebar-first .block a.active{
+  height: 10px;
+  
+  background: url("../images/icon_search_active.png") no-repeat 0px 2px;
+}
+
+
+/* Similar WIdgets and Bundle
+-------------------------------------------------------------- */
+.above-comments .block-apachesolr{
+  
+}
+
+/* Multistep Common
+-------------------------------------------------------------- */
+.block-multistep  {
+	height: 50px;
+}
+
+.multistep-progress-bar-wrapper {
+	position: relative;
+	top: 9px;
+}
+
+.block-multistep .item-list ul li {
+	color:#333333;
+	list-style-type: none;
+	float: left;
+	border-right-style: solid;
+	border-color: #333333;
+	border-width: 1px;
+	width: 183px;
+}
+
+
+/* Multistep Bundles */
+#block-multistep-bundle {
+	color: #658CB2;
+}
+
+div#block-multistep-bundle .item-list ul li a,
+div#block-multistep-bundle .item-list ul li span {
+	color:#333333;
+	margin: 0 auto;
+	display: block;
+	width: 182px;
+	text-align:center;
+}
+
+/* Multistep Tools */
+
+div#block-multistep-lstool_opensocial .inner,
+div#block-multistep-lstool_w3c .inner{
+	margin: 0;
+}
+
+div#block-multistep-lstool_opensocial .inner .content,
+div#block-multistep-lstool_w3c .inner .content{
+	width: 935px;
+}
+
+div#block-multistep-lstool_opensocial .item-list ul li,
+div#block-multistep-lstool_w3c .inner .item-list ul li {
+	color:#333333;
+	list-style-type: none;
+	float: left;
+	border-right-style: solid;
+	border-color: #333333;
+	border-width: 1px;
+	width: 130px;
+}
+
+div#block-multistep-lstool_w3c .item-list ul li a,
+div#block-multistep-lstool_w3c .item-list ul li span,
+div#block-multistep-lstool_opensocial .item-list ul li a,
+div#block-multistep-lstool_opensocial .item-list ul li span  {
+	color:#333333;
+	margin: 0 auto;
+	display: block;
+	width: 129px;
+	text-align:center;
+}
+
+
+/* remove last limiter in bar 
+-------------------------------------------------------------- */
+.block-multistep .item-list ul li+li+li+li+li {
+	border-right-style: none;
+} 
+
+
+#block-multistep-bundle .inner {
+	margin: 0;
+}
+
+#block-multistep-bundle .inner .content{
+	width: 935px;
+}
+
+#block-multistep-bundle .multistep-progress-bar {
+	height: 2em;
+	color:#6699CC;
+	background-image: 	-webkit-gradient(linear, 0% 0%, 100% 0%, from(#FFFFFF), to(#6699CC));	/* Chrome,Safari4+ */
+	background-image: 	-webkit-linear-gradient(left,#FFFFFF, #6699CC );	/* Chrome10+,Safari5.1+ */
+	background-image: 	-moz-linear-gradient(left, #FFFFFF, #6699CC);		/* FF3.6+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#FFFFFF', endColorstr='#6699CC',GradientType=1 );	/* IE6-9 */
+	background-image: 	-ms-linear-gradient(left, #FFFFFF, #6699CC);	/* IE10+ */
+	background-image: 	-o-linear-gradient(left, #FFFFFF, #6699CC);		/* Opera 11.10+ */
+	background-image: 	linear-gradient(to right, #FFFFFF,#6699CC);		/* W3C */
+	background-color: #6699CC;		/* FallBack */
+}
+
+/* Multistep Tool*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

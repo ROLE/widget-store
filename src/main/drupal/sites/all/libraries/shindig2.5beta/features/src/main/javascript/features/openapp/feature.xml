@@ -1,0 +1,8 @@
+<feature>
+  <name>openapp</name>
+  <dependency>globals</dependency>
+  <gadget>
+  </gadget>
+  <container>
+  </container>
+</feature>

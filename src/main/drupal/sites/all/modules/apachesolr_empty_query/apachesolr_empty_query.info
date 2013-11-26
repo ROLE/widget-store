@@ -1,0 +1,7 @@
+name = Apache Solr Empty Query
+description = Modifies the filters of apache solr to show results even on an empty query
+dependencies[] = apachesolr
+package = "Apache Solr"
+core = "6.x"
+
+

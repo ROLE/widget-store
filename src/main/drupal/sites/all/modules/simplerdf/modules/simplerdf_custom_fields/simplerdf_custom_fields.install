@@ -1,0 +1,94 @@
+<?php
+/**
+ * @file
+ * Module installer.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function simplerdf_custom_fields_schema() {
+  $t = get_t();
+
+  $schema['simplerdf_custom_fields'] = array(
+    'description' => $t('Custom fields'),
+
+    'fields' => array(
+      'name' => array(
+        'description' => $t('Machine name of the field.'),
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+      ),
+      'title' => array(
+        'description' => $t('User-friendly field title.'),
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'type' => array(
+        'description' => $t('Type of field: basic or advanced.'),
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ),
+      'settings' => array(
+        'description' => $t('Custom field settings.'),
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+        'serialize' => TRUE,
+      ),
+    ),
+
+    'primary key' => array('name'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function simplerdf_custom_fields_install() {
+  drupal_install_schema('simplerdf_custom_fields');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function simplerdf_custom_fields_uninstall() {
+  drupal_uninstall_schema('simplerdf_custom_fields');
+}
+
+/**
+ * Implements hook_update_N() for 6001.
+ */
+function simplerdf_custom_fields_update_6001(&$sandbox) {
+  $ret = array();
+
+  $result = db_query("SELECT * FROM {simplerdf_custom_fields}");
+  while ($field = db_fetch_object($result)) {
+    // Migrate basic field settings
+    if ($field->type == 'basic') {
+      $settings = unserialize($field->settings);
+      // Flag as node field
+      $settings['object_types'] = array('node' => 'node');
+      if (isset($settings['node_field'])) {
+        // Map node field key into just field key
+        $settings['field_key'] = $settings['node_field'];
+        unset($settings['node_field']);
+      }
+      // Update
+      $query = "UPDATE {simplerdf_custom_fields} SET settings = '%s' WHERE name = '%s'";
+      $args = array(serialize($settings), $field->name);
+      $update_result = db_query($query, $args);
+      // Construct executed query
+      _db_query_callback($args, TRUE);
+      $query = preg_replace_callback(DB_QUERY_REGEXP, '_db_query_callback', $query);
+      $ret[] = array('success' => $update_result !== FALSE, 'query' => check_plain($query), 'rows' => db_affected_rows());
+    }
+  }
+
+  return $ret;
+}

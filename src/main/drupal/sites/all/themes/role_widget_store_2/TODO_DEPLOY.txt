@@ -1,0 +1,5 @@
+Static Pages (About, Developer, Partner)
+	- Copy content from my (Sven) local widgetstore and paste it as content.
+	- Copy files/images/profile_pictures/profile_image_default.png
+	- Copy files/imagecache/overlay/*
+  - Copy Favicon to root folder

@@ -1,0 +1,9 @@
+; $Id$
+name = lstool_W3C
+description = Supports W3C Tools.
+package = ROLE Widget Store
+core = 6.x
+php = 5.2
+
+dependencies[] = lstool
+

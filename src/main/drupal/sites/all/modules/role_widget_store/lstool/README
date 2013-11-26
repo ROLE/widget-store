@@ -1,0 +1,31 @@
+ROLE Widgetstore
+----------------
+
+To function properly, the ROLE Widgetstore requires 
+ a) mod_rewrite to be enabled in Apache
+ b) the .htaccess to be modified in the following way:
+
+    The part, between by "### BEGIN ROLE WIDGETSTORE SECTION ###" and
+    "### END ROLE WIDGETSTORE SECTION ###" hast to be inserted at this
+    position:
+
+# excerpt from .htaccess provided by drupal #
+(...)
+  # If your site is running in a VirtualDocumentRoot at http://example.com/,
+  # uncomment the following line:
+  # RewriteBase /
+  
+  ### BEGIN ROLE WIDGETSTORE SECTION ###
+  # Rewrite URLs for shindig
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^gadgets/(.*)$ /sites/all/modules/role_widget_store/lstool_opensocial/shindig/$1 [L,QSA]
+  ### END ROLE WIDGETSTORE SECTION ###
+
+  # Rewrite URLs of the form 'x' to the form 'index.php?q=x'.
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} !=/favicon.ico
+  RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]
+(...)
+# end of excerpt

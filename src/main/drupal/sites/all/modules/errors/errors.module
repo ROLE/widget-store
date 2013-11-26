@@ -1,0 +1,66 @@
+<?php
+
+/**
+ * Implements hook_menu()
+ */
+function errors_menu() {
+  $items['error/403'] = array(
+    'title' => 'ACCESS DENIED',
+    'page callback' => 'errors_403_page',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  
+  $items['error/404'] = array(
+    'title' => 'PAGE NOT FOUND',
+    'page callback' => 'errors_404_page',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  
+  return $items;
+}
+
+/**
+ * Callback for 403 errors
+ */
+function errors_403_page() {
+  return theme('error_403');
+}
+
+/**
+ * Callback for 404 errors
+ */
+function errors_404_page() {
+  return theme('error_404');
+}
+
+/**
+ * Implements hook_theme()
+ */
+function errors_theme() {
+  return array(
+    'error_403' => array(
+      'arguments' => array(),
+      'template' => 'error-403'
+    ),
+    'error_404' => array(
+      'arguments' => array(),
+      'template' => 'error-404'
+    ),
+  );
+}
+
+/**
+ * Implements hook_preprocess_error_403
+ */
+function errors_preprocess_error_403(&$variables) {
+  $variables['image'] = "path to some image";
+}
+
+/**
+ * Implements hook_preprocess_error_404
+ */
+function errors_preprocess_error_404(&$variables) {
+  $variables['image'] = "path to some image";
+}

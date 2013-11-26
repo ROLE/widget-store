@@ -1,0 +1,214 @@
+ul#my-list li{
+	background: none;
+}
+
+/* deactivate borders in nav bars
+ ------------------------------------------------------------------*/
+div#ttstabs-1,
+div#tabsMF-1,
+div#tabsMF-2,
+div#tabsMF-3, 
+div#tabsMF-4,
+div#tabsMF-5,
+div#tabsMF-6,
+div#tabsMF-7 {
+	border: none;
+	background: none;
+}
+
+div.hoverscroll ul.list li.ui-state-default a{
+	color:#666666;
+}
+
+div.hoverscroll ul.list li.ui-state-active a{
+	color:#333;
+}
+.ttstagstag {
+	background-color: #5A5856;
+}
+
+
+/* Droppable Field */
+.droppableField-wrapper{
+	font-family: Tahoma;
+	width:50%;
+	float: left;
+}
+
+.droppableField {
+	width: auto;
+	height: 260px;
+	padding:5px;
+	margin: 5px;
+	font-size:70%;
+	background-image: 	-webkit-gradient(linear, 0% 0%, 0% 100%, from(#B3B3B3), to(#898886));	/* Chrome,Safari4+ */
+	background-image: 	-webkit-linear-gradient(top,#B3B3B3 50%, #898886 100%); /* Chrome10+,Safari5.1+ */
+	background-image: 	-moz-linear-gradient(top, #B3B3B3, #898886);	/* FF3.6+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#B3B3B3', endColorstr='#898886',GradientType=0 ); /* IE6-9 */
+	background-image: 	-ms-linear-gradient(top, #B3B3B3, #898886);		/* IE10+ */
+	background-image: 	-o-linear-gradient(top, #B3B3B3, #898886);		/* Opera 11.10+ */
+	background-image: 	linear-gradient(to bottom, #B3B3B3,#898886);	/* W3C */
+	background-color:#898886;		/* FallBack */
+}
+
+.droppableField h2 {
+	color:#666666;
+	font-size:2.0em;
+	margin:12px 0 13px 0;
+	font-weight:normal;
+}
+
+/* Tabs */
+
+li#tabsSL-1 a,
+li#tabsSL-2 a,
+li#tabsSL-3 a,
+li#tabsSL-4 a,
+li#tabsSL-5 a,
+li#tabsSL-6 a, 
+li#tabsSL-7 a {
+	padding: 0;
+}
+
+#ttstabs-2 {
+	background: url("/sites/all/themes/role_widget_store_2/images/tts_scrollbar.png") no-repeat;
+	border: none;
+}
+
+#tabsMF {
+	width: 100%;
+	border-style: none;
+	padding: 0;
+}
+
+#ttstabs {
+	background: none;
+	border-style: none;
+	padding: 0;
+	width: auto;
+}
+
+
+#ttstabs_1:active,
+#ttstabs_1:link,
+#ttstabs_2:active,
+#ttstabs_2:link{
+	background-color:#898886;
+  	color: #FFFFFF;
+  	text-transform: uppercase;
+}
+
+
+#ttstabs_1:hover,
+#ttstabs_2:hover,
+li.ui-state-active #ttstabs_1,
+li.ui-state-active #ttstabs_2{
+	background-image: 	-webkit-gradient(linear, 0% 0%, 0% 100%, from(#7C7C7C), to(#626160));	/* Chrome,Safari4+ */
+	background-image: 	-webkit-linear-gradient(top,#7C7C7C, #626160); /* Chrome10+,Safari5.1+ */
+	background-image: 	-moz-linear-gradient(top, #7C7C7C, #626160);	/* FF3.6+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7C7C7C', endColorstr='#626160',GradientType=0 ); /* IE6-9 */
+	background-image: 	-ms-linear-gradient(top, #7C7C7C, #626160);		/* IE10+ */
+	background-image: 	-o-linear-gradient(top, #7C7C7C, #626160);		/* Opera 11.10+ */
+	background-image: 	linear-gradient(to bottom, #7C7C7C,#626160);	/* W3C */
+	background-color:#626160;		/* FallBack */
+  	color: #FFFFFF;
+  	text-transform: uppercase;
+}
+
+
+#ttstabs ul li{
+	width: auto;
+	border: none;
+	margin: 5px;
+}
+
+
+/* Tag Cloud */
+
+.tagCloud-wrapper{
+	width:50%;
+	float: left;
+	font-size: 12px;
+	font-family: Tahoma;
+}
+
+.tagCloud {
+	width: auto;
+	height:260px;
+	text-align:center;
+	padding:5px; 
+	font-size:70%;
+	margin: 5px 5px 5px 0;
+	
+	background-image: 	-webkit-gradient(linear, 0% 0%, 0% 100%, from(#B3B3B3), to(#898886));	/* Chrome,Safari4+ */
+	background-image: 	-webkit-linear-gradient(top,#B3B3B3 50%, #898886 100%); /* Chrome10+,Safari5.1+ */
+	background-image: 	-moz-linear-gradient(top, #B3B3B3, #898886);	/* FF3.6+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#B3B3B3', endColorstr='#898886',GradientType=0 ); /* IE6-9 */
+	background-image: 	-ms-linear-gradient(top, #B3B3B3, #898886);		/* IE10+ */
+	background-image: 	-o-linear-gradient(top, #B3B3B3, #898886);		/* Opera 11.10+ */
+	background-image: 	linear-gradient(to bottom, #B3B3B3,#898886);	/* W3C */
+	background-color:#898886;		/* FallBack */
+}
+
+.tagCloud .ui-widget-header { 
+	/*background: #cccccc url(images/ui-bg_highlight-soft_75_cccccc_1x100.png) 50% 50% repeat-x;*/
+	color: #222222;
+	font-weight: bold;
+	margin-bottom: 0.5em;
+}
+
+.tagCloud h2 {
+	color:#ffffff;
+	font-size:2.0em;
+	margin:12px 0 13px 0;
+	font-weight:normal;
+	font-size: 12px;
+	width: 135px;
+	text-transform: uppercase;
+	padding: 5px 0 5px 0;
+	
+	background-color:#898886;		/* FallBack */
+}
+
+/* Tag List aka Tag Cloud 2*/
+
+.tagList {
+	border: none;
+	padding:0; 
+}
+
+.taglist ul {
+	padding: 0;
+	margin: 0;
+}
+
+
+
+.tagList li {
+	cursor: pointer;
+	list-style-type:none; 
+	float:left; 
+	height:30px;
+	text-decoration:none;
+	color:#ffffff;
+	text-align: center;
+	line-height: 30px;
+	text-align: center;
+	font-size:1.0em;
+	margin: 10px 15px 10px 0px;
+	
+	background-color:#656363;		/* FallBack */
+}
+
+
+.tagList li hover {
+	text-decoration:underline;
+}
+
+
+/* Misc */
+
+.heightCalc {
+	width: 448px;
+	margin: 5px;
+}

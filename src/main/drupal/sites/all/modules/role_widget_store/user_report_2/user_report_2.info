@@ -1,0 +1,11 @@
+; $Id: $
+
+name = User Report 2 Module 
+description = Adds content types to create user reports for bundles and all kinds of widgets
+package = ROLE Widget Store
+core = 6.x
+
+dependencies[] = better_formats
+dependencies[] = fivestar
+dependencies[] = nodereference
+dependencies[] = views

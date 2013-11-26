@@ -1,0 +1,15 @@
+; $Id: media_hulu.info,v 1.2 2009/03/13 02:30:39 aaron Exp $
+
+name = Media: Hulu
+description = Embedded Video Field provider file for Hulu.com.
+core = 6.x
+dependencies[] = emvideo
+package = Media
+
+
+; Information added by drupal.org packaging script on 2009-03-13
+version = "6.x-1.0-alpha1"
+core = "6.x"
+project = "media_hulu"
+datestamp = "1236912031"
+

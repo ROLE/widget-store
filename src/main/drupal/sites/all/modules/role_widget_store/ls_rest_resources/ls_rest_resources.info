@@ -1,0 +1,6 @@
+name = ROLE REST Resource
+description = Resources for the ROLE REST web service
+package = ROLE Widget Store
+
+core = 6.x
+php = 5.2

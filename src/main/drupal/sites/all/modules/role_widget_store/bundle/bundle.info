@@ -1,0 +1,37 @@
+; $Id: $
+
+name = Bundle Module
+description = Adds content types to create bundles
+package = ROLE Widget Store
+core = 6.x
+dependencies[] = views
+
+dependencies[] = better_formats
+
+dependencies[] = content
+dependencies[] = text
+dependencies[] = content_copy
+dependencies[] = link
+dependencies[] = nodereference
+dependencies[] = imagefield
+dependencies[] = content_permissions
+
+dependencies[] = fivestar
+
+dependencies[] = views_customfield
+
+dependencies[] = nodereference
+dependencies[] = nodereference_explorer
+dependencies[] = modalframe
+
+dependencies[] = imagecache
+
+dependencies[] = emfield
+
+dependencies[] = multistep
+dependencies[] = content_multigroup
+
+
+
+
+

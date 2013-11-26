@@ -1,0 +1,167 @@
+<?php
+
+
+/**
+ * @file    taxonomy_machine_names.module
+ * @desc    Attempts to solve the taxonomy machine name issue (for vocabularies
+ *          only).
+ *
+ */
+
+
+/**
+ * Implementation of hook_views_api()
+ *
+ */
+function taxonomy_machine_names_views_api() {
+  return array(
+    'api'  => 2,
+    'path' => drupal_get_path('module', 'taxonomy_machine_names') . '/includes',
+  );
+}
+
+
+/**
+ * Implementation of hook_schema_alter()
+ *
+ */
+function taxonomy_machine_names_schema_alter(&$schema) {
+
+  // please see taxonomy_machine_names.install for all the ugly details
+  $schema['vocabulary']['fields']['machine_name'] = array(
+    'type'   => 'varchar',
+    'length' => 32,
+  );
+  $schema['vocabulary']['unique keys'] = array(
+    'machine_name' => array('machine_name'),
+  );
+
+}
+
+
+/**
+ * Implementation of hook_form_alter()
+ *
+ */
+function taxonomy_machine_names_form_alter(&$form, $form_state, $form_id) {
+  
+  if ($form_id == 'taxonomy_form_vocabulary') {
+    
+    $is_update    = isset($form['#parameters'][2]) ? TRUE : FALSE;
+    $machine_name = isset($form['#parameters'][2]['machine_name']) ? $form['#parameters'][2]['machine_name'] : NULL;
+    
+    $form['identification']['machine_name'] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Machine name'),
+      '#maxlength'     => 60,
+      '#description'   => t('The machine readable name for this vocabulary, should consist only of lower case, alpha numeric characters, and underscores. This name should *never* be changed.'),
+      '#required'      => 1,
+      '#weight'        => 0,
+    );
+    
+    if ($is_update) {
+      $form['identification']['machine_name']['#disabled'] = TRUE;
+      $form['identification']['machine_name']['#value'] = $machine_name;
+    }
+    else {
+      // We'll include our machine name generation code on create, they
+      // shouldn't be modified on update after all...
+      taxonomy_machine_names_js_generate_machine_name();
+    }
+
+  }
+
+}
+
+/* End of hooks, private/helper functions follow
+---------------------------------------------------------------------- */
+
+/**
+ * We'll expose a call to grab the vocabulary by machine name. We're using the
+ * taxonomy name space in order to keep the functions a bit more consistent.
+ * This does include functionality for taxonomy_get_tree within this as well.
+ *
+ * @deprecated deprecated since 6.x-1.0-beta2, will be removed in 6.x-1.0
+ * @see taxonomy_vocabulary_machine_name_load()
+ *
+ */
+function taxonomy_get_vocabulary($machine_name, $include_terms = FALSE) {
+
+  $vocabulary = _taxonomy_machine_names_get_vocabulary($machine_name);
+
+  if ($include_terms && isset($vocabulary->vid) ) {
+    return taxonomy_get_tree($vocabulary->vid);
+  }
+
+  return $vocabulary;
+
+}
+
+
+/**
+ * Returns the vocabulary object for the specified vocabulary. This is a
+ * backport of the D7 function by the same name.
+ *
+ * @param   $name  The vocabulary's machine name.
+ * @return  The vocabulary object with all its metadata, if exists, FALSE
+ *          otherwise. Results are statically cached.
+ *
+ */
+function taxonomy_vocabulary_machine_name_load($name) {
+
+  static $vocabulary = array();
+
+  if (!isset($vocabulary[$name]) ) {
+    $vocabulary[$name] = _taxonomy_machine_names_get_vocabulary($name);
+  }
+
+  return $vocabulary[$name];
+
+}
+
+
+/**
+ * Generate a machine name given a string
+ *
+ */
+function taxonomy_machine_names_generate_machine_name($string) {
+  // Consider '/\W+/' as a reg exp instead.
+  return preg_replace('/[^[:alnum:]_]/', '_', strtolower(trim($string) ) );
+}
+
+
+
+/**
+ * Generate a machine name given a text field via javascript
+ *
+ * @param   (string)    source field
+ * @param   (string)    target field
+ *
+ */
+function taxonomy_machine_names_js_generate_machine_name($source = 'name', $target = 'machine-name') {
+
+  $tokens = array(
+    '%source%' => 'edit-' . $source,
+    '%target%' => 'edit-' . $target,
+  );
+  $js = file_get_contents(dirname(__FILE__) . '/js/generate.js');
+
+  foreach($tokens as $key => $sub) {
+    $js = str_replace($key, $sub, $js);
+  }
+
+  drupal_add_js($js, 'inline');
+
+}
+
+
+/**
+ * Isolate out our helper query
+ *
+ */
+function _taxonomy_machine_names_get_vocabulary($machine_name) {
+
+  $result = db_query("SELECT v.* FROM {vocabulary} v WHERE machine_name = '%s'", $machine_name);
+  return db_fetch_object($result);
+
+}

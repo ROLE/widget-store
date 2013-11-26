@@ -1,0 +1,402 @@
+<?php
+// $Id: ctools_plugin_example.module,v 1.1 2009/08/17 22:07:14 merlinofchaos Exp $
+
+/****************************************************************
+ *       DRUPAL HOOKS        
+ ****************************************************************/
+
+/**
+ *  Implementation of hook_enable
+ */
+
+function system_components_enable() {
+
+  //import content types
+  _system_components_import_cck_nodes();
+
+  //import rules
+  _system_components_import_rules();
+}
+
+/**
+ *  Implementation of hook_disable
+ */
+
+function system_components_disable() {
+
+  //import content types
+  _system_components_delete_cck_nodes();
+
+  //remove rules
+  _system_components_remove_rules();
+}
+
+/**
+ * Implementation of hook_views_api().
+ *
+ * Specifies the location of the views to import and triggers the import
+ * 
+ * This hook runs funtion in the file system_config.views_default
+ * which import all views defined in the folder views
+ * 
+ */
+function system_components_views_api() {
+  return array(
+    'api' => '2', 'path' => drupal_get_path('module', 'system_components'),
+  );
+}
+
+/**
+ * Implement hook_ctools_plugin_api().
+ *
+ * If you do this, CTools will pick up default panels pages in
+ * <modulename>.pages_default.inc
+ */
+function system_components_ctools_plugin_api($module, $api) {
+
+  if ($module == 'page_manager' && $api == 'pages_default') {
+    return array(
+      'version' => 1
+    );
+  }
+}
+
+/**
+ *  Implementation of hook_default_presets().
+ *
+ *  Imports all default presets
+ */
+function system_components_imagecache_default_presets() {
+  $presets = array();
+
+  $presets['wysiwyg_200x200'] = array(
+      'presetname' => 'wysiwyg_200x200',
+      'actions' => array(
+          0 => array(
+              'weight' => '0', 'module' => 'imagecache',
+              'action' => 'imagecache_scale',
+              'data' => array(
+                'width' => '200', 'height' => '200', 'upscale' => '1',
+              ),
+          ),
+      ),
+  );// end wysiwyg_200x200
+
+  $presets['thumbnail'] = array(
+      'presetname' => 'thumbnail',
+      'actions' => array(
+          0 => array(
+              'weight' => '0', 'module' => 'imagecache',
+              'action' => 'imagecache_scale',
+              'data' => array(
+                'width' => '110', 'height' => '110', 'upscale' => 1,
+              ),
+          ),
+          1 => array(
+              'weight' => '0', 'module' => 'imagecache_canvasactions',
+              'action' => 'canvasactions_roundedcorners',
+              'data' => array(
+                  'radius' => '5',
+                  'independent_corners_set' => array(
+                      'independent_corners' => 0,
+                      'radii' => array(
+                        'tl' => '', 'tr' => '', 'bl' => '', 'br' => '',
+                      ),
+                  ),
+              ),
+          ),
+      ),
+  );//end thumbnail
+
+
+  return $presets;
+}
+
+/**
+ * Implementation of hook_form_alter()
+ *
+ */
+function system_components_form_alter(&$form, $form_state, $form_id) {
+  switch ($form_id) {
+    case 'user_register':
+    case 'user_login':
+    case 'user_login_block':
+    	
+      //process the destination this will preserve the GET variables after a login/registration
+      $_REQUEST['destination'] = substr(request_uri(), 1);
+      break;
+  }
+
+}
+
+/**
+ * Implementation of hook_block().
+ */
+function system_components_block($op = 'list', $delta = 0, $edit = array()) {
+
+  //block 0: provides a block with a login form
+  //block 1: provides a block with a registration form
+  switch ($op) {
+    case 'list':
+      $blocks[0] = array(
+        'info' => t('Login'),
+      );
+      $blocks[1] = array(
+        'info' => t('Register'),
+      );
+      $blocks[2] = array(
+        'info' => t('Contact'),
+      );
+      return $blocks;
+
+    case 'view':
+      switch ($delta) {
+        case 0:
+          $block['subject'] = "Login";
+          $block['content'] = _system_components_login_block();
+          break;
+        case 1:
+          $block['subject'] = "Register";
+          $block['content'] = _system_components_register_block();
+          break;
+        case 2:
+          $block['subject'] = "Contact";
+          $block['content'] = _system_components_contact_block();
+          break;
+      }
+      return $block;
+  }
+}
+
+function system_components_views_pre_execute(&$view) {
+  // bestsellers - limit to top 50
+  if ($view->name == 'frontpage_tool_list'
+      || ($view->name == 'frontpage_bundle_list')) {
+    $view->build_info['count_query'] .= ' LIMIT 10';
+  }
+}
+
+/****************************************************************
+ *       MODULE FUNCTIONS
+ ****************************************************************/
+/**
+ * Defines the login block
+ *
+ */
+function _system_components_login_block() {
+
+  //if user is not logged in provide the login form
+  if (!$user->uid) {
+    return drupal_get_form('user_login');
+  } else {
+
+  }
+}
+
+/**
+ * Defines the register block
+ *
+ */
+function _system_components_register_block() {
+  //if user is not logged in provide the register form
+  if (!$user->uid) {
+    return drupal_get_form('user_register');
+  } else {
+
+  }
+}
+/**
+ * Defines the contact block
+ *
+ */
+function _system_components_contact_block() {
+
+  $block_content = '<h1>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;... is important!</h1>
+    <p>We thank you for your interest in the ROLE WIDGET STORE and will 
+    contact you as soon as possible.</p><p style="text-align: right;">
+    <a href="contact">CONTACT</a>
+    </p>
+    <p style="text-align: right;">&nbsp;</p>';
+
+  return $block_content;
+}
+
+/**
+ * Import rules
+ *
+ * The settings files are stored in the folder rules
+ *
+ */
+function _system_components_import_rules() {
+
+  //incluse rules files
+  require_once drupal_get_path('module', 'rules_admin')
+      . '/rules_admin.export.inc';
+  require_once drupal_get_path('module', 'rules') . '/rules.module';
+
+  //get path to the rule export files
+  $path = drupal_get_path('module', 'system_components') . "/rules/*.inc";
+
+  //part taken from rules_admin_form_import_submit@rules_admin.export.inc
+  if (glob($path)) {
+    foreach (glob($path) as $exported_rule) {
+      $filename = basename($exported_rule);
+      $name = substr($filename, 0, strrpos($filename, '.'));
+
+      eval('$import = ' . file_get_contents($exported_rule));
+
+      if (isset($import) && is_array($import) && count($import)) {
+        // Check whether it are workflow-ng rules
+        if (rules_admin_import_workflow_ng($import)) {
+          return;
+        }
+
+        foreach ($import as $item_type => $elements) {
+          foreach ($elements as $name => $element) {
+            //let the item type alter the data before it's saved
+            rules_item_type_invoke($item_type, 'import',
+                array(
+                  &$name, &$element
+                ));
+            rules_item_save($item_type, $name, $element);
+            drupal_set_message(
+                t('Imported rule %label.',
+                    array(
+                      '%label' => rules_get_element_label($element)
+                    )));
+          }
+        }
+        rules_clear_cache();
+      } else {
+        drupal_set_message(t('Import of rules failed.'), 'error');
+      }
+
+    }
+  }
+}
+
+/**
+ * Remove rules
+ *
+ * The settings files are stored in the folder rules
+ *
+ */
+function _system_components_remove_rules() {
+
+  //incluse rules files
+  require_once drupal_get_path('module', 'rules_admin')
+      . '/rules_admin.export.inc';
+  require_once drupal_get_path('module', 'rules') . '/rules.module';
+
+  //get path to the rule export files
+  $path = drupal_get_path('module', 'system_components') . "/rules/*.inc";
+
+  //part taken from rules_admin_form_import_submit@rules_admin.export.inc
+  if (glob($path)) {
+    foreach (glob($path) as $exported_rule) {
+      $filename = basename($exported_rule);
+      $name = substr($filename, 0, strrpos($filename, '.'));
+
+      eval('$import = ' . file_get_contents($exported_rule));
+
+      if (isset($import) && is_array($import) && count($import)) {
+        // Check whether it are workflow-ng rules
+        if (rules_admin_import_workflow_ng($import)) {
+          return;
+        }
+
+        foreach ($import as $item_type => $elements) {
+          foreach ($elements as $name => $element) {
+            //let the item type alter the data before it's saved
+            rules_item_type_invoke($item_type, 'import',
+                array(
+                  &$name, &$element
+                ));
+            rules_item_delete($item_type, $name);
+            drupal_set_message(
+                t('Removed rule %label.',
+                    array(
+                      '%label' => rules_get_element_label($element)
+                    )));
+          }
+        }
+        rules_clear_cache();
+      } else {
+        drupal_set_message(t('Deletion of rules failed.'), 'error');
+      }
+
+    }
+  }
+}
+
+/**
+ * Create new content types (using CCK)
+ */
+function _system_components_import_cck_nodes() {
+
+  //get path to the rule export files
+  $path = drupal_get_path('module', 'system_components')
+      . "/content_types/*.inc";
+
+  //part taken from rules_admin_form_import_submit@rules_admin.export.inc
+  if (glob($path)) {
+    foreach (glob($path) as $exported_cck_node_type) {
+      $filename = basename($exported_cck_node_type);
+      $name = substr($filename, 0, strrpos($filename, '.'));
+
+      eval(file_get_contents($exported_cck_node_type));
+
+      if (isset($content) && is_array($content)) {
+
+        $form_state['values']['type_name'] = '<create>';
+        $form_state['values']['macro'] = '$content = '
+            . var_export($content, TRUE) . ';';
+
+        // form provided by content_copy.module
+        drupal_execute('content_copy_import_form', $form_state);
+
+        module_load_include('module', 'content');
+        content_clear_type_cache();
+
+        //drupal_set_message(t('Imported CCK node: %label.',array('%label' => $content['type']['name'])));
+      } else {
+        drupal_set_message(t('Import of CCK nodes failed.'), 'error');
+      }
+
+    }
+  }
+}
+
+/**
+ * Create new content types (using CCK)
+ */
+function _system_components_delete_cck_nodes() {
+
+  //get path to the rule export files
+  $path = drupal_get_path('module', 'system_components')
+      . "/content_types/*.inc";
+
+  //part taken from rules_admin_form_import_submit@rules_admin.export.inc
+  if (glob($path)) {
+    foreach (glob($path) as $exported_cck_node_type) {
+      $filename = basename($exported_cck_node_type);
+      $name = substr($filename, 0, strrpos($filename, '.'));
+
+      eval(file_get_contents($exported_cck_node_type));
+
+      if (isset($content) && is_array($content)) {
+
+        node_type_delete($content['type']['name']);
+
+        drupal_set_message(
+            t('Deleted CCK node: %label.',
+                array(
+                  '%label' => $content['type']['name']
+                )));
+      } else {
+        drupal_set_message(t('Deletion of CCK nodes failed.'), 'error');
+      }
+
+    }
+  }
+}

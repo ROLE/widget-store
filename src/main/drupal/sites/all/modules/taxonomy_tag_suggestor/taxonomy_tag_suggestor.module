@@ -1,0 +1,418 @@
+<?php 
+
+/**
+* Implementation of hook_form_alter().
+*/
+function taxonomy_tag_suggestor_form_alter(&$form, &$form_state, $form_id) {
+	if ($form_id == 'taxonomy_form_vocabulary') {
+		$vid = $form['vid']['#value'];
+		$vocab = taxonomy_vocabulary_load($vid);
+		if ($vocab) {
+			$tts = variable_get('taxonomy_tag_suggestor_vid_'. $vid, 0);
+			//	Position the name field higher
+ 			// Add our own submit handler
+			$form['#submit'][] = 'taxonomy_tag_suggestor_submit';
+ 			// Create fieldset and form elements
+			$form['settings']['tts'] = array(
+		        '#type'         => 'fieldset',
+		        '#title'        => t('Taxonomy_Tag_Suggestor'),
+		        '#collapsed'    => !$tts,
+		        '#collapsible'  => TRUE,
+		        '#tree'         => TRUE,
+		        '#weight'       => 3,
+			);
+ 			// Get list of all content types
+			$types = node_get_types('names');
+ 			// Loop through all types that are enabled for this vocab
+			foreach ($vocab->nodes as $index => $type) {
+				$options[$type] = $types[$type];
+			}
+			
+			$options['-all-'] = t('All content types');
+			$form['settings']['tts']['taxonomy_tag_suggestor_vid_'. $vid]['types'] = array(
+				'#type'          => 'checkboxes',
+				'#title'         => t('Enable Taxonomy Tag Suggestor for the Vocabulary Content Types Below'),
+				'#options'       => $options,
+				'#default_value' => $tts ? $tts['types'] : array(),
+				'#weight'        => -1,
+			);
+			
+			$form['settings']['tts']['taxonomy_tag_suggestor_vid_'. $vid]['source'] = array(
+				'#type'          => 'select',
+				'#title'         => t('Specify Taxonomy Source for Tag Suggestion Below'),
+				'#options'       => array (
+					''			=> t('None'),
+					'intern'	=> t('Intern'),
+					'dbpedia'	=> t('DBpedia')
+					),
+			);
+		}
+	}
+	
+ 	// Node Edit Form: Typy name of node is not known so far, so search for substring
+	if ($form['#id'] === 'node-form') {
+		if ($form_state['values']['op'] === 'Preview' || $form_state['values']['op'] === 'Update Tool information from URI') {
+			if(!empty($form_state['values']['taxonomy']['tags']['2'])) {
+				$preSavedTags_intern = $form_state['values']['taxonomy']['tags']['2'];
+			}
+			if(!empty($form_state['values']['taxonomy']['tags']['3'])) {
+				$preSavedTags_extern = $form_state['values']['taxonomy']['tags']['3'];
+			}	
+		}	
+			
+		$form['taxonomy_tag_suggestor']['pesavedtagsintern'] = array(
+		 			 						'#type' => 'hidden',
+		 			 						'#name' => 'tts_pesavedtagsintern',
+		 			 			  			'#title' => t('pesavedtagsintern'),
+		 			 						'#value' => $preSavedTags_intern,
+		 			 						'#id' => 'pesavedtagsintern',
+		);
+		$form['taxonomy_tag_suggestor']['pesavedtagsextern'] = array(
+		 			 						'#type' => 'hidden',
+		 			 						'#name' => 'tts_pesavedtagsextern',
+		 			 			  			'#title' => t('pesavedtagsextern'),
+		 			 						'#value' => $preSavedTags_extern,
+		 			 						'#id' => 'pesavedtagsextern',
+		);
+		$form['#after_build'][] = 'taxonomy_tag_suggestor_after_build';
+	}
+}
+
+function taxonomy_tag_suggestor_after_build(&$form, $form_state){
+	// check if preview form, than skip form generation, 
+	// else the form is double-generated,
+	// as well as ids are doubled, resulting in confusing JQuery 
+	if ($form_state['values']['op'] === 'Preview' || $form_state['values']['op'] === 'Update Tool information from URI') {
+		return $form;
+	}
+	
+	
+	
+	// load parameter
+   	$content_type = $form['type']['#value'];
+   	// Get all vocabs for this content type
+   	$vocabularies = taxonomy_get_vocabularies($content_type);
+   	
+   	$intern_vocabs = array();
+   	$extern_vocabs = array();
+    	
+   	foreach ($vocabularies as $vid => $vocabulary) {
+   		$tmp = variable_get('taxonomy_tag_suggestor_vid_'. $vid, 0);
+    		
+   		switch ($tmp['source']) {
+   			case 'intern':
+   			case 'dbpedia':
+   				$v = new stdClass();
+   				$v->id = $vid;
+   				$v->name = $vocabulary->name;
+   				$v->mode = $tmp['source'];
+   				if  ($tmp['source'] === 'intern' ) {$intern_vocabs[] = $v;}
+   				else  if ($tmp['source'] === 'dbpedia' ) {$extern_vocabs[] = $v;}
+   				break;
+   		}
+   		$tts[$vid] = variable_get('taxonomy_tag_suggestor_vid_'. $vid, 0);
+   	}
+    	
+	$nr = $tts[$vid];
+		
+	// check if extern or intern is available before add css and js
+	if (!empty($intern_vocabs) || !empty($extern_vocabs)){
+		drupal_add_css(drupal_get_path('themes', 'fusion') . '/role_widget_store/css/jquery/jquery-ui.css');
+		drupal_add_css(drupal_get_path('module', 'jquery_ui') .'/jquery.ui/themes/base/jquery.ui.theme.css');
+		drupal_add_css(drupal_get_path('module', 'jquery_ui') .'/jquery.ui/themes/base/jquery.ui.autocomplete.css');
+		drupal_add_css(drupal_get_path('module', 'taxonomy_tag_suggestor') .'/taxonomy_tag_suggestor.css');
+		jquery_ui_add(array('ui.tabs', 'ui.widget', 'ui.draggable', 'ui.droppable' ,'ui.position', 'ui.autocomplete',  'effects.slide', 'ui.slider'));
+		drupal_add_js(drupal_get_path('module', 'taxonomy_tag_suggestor') .'/taxonomy_tag_suggestor.js');
+		drupal_add_js(drupal_get_path('module', 'taxonomy_tag_suggestor') .'/jquery.hoverscroll.js');
+		drupal_add_css(drupal_get_path('module', 'taxonomy_tag_suggestor') .'/jquery.hoverscroll.css');	
+		
+		$terms = array();
+		$mapNameTID = array();
+		
+ 		if (!empty($intern_vocabs))	{
+ 			
+ 			foreach($intern_vocabs as $arr_id => $voc) {
+ 				$intern = $voc->id;
+ 				
+				if(isset($form['taxonomy']['tags'])){
+					if(isset($form['taxonomy']['tags'][$voc->id]['#access']) && $form['taxonomy']['tags'][$voc->id]['#access'] == FALSE){
+						break;	
+					}
+				}else{
+					if(isset($form['taxonomy'][$voc->id]['#access']) && $form['taxonomy'][$voc->id]['#access'] == FALSE){
+						break;
+					} 
+				}
+				
+ 	 			// generate the first level elem of the tree taxonomy, e.g. the FunctionalityTypes
+	  			$parents = taxonomy_get_tree($intern,0,-1,1);
+	
+	 			$related= array();
+	 			$termList = array();
+	 			$parentList = array();
+	 			$mapParentTerm = array();
+	 			
+	 			foreach ($parents as $pnr => $parent) {
+	 				$tmp = array();
+	 				$tmpChildList = array();
+	 				$children = taxonomy_get_children( $parent->tid,$intern);
+	 				foreach ($children as $cnr => $child) {
+	 					$tmp[$parent->tid] = $child->id;
+	 					$rel = taxonomy_get_related($child->tid);
+	 					$tmp_rel = array();
+	 					foreach($rel as $rnr => $childTerm) {
+	 						$tmp_rel[] = $childTerm->tid;
+	 					}
+	 					$tmp_term = array();
+	 					$tmp_term['label'] = $child->name;
+	 					$tmp_term['desc'] = $child->description;
+	 					$terms[$child->tid] = $tmp_term;
+	 					$mapNameTID[$child->name] = $child->tid;
+	 					$tmpChildList[] = $child->tid;
+	 					$termList[] =  $child->name;
+	 					$related[$child->tid] = $tmp_rel;		 					
+	 				}
+	 				$mapParentTerm[$parent->tid] = $tmpChildList;
+ 	 				$parentList[] = $parent->tid;
+	 			}
+ 			
+		 		$desc2 = "
+					<div id=\"taxonomy-tag-suggestor-intern\"> 
+						<div class=\"ui-widget\">
+							<input id=\"tags-intern\"/>
+							<label for=\"tags\">Search</label>
+						</div>
+						<div class=\"tts-dropzone\" style=\"overflow:hidden\">
+							<div class=\"tagCloud-wrapper\">
+								<div id=\"left-intern\" class=\"tagCloud\">
+									<div id=\"ttstabs\">
+										<ul>
+											<li><a id=\"ttstabs_1\" href=\"#ttstabs-1\">Recommendations</a></li>
+											<li><a id=\"ttstabs_2\" href=\"#ttstabs-2\">Browse</a></li>
+										</ul>
+										<div id=\"ttstabs-1\">
+				   						</div>
+										<div id=\"ttstabs-2\">							
+											<div id=\"tabsMF\">
+												<ul id=\"my-list\">
+												";
+											
+ 				// Generate the tabs in Main Functionalities
+	 			$i = 0;
+	 			foreach($parents as $pnr => $parent) {
+	 				$i++;
+	 				$desc2 = $desc2 . '<li id ="tabsSL-' . $i . '"><a href="#tabsMF-' . $i .'">' . $parent->name .'</a></li>';
+	 			}
+	 			$desc2 = $desc2 . '</ul>';
+	 			$i = 0;
+	 			foreach($parents as $pnr => $parent) {
+	 				$i++;
+	 				$desc2 = $desc2 . '<div id="tabsMF-' . $i . '"></div>';
+	 			}
+		 			
+			  	 $desc2 = $desc2 . "	</div>											
+									</div>
+		 	  					</div>
+		 	  				</div>
+	 	  				</div>
+	 	  				<div  class=\"droppableField-wrapper\">		
+		 	   				<div id=\"right-intern\" class=\"droppableField\">
+								<h2>Drop $voc->name here</h2>
+							</div>
+						</div>
+					</div>
+					<div class=\"help-text\" style=\"clear:both\">
+						<p>You can add $voc->name here. Either use the search or browse throught the functionalities.<br/> 
+						Drag the functionalities you want to add to the right field.</p>
+					</div>								
+		  				</div>
+		    		";
+ 				
+ 				
+	 			drupal_add_js(array('taxonomy_tag_suggestor' => array('intern' => $intern)), 'setting');
+	 			drupal_add_js(array('taxonomy_tag_suggestor' => array('related' => $related)), 'setting');
+	 			drupal_add_js(array('taxonomy_tag_suggestor' => array('parents' => $parentList)), 'setting');
+	 			drupal_add_js(array('taxonomy_tag_suggestor' => array('termsList' => $termList)), 'setting');
+	 			drupal_add_js(array('taxonomy_tag_suggestor' => array('mapParentTerm' => $mapParentTerm)), 'setting');
+
+	 			
+	 			if ($voc->tags == 1) {
+	 				$form['taxonomy']['tags'][$voc->id]['taxonomy_tag_suggestor'] = array(
+	 			            '#type' => 'fieldset', '#title' => t('Functionalities'),
+	 			            '#description' => $desc2,
+	 						// set the same weight as the real taxonomy menu
+	 			            '#weight' => $form['#content_extra_fields']['taxonomy']['weight'],
+	 				);
+	 			} else {
+	 				$form['taxonomy'][$voc->id]['taxonomy_tag_suggestor'] = array(
+	 			            '#type' => 'fieldset', '#title' => t('Functionalities'),
+	 			            '#description' => $desc2,
+	 						// set the same weight as the real taxonomy menu
+	 			            '#weight' => $form['#content_extra_fields']['taxonomy']['weight'],
+	 				);
+	 			}
+	 		}
+ 		}
+	 		
+	 	if (!empty($extern_vocabs)) {
+	 		$mutex = false;
+	 		foreach($extern_vocabs as $arr_id => $voc) {
+	 			$extern = $voc->id;
+	 			
+				
+				if(isset($form['taxonomy']['tags'])){
+					if(isset($form['taxonomy']['tags'][$voc->id]['#access']) && $form['taxonomy']['tags'][$voc->id]['#access'] == FALSE){
+						break;	
+					}
+				}else{
+					if(isset($form['taxonomy'][$voc->id]['#access']) && $form['taxonomy'][$voc->id]['#access'] == FALSE){
+						break;
+					} 
+				}
+				
+	 			$nid = $form['nid']['#value'];
+	 			$nid  = node_load($nid);
+	 			$vocTerms = taxonomy_node_get_terms_by_vocabulary($nid,$extern);
+	  			foreach ($vocTerms as $tnr => $vTerm) {
+	  				$tmp = array();
+	  				$tmp['label'] = $vTerm->name;
+	  				$tmp['desc'] = $vTerm->description;
+	  				$terms[$vTerm->tid] = $tmp;
+	  				$mapNameTID[$vTerm->name] = $vTerm->tid;
+	  			}
+	 			
+	 			if ($mutex) break;
+				drupal_add_js(array('taxonomy_tag_suggestor' => array('extern' => $extern)), 'setting');
+		 			
+				$desc = "
+					<div id=\"taxonomy-tag-suggestor-extern\">
+						<div class=\"ui-widget\">						
+							<input id=\"tags-extern\"/>
+							<label for=\"tags-extern\">Search</label>
+						</div>
+						<div class=\"tts-dropzone\" style=\"overflow:hidden\">
+							<div class=\"tagCloud-wrapper\">
+			 					<div id=\"left-extern\" class=\"tagCloud\">
+			 			  	   		<h2>Recommendations</h2>
+			 			 	  	</div>
+							</div>
+							<div class=\"droppableField-wrapper\">
+			 			 	   	<div id=\"right-extern\" class=\"droppableField\">
+			 						<h2>Drop $voc->name here</h2>
+			 					</div>
+			 				</div>
+	 					</div>
+	 					<div class=\"help-text\" style=\"clear:both\">
+							<p>You can add $voc->name from dbpedia here. Use the search to find the fitting domain.<br/> 
+							Drag the functionalities you want to add to the right field.</p>
+						</div>
+	 			  	</div>
+ 			    ";
+				
+				if ($voc->tags == 1) {
+					$form['taxonomy']['tags'][$voc->id]['taxonomy_tag_suggestor'] = array(
+				            '#type' => 'fieldset', '#title' => t($voc->name),
+				            '#description' => $desc,
+							//set the same weight as the real taxonomy menu
+				            '#weight' => $form['#content_extra_fields']['taxonomy']['weight'],
+					);
+				} else {
+					$form['taxonomy'][$voc->id]['taxonomy_tag_suggestor'] = array(
+				            '#type' => 'fieldset', '#title' => t($voc->name),
+				            '#description' => $desc,
+							//set the same weight as the real taxonomy menu
+				            '#weight' => $form['#content_extra_fields']['taxonomy']['weight'],
+					);
+				}
+				
+	 			$form['taxonomy_tag_suggestor']['dbpedia'] = array(
+					'#type' => 'hidden',
+					'#name' => 'tts_dbpedia',
+		  			'#title' => t('dbpedia'),
+					'#value' => $extern,
+					'#id' => 'dbpedia',
+	 			 );
+		 			
+	 			$mutex = true;
+ 			}
+	 	}
+	 	drupal_add_js(array('taxonomy_tag_suggestor' => array('terms' => $terms)), 'setting');
+	 	drupal_add_js(array('taxonomy_tag_suggestor' => array('mapNameTID' => $mapNameTID)), 'setting');
+	}
+	$form['#submit'][] = 'taxonomy_tag_suggestor_submit';
+		
+	return $form;
+}
+
+
+/**
+ * Save form parameters in db
+ * 
+ * @param unknown_type $form
+ * @param unknown_type $form_state
+ */
+function taxonomy_tag_suggestor_submit(&$form, $form_state) {
+	$vid = $form['vid']['#value'];
+	if (count($form['settings']['tts']['taxonomy_tag_suggestor_vid_'. $vid])) {
+		$tostore = array(
+	    	'types'		=> $form['settings']['tts']['taxonomy_tag_suggestor_vid_'. $vid]['types']['#value'],
+			'source'	=> $form['settings']['tts']['taxonomy_tag_suggestor_vid_'. $vid]['source']['#value'],
+		);
+		variable_set('taxonomy_tag_suggestor_vid_'. $vid, $tostore);
+	}
+	$tag_string = $form['#post']['tts_dbpedia'];
+	
+	if (count($tag_string)) {
+ 		// get vocabulary id to save to
+		$vocid = $form['taxonomy_tag_suggestor']['dbpedia']['#value'];
+		
+		$tag_string_arr=explode('||',$tag_string);
+		// remove vocid from tag string
+		array_shift($tag_string_arr);
+		$node = node_load($form['nid']['#value']);
+		$terms = array();
+
+		foreach ($tag_string_arr as $nr => $tag) {
+			$tag_tmp =  explode('$$',$tag);
+			$name = $tag_tmp[0];
+			$desc = $tag_tmp[1];
+			$guid = $tag_tmp[2];
+
+			
+ 			if (!empty($guid) && !empty($vocid)) {
+				$dups = taxonomy_tag_suggestor_isDuplicate($guid,$vocid);
+				if(empty($dups)) {
+					taxonomy_tag_suggestor_add_term($name,$vocid,$desc,$guid,'0');
+				}
+				$term = taxonomy_guid_get_term($guid,$vocid);
+				$terms[$term[0]->tid] = $term[0];
+ 			}
+		}
+	}
+}
+
+
+/**
+* Adds one taxonomy term in a vocabulary (specified through vid)
+*
+* @param $name						Name of term
+* @param $vid						Vocabular ID
+* @param $description				Description of term
+* @param $weight					Weight of the term
+*
+* @return $form_values['tid']		Term ID
+*/
+function taxonomy_tag_suggestor_add_term($name, $vid, $description, $guid, $weight) {
+	$form_values = array();
+	$form_values['name'] = trim($name);
+	$form_values['description'] = $description;
+	$form_values['guid'] = $guid;
+	$form_values['vid'] = $vid;
+	$form_values['weight'] = $weight;
+	taxonomy_save_term($form_values);
+}
+
+ function taxonomy_tag_suggestor_isDuplicate($guid,$vocid) {
+  	$tid = db_fetch_array(db_query("SELECT guid FROM {term_data} WHERE guid='%s'", $guid));
+  	return ($tid);
+ }

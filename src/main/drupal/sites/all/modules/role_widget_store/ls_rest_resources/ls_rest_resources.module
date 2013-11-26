@@ -1,0 +1,29 @@
+<?php
+// noteresource.module
+/**
+ * Implements hook_perm().
+ */
+function ls_rest_resources_perm() {
+	return array(
+        'access nodes via services',
+        'access terms via services',
+	);
+}
+
+
+/**
+ * Supplies the resource definitions for Drupal core data
+ *
+ * @return array
+ */
+function ls_rest_resources_services_resources() {
+	require_once("resources/ls_node_resource.inc");;
+	require_once("resources/ls_taxonomy_resource.inc");
+
+	$resources = array();
+
+	$resources += _ls_node_resource_definition();
+	$resources += _ls_taxonomy_resource_definition();
+
+	return $resources;
+}

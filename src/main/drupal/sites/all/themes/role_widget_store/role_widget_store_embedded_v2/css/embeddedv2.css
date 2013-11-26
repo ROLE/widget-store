@@ -1,0 +1,81 @@
+
+div.node-type-ls_tools-teaser .select-button a{
+	background: url("../images/grey_button.png");
+	text-align: center;
+	width: 90px;
+	height: 20px;
+	color: #fff;
+	padding-top: 3px;
+	font-weight: bold;
+	display: block;
+	margin: 20px auto 0 auto;
+}
+
+
+div.node-type-ls_tools-teaser .select-button a:hover{
+	text-decoration: none;
+}
+
+.meta-information .select-button{
+	float: left;
+}
+
+.meta-information .select-button a{
+	background: url("../images/grey_button.png");
+	text-decoration: none;
+	text-align: center;
+	width: 90px;
+	height: 20px;
+	color: #fff;
+	padding-top: 3px;
+	font-weight: bold;
+	display: block;
+	margin: 0px auto 0 auto;	
+}
+
+.details_container  .select-button a{
+	background: url("../images/grey_button.png");
+	text-decoration: none;
+	text-align: center;
+	width: 90px;
+	height: 20px;
+	color: #fff;
+	padding-top: 3px;
+	font-weight: bold;
+	display: block;
+	margin: 0px auto 0 auto;	
+}
+
+.meta-information .select-button a:hover{
+	text-align: center;
+	text-decoration: none;
+	
+}
+
+#page {
+	background: none;
+	margin:auto;
+	width:auto;
+}
+#page-top {
+	background: none;
+	margin: 10px auto 0 auto;
+	height: 0px;
+	width:auto;
+}
+#page-bottom {
+	background: none;
+	margin:auto;
+	width:auto;
+
+}
+.page {
+}
+
+#page-wrapper{
+	overflow: auto;
+	background: none;
+	background-repeat:no-repeat;
+	width:auto;
+
+}

@@ -1,0 +1,13 @@
+.lstool_opensocial-checkboxes {
+  clear: both;
+  padding-top: 1em;
+}
+
+.lstool_opensocial-checkboxes .form-item label.option {
+  float: left; /* LTR */
+  margin-right: 1.5em; /* LTR */
+}
+
+.lstool_opensocial-checkboxes label {
+    width: 210px;
+}

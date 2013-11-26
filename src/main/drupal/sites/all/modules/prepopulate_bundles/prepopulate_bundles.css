@@ -1,0 +1,35 @@
+.prepopulate_bundles-tools {
+	text-align: justify;
+	display: block;
+	float: left;
+	padding: 10px;
+	border: solid #808080;
+	border-width:1px;
+	margin: 5px;
+	height: 110px;
+}
+
+.prepopulate_bundles-taxonomy-complete {
+	clear: both;
+	float: right;
+	border: solid 1px #808080;
+
+}
+
+.prepopulate_bundles-taxonomy-box {
+	float: left;
+	padding-left: 1.2em;
+}
+
+.pp-box {
+	float: left;
+}
+
+.pp-box .prepopulate_bundles-taxonomy-complete{
+	font-size:0.9em;
+	clear: both;
+	line-height: 0.2em;
+	float: left;
+	padding: 2px;
+	margin: 5px;
+}

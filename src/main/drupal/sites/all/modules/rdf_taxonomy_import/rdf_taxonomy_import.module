@@ -1,0 +1,549 @@
+<?php
+
+// Used for identifying that a new vocabulary should be generated
+define('TAXONOMY_XML_CREATE_NEW', -1);
+
+/**
+ * Implementation of hook_menu: Define menu links.
+ *
+ * @note See hook_menu for a description of return values.
+ * 
+ * @return $items 		Callback of menu items
+ */
+function rdf_taxonomy_import_menu() {
+  if (!module_exists('taxonomy')) {
+    return;
+  }
+
+  $items = array();
+
+   $items['admin/content/taxonomy/import/rdf_taxonomy_import'] = array(
+    'title' => 'RDF Taxonomy Import', 
+    'page callback' => 'rdf_taxonomy_import_servicer',
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  
+  $items['rdf_taxonomy_import'] = array(
+    'title' => 'On this date',
+    'page callback' => 'rdf_taxonomy_import_servicer',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK
+  );
+
+  return $items;
+}
+/**
+ * Checks if term already exists in specified vocabulary
+ * 
+ * If a term with the same name already exists in the vocabulary,
+ * specified by $vid, the term ID tid is returned.
+ * 
+ * @param $name Name of term
+ * @param  $vid Vocabulary ID
+ * @return tid
+ */
+function _rdf_taxonomy_import_get_termid_by_name($name, $vid) {
+  $db_result = db_query(db_rewrite_sql("SELECT t.tid FROM {term_data} t WHERE vid = '%d' AND LOWER(t.name) = LOWER('%s')", 't', 'tid'),trim($vid), trim($name));
+  $result = array();
+  $term_id = db_fetch_object($db_result)->tid;
+ 
+  return $term_id;
+}
+
+/**
+ * Adds one taxonomy term in a vocabulary (specified through vid)
+ * 
+ * If the term name already exists, the term is updated,
+ * i.e. the fields 'tid', 'vid' and 'name' are staying the same,
+ * all other fields like guid, description are updated.
+ * 
+ * @param $name						Name of term
+ * @param $vid						Vocabular ID
+ * @param $description				Description of term
+ * @param $weight					Weight of the term
+ *
+ * @return $form_values['tid']		Term ID
+ */
+function rdf_taxonomy_import_add_term($name, $vid, $description, $guid, $weight) {
+	$form_values = array();
+	$form_values['name'] = $name;
+	$form_values['description'] = $description;
+	$form_values['guid'] = $guid;
+	$form_values['vid'] = $vid;
+	$form_values['weight'] = $weight;
+	
+	// check if term already exists, then only update term data
+	$term_exists_tid = _rdf_taxonomy_import_get_termid_by_name($name, $vid);
+	if (!empty($term_exists_tid)) {
+		$form_values['tid'] = $term_exists_tid;
+	}
+	
+	taxonomy_save_term($form_values);
+
+	return $form_values['tid'];
+}
+
+/**
+ * Updates one term with the given relations
+ * 
+ * @param $term			Term
+ * @param $vid			Vocabular ID
+ */
+function rdf_taxonomy_import_update_term_relations($term, $vid) {
+	// if no relations given for this term, nothing to do, so return
+	if ( empty($term['relsTrmGUIDs']) ) {
+		return "Empty";
+	}
+	
+	$tid=$term['tid'];
+	$name= $term['name'];
+	$desc= $term['description'];
+	
+	
+	// get parent tid
+	$tmp = $term['parent'];
+	$parents = taxonomy_guid_get_term($tmp, $vid);
+	$parent = $parents[0];
+	$form_values = array();
+	$form_values['name'] = $name;
+	$form_values['tid'] = $tid;
+	$form_values['description'] = $desc;
+	$form_values['parent'] = $parent->tid;
+	
+	$relations = array();
+	$relsTrmGUIDs=$term['relsTrmGUIDs'];
+	
+	// get Term ID for every GUID in the list of the term and 
+	// push TID to array because saving relations expects array of TIDs
+	foreach ( $relsTrmGUIDs as $relTrmGUID) {
+		$relTerms = taxonomy_guid_get_term($relTrmGUID, $vid);
+		$relTerm = $relTerms[0];
+		array_push($relations, $relTerm->tid);
+	}	
+	
+	$form_values['relations'] = $relations;
+	
+	taxonomy_save_term($form_values);
+
+	return $status;
+}
+
+
+/**
+ * Adds terms to a vocabulary 
+ * 
+ * If vocabulary exists or name of vocabulary already exits, terms are added to this vocabulary
+ * else a new vocabulary is generated where the terms are added to.
+ * 
+ * @param $terms				Array of terms (nr => term), 
+ * 								term as array of ('name' => data, 'description'=> data)
+ * @param $vid					Vocabulary ID imported to
+ * @param $file					The filename imported form
+ * @param $url					The URL imported form
+ * 
+ * @return $info_terms			Array of added terms, term as ('name', 'tid'):
+ */
+function rdf_taxonomy_import_add_vocabulary($terms_c, $vid, $file, $url, $edit = array()) {
+	// check if valid vid, else create a new basic vocabulary to import to
+	// provide user later a reference to change newly generated vocabular properties
+	if ($vid == TAXONOMY_XML_CREATE_NEW) {
+		// Requested to create new vocab.
+		$newname = !empty($file) ? basename($file) : basename($url);
+		$vocabulary = _rdf_taxonomy_importer_get_vocabulary_placeholder($newname, $edit);
+		$vid = $vocabulary->vid;
+		variable_set('taxonomy_xml_vid', $vid);
+	}
+	
+	// initialize helper variables
+	$info = array ();
+	
+	$terms_parents = $terms_c['1'];
+	$terms = $terms_c['2'];
+	
+	//import FunctionalityTypess first
+	foreach ($terms_parents as $term) {
+		$name = $term['name'];
+		$description = $term['description'];
+		$guid = $term['guid'];
+		if (isset($name) && isset($description)) {
+			$info_term['tid'] = rdf_taxonomy_import_add_term($name, $vid, $description, $guid, '0');
+			$info_term['name'] = $term['name'];
+			$info[] = $info_term;
+		}
+	}
+	
+	foreach ($terms as $term) {
+	 	$name = $term['name'];
+	 	$description = $term['description'];
+	 	$guid = $term['guid'];
+	 	if (isset($name) && isset($description)) {
+	 		$info_term['tid'] = rdf_taxonomy_import_add_term($name, $vid, $description, $guid, '0');
+			$info_term['name'] = $term['name'];
+			$info_term['parent'] = $term['parent'];
+			$info_term['relsTrmGUIDs'] = $term['relations'];
+			$info[] = $info_term; 
+	 	}
+	}
+	// Show debug information: Which relations, tid, name contains $info
+	//dpm($info);
+	
+	foreach ($info as $term) {
+		rdf_taxonomy_import_update_term_relations($term, $vid);
+	}
+	
+	return ($info);
+}
+
+/**
+ * Start importing of an RDF/XML file 
+ * 
+ * Only the RDF/XML files delivered from Koblenz are supported.
+ * 
+ * @return $output 		Ouput string
+ */
+function rdf_taxonomy_import_servicer() {
+  $output = ''; 
+  $output = drupal_get_form('rdf_taxonomy_import_form');
+  return $output;
+}
+
+/**
+ * Fetches the RDF file and parses it, result Triples saved in array of terms 
+ * 
+ * @param $rdf_location			RDF file location
+ * @param $mode					Mode of import, 'local file' or 'web url'
+ * 
+ * @return $vocabulary			Array of terms
+ */
+function rdf_taxonomy_import_fetch_n_parse($rdf_location, $mode) {
+  // set which taxonmy version should be parsed
+  $TAX_VER=2;
+  // initialize helper variables
+  $triples = '';
+  $functionalityID = 0;
+  $vocabulary = array();
+  $role = 'http://purl.org/role/terms/';
+  $role_instance = 'http://purl.org/role/instances/';
+  $roleName = $role . 'hasName';
+  $roleDesc = $role . 'hasDescription';
+  $roleRel = $role . 'relatedFunctionality';
+  $roleFunc = $role_instance . 'Functionality#';
+  switch ($TAX_VER) {
+	case 1:
+		$roleParent = $role . 'hasFunctionalityType';
+		$roleType = $role . 'FunctionalityTypeTC';
+		break;
+	case 2:
+		$roleParent = $role . 'providedByCategory';
+		$roleType = $role_instance . 'ToolCategory#';
+		break;
+  }
+  
+  // variables needed for FunctionalityType
+  $voc_parents = array();
+  $rdfs =  'http://www.w3.org/2000/01/rdf-schema#';
+  $roleTypeLabel = $rdfs . 'label';
+  
+  // import the RDF parser (based on ARC2)
+  include_once("sites/all/modules/rdf_taxonomy_import/arc2/ARC2.php");
+  
+  // initialize parser and parse
+  $parser = ARC2::getRDFXMLParser();
+  switch ($mode) {
+  	case 'url':
+  		$parser->parse($rdf_location);
+ 		break;
+  	case 'filepath':
+  		$base = 'http://www.role-widgetstore.eu/'; 
+  		$parser->parse($base,$rdf_location);
+  		break;
+  }
+  $triples = $parser->getTriples();
+  
+  // iterate over all triples in RDF/XML file
+  for ($i = 0, $i_max = count($triples); $i < $i_max; $i++) {
+  	
+  	$triple = $triples[$i];
+   	$subject = $triple['s'];
+   	
+   	$type_occurs = strpos($subject,$roleType);
+   	if ($type_occurs === false) {
+   	}
+   	else {
+   		$predicate = $triple['p'];
+   		$object = $triple['o'];
+   		
+   		$functionalityID = substr($subject,strlen($roleType),strlen($subject));
+   		
+   		switch ($predicate) {
+   			case $roleTypeLabel:
+   				$voc_parents[$functionalityID]['guid'] = $subject;
+   				$voc_parents[$functionalityID]['name'] = $object;
+   				$voc_parents[$functionalityID]['description'] = $object;
+   				break;		
+   		}
+   	}
+   	
+    $func_occurs = strpos($subject,$roleFunc);
+    
+   	// get only triples describing Functionalities (=FunctionalityTF as subject)
+    //if ($test_str === 'http://purl.org/role/terms/FunctionalityTF') {
+	if ($func_occurs === false) {}
+	else {
+   	  // these variables are only neeeded if we find "FunctionalityTF"
+      $predicate = $triple['p'];
+      $object = $triple['o'];
+      
+      $functionalityID = substr($subject,strlen($roleFunc),strlen($subject));
+
+      // save the parsed information in an array
+      switch ($predicate) {
+      	case $roleName:
+      		$vocabulary[$functionalityID]['guid'] = $subject;
+      		$vocabulary[$functionalityID]['name'] = $object;  
+      		break;
+      	case $roleDesc:
+      		$vocabulary[$functionalityID]['description'] = $object;
+      		break;     	
+      	case $roleRel:
+      		$rel = $vocabulary[$functionalityID]['relations'];
+      		if (is_array($rel)) {
+      			$tmp = $rel;
+      		}
+      		else {
+      			$tmp = array();
+      		}
+      		array_push($tmp, $object);
+      	
+      		$vocabulary[$functionalityID]['relations'] = $tmp;
+      		break;
+      	case $roleParent:
+
+      		$vocabulary[$functionalityID]['parent'] = $object;
+      		break;
+      }
+    }   
+  }  
+ 
+  $voc = array('1' => $voc_parents, '2' => $vocabulary);#+
+  
+  return $voc;
+  //return $vocabulary;
+}
+
+
+/**
+* Builds the import form.
+*
+* Form contains a selector to choose the import method used (upload, URL, Web
+* Service). This selector should reveal or hide the appropriate secondary
+* parameters. Uses JS and a bit of CSS to show/hide. With no JS, all options
+* are shown but only the chosen one is used.
+*
+* @see rdf_taxonomy_import_form_submit()
+* 
+* @param $form_state
+*
+* @return $form				Form
+*/
+function rdf_taxonomy_import_form($form_state) {
+	drupal_add_js(drupal_get_path('module', 'rdf_taxonomy_import') . '/rdf_taxonomy_import.js');
+	drupal_add_css(drupal_get_path('module', 'rdf_taxonomy_import') . '/rdf_taxonomy_import.css');
+
+	$vocs[TAXONOMY_XML_CREATE_NEW] = t('[Create new]');
+	foreach (taxonomy_get_vocabularies() as $vid => $voc) {
+		$vocs[$vid] = $voc->name;
+	}
+	$form['vid'] = array(
+    '#type' => 'select',
+    '#title' => t('Target vocabulary'),
+	'#default_value' => variable_get('taxonomy_xml_vid', TAXONOMY_XML_CREATE_NEW),
+    '#options' => $vocs,
+    '#description' => t('
+      The vocabulary into which terms should be loaded.
+      If you choose a pre-existing vocabulary,
+      existing vocabulary settings (tags, node types etc) will NOT be modified.
+      If it is to be created new, they <em>may</em> be retained.
+      Internal vocabulary ID "vid" cannot be imported.
+    '),
+	);
+	
+	$form['data_source'] = array(
+	    '#type' => 'fieldset',
+		'#title' => t('Data Source'),
+	    '#id' => 'data_source',
+	    '#attributes' => array('id' => 'data_source'),
+	);
+	$form['data_source']['protocol'] = array(
+	    '#type' => 'select',
+	    '#title' => t('Data Source'),
+	    '#options' => array(
+	      'none' => t('CHOOSE'),
+	      'url' => t('Web URL'),
+	      'filepath' => t('Local File')
+	),
+	    '#attributes' => array('id' => 'protocol'),
+	    
+	);	
+	$form['data_source']['url'] = array(
+	    '#type' => 'textfield',
+	    '#size' => 100,
+	    '#title' => t('URL to import from'),
+	    '#description' => t('
+	      Enter the URL of a file or web service containing a vocabulary definition.
+	      <br/>eg <em>http://www.w3.org/TR/2003/PR-owl-guide-20031215/food</em>
+	      <br/>The URL will be fetched requesting a content-type rdf/xml if available,<br/>
+	      this means sometimes you can enter URLs that look like web pages <br/>
+	      but we will actually retrieve the raw data.
+	      (On well-behaved sources)
+	    '),
+	);
+	$form['data_source']['filepath'] = array(
+	    '#type' => 'textfield',
+	    '#size' => 100,
+	    '#title' => t('Local filepath'),
+	    '#description' => t('
+	      Enter the path of a file containing an appropriately formatted vocabulary.<br>
+	      The path can either be relative to the files directory or to Drupal root.
+	   '),
+	);
+	// Add this as a requirement!
+	if (! module_exists('taxonomy_guid')) {
+		$form['recurse_down']['#default_value'] = FALSE;
+		$form['recurse_down']['#disabled'] = TRUE;
+		$form['recurse_down']['#description'] = '<p><strong>' . t('Enable taxonomy_guid before trying recursion.') . '</strong></p>' . $form['recurse_down']['#description'];
+	}
+
+	$form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Import'),
+	);
+	$form['#attributes'] = array('enctype' => 'multipart/form-data');
+
+	return $form;
+}
+
+/**
+ * Check form data and call functions to fetch and parse RDF file with correct settings
+ * 
+ * Called on submition of form. Checks which mode of operation was chossen, 
+ * i.e. local file ('file') or web url ('url'), depending on mode, 
+ * the parser is called with the correct settings (differnt for both in ARC2)
+ * afterwards the resulting terms array is given to the function to add terms to a vocabulary
+ * 
+ * @param $form				Form
+ * @param $form_state		Form values
+ */
+function rdf_taxonomy_import_form_submit($form, &$form_state) {
+	$form_values = $form_state['values'];
+	$vid = $form_values['vid'];
+	$url = $form_values['url'];
+	$file = $form_values['filepath'];
+	$vocabulary = '';
+	
+	// choose 
+	switch ($form_values['protocol']){
+		case 'url':
+			if (empty($form_values['url'])) {
+				drupal_set_message(t("No URL specified!"),'error',TRUE);
+				return FALSE;
+			}
+			// checks OK: fetch RDF XML file and parse
+			$vocabulary = rdf_taxonomy_import_fetch_n_parse($url, 'url');
+			break;
+		case 'filepath':
+			// checks OK: fetch RDF XML file and parse
+			if (!file_exists($file)) {
+				drupal_set_message(t("File does not exist or file path is wrong! You tried file: \"$ile\""),'error',TRUE);
+				return FALSE;
+			}
+			$data =  file_get_contents($file);
+			if (!$data) {
+				drupal_set_message(t("Error occured while file opening!"),'error',TRUE);
+				return FALSE;
+			}
+			// checks OK, start parsing
+			$vocabulary =  rdf_taxonomy_import_fetch_n_parse($data, 'filepath');
+			break;
+	}
+	
+	//check if error occured during parsing or no terms were found
+	if (empty($vocabulary)) {
+		$output .= t('No terms were imported');
+	}
+	else {
+		$modified_terms = rdf_taxonomy_import_add_vocabulary($vocabulary,$vid,$file,$url);
+		
+		if (!empty($modified_terms)) {
+			if (is_array($modified_terms)) {
+				$term_list = array();
+				foreach ($modified_terms as $list_term) {
+					$term_list[] = l($list_term['name'], 'admin/content/taxonomy/edit/term/' . $list_term['tid']);
+				}
+			
+				drupal_set_message(t('Updated %count term(s)', array('%count' => count($modified_terms))) . ' <i>' . implode(', ', $term_list) . '.</i> ');
+				drupal_set_message(t("
+				          Imported vocabulary %vocab_name.
+				          You may now need to <a href='!settings_link'>Review the vocabulary settings</a>
+				          or <a href='!list_link'>List the terms</a>",
+				array(
+				            '%vocab_name' => $vocabulary->name,
+				            '!settings_link' => url('admin/content/taxonomy/edit/vocabulary/' . $vid),
+				            '!list_link' => url('admin/content/taxonomy/' . $vid),
+				)
+				));
+			}
+		}
+	}
+}
+
+/**
+* Fetch the named vocab if it exists
+*
+* Create and return a useful placeholder if not.
+*
+* @param $name				Name which should be used for the vocabulary.
+* @param $edit 				An array of additional vocabulary properties as used by
+* 							taxonomy_save_vocabulary, eg 'description', 'help', 'required', 'tags'
+*
+* @return $vocabulary		The new vocab object
+*/
+function _rdf_taxonomy_importer_get_vocabulary_placeholder($name, $edit = array()) {
+	if ($vocabulary = rdf_taxonomy_import_get_vocabulary_by_name($name)) {
+		return $vocabulary;
+	}
+
+	// Create new vocab
+	$vocabulary = array(
+    'name' => $name,
+    'relations' => TRUE,
+    'hierarchy' => 2,
+	) + $edit;
+
+	taxonomy_save_vocabulary($vocabulary);
+
+	// Accessing the DB directly is not so nice, perhaps there is an alternative
+	// In the end this is also error-prone
+	// But so we get the vid, because the result isn't given back to us.
+	$vid = db_result(db_query("SELECT vid FROM {vocabulary} WHERE LOWER('%s') LIKE LOWER(name)", $vocabulary['name']));
+	$vocabulary = taxonomy_vocabulary_load($vid);
+	drupal_set_message(t('Created vocabulary %vid %vocabname to put these terms into. You probably want to <a href="!vocablink">go edit it now</a>.', array('%vocabname' => $vocabulary->name, '%vid' => $vid, '!vocablink' => url('admin/content/taxonomy/edit/vocabulary/' . $vid) )));
+	return $vocabulary;
+}
+
+/**
+* Fetch a vocabulary by name.
+* 
+* @param $name		Name of searched vocabulary
+* 
+* @return $voc		Vocabulary object. NULL if not found
+*/
+function rdf_taxonomy_import_get_vocabulary_by_name($name) {
+	$vs = taxonomy_get_vocabularies();
+	foreach ($vs as $voc) {
+		if ($voc->name == $name) {
+			return $voc;
+		}
+	}
+}

@@ -1,0 +1,6 @@
+; $Id: bodywrapper.info,v 0.5 2008/09/29 03:51:02 gabrielradic Exp $
+name = "Body Wrapper"
+description = Wraps the node body field in a [DIV class=node-body] tag to simplify theming.  
+package = "Other"
+core = 6.x
+version = "6.x-1.0"

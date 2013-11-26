@@ -1,0 +1,6 @@
+<?php
+function bodywrapper_nodeapi(&$node, $op, $teaser, $page) {
+	if ($op == 'view') {
+		$node->content['body']['#value'] = "<div class=\"node-body\">" . $node->content['body']['#value'] . "</div>";
+	}
+}

@@ -1,0 +1,18 @@
+name = ROLE Widget Store Components
+description = Add components like pages, rules, views to the system
+package = ROLE Widget Store Components
+
+dependencies[] = views
+dependencies[] = panels
+dependencies[] = rules
+dependencies[] = rules_admin
+dependencies[] = install_profile_api
+dependencies[] = ctools
+dependencies[] = statistics
+
+
+
+core = 6.x
+
+
+

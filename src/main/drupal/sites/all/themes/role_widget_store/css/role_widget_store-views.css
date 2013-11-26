@@ -1,0 +1,664 @@
+/* ------------------------------------------------------------------------
+ * View: General CSS Settings
+ * ------------------------------------------------------------------------
+ */ 
+.view .view-header{
+	margin-bottom: 10px;
+} 
+ 
+
+/* ------------------------------------------------------------------------
+ * View: my-tools
+ * ------------------------------------------------------------------------
+ */ 
+.view-my-tools .fivestar-widget-static,
+.view-my-tools .number-of-votes{
+	float: left;
+}
+
+.view-my-tools .number-of-votes{
+	padding-top: 3px;
+	padding-left: 3px;
+}
+
+
+/* ------------------------------------------------------------------------
+ * View: contest-tools
+ * ------------------------------------------------------------------------
+ */  
+ 
+ div.view-contest-tools div.view-content .lstool-thumbnail{
+	background: #fff;
+	height:auto;
+	overflow: hidden;
+	position:relative;
+}
+
+div.view-contest-tools div.view-content .lstool-thumbnail-overlay{
+	/*position:absolute;
+	background:url(../images/thumbnail_overlay.png);
+	height: 112px;
+	width:112px;*/
+}
+
+div.view-contest-tools div.view-content .lstool-thumbnail-overlay-top{
+	position:absolute;
+	background:url(../images/thumbnail_overlay_top.png) no-repeat;
+	height: 8px;
+	width:112px;
+	z-index: 1;
+}
+
+div.view-contest-tools div.view-content .lstool-thumbnail-overlay-mid{
+	position:absolute;
+	background:url(../images/thumbnail_overlay_mid.png) repeat-y;
+	height: 100%;
+	width:112px;
+	z-index: 0;
+}
+
+div.view-contest-tools div.view-content .lstool-thumbnail-overlay-bottom{
+	position:absolute;
+	background:url(../images/thumbnail_overlay_bottom.png) no-repeat;
+	height: 7px;
+	width:112px;
+	bottom: -0px;
+	z-index: 1;
+}
+ 
+/* ------------------------------------------------------------------------
+ * View: cover flow
+ * ------------------------------------------------------------------------
+ */ 
+ 
+div.coverflow .view-header{
+	position: absolute;
+	z-index: 100;
+	left: 20px;
+	color: #fff;
+	font-size: 18px;
+}
+
+div.coverflow .view-header p{
+	margin: 10px 0 0 0;
+	
+}
+
+.ui-jcoverflip {
+  position: relative;
+}
+
+.ui-jcoverflip--item {
+  position: absolute;
+  display: block;
+}
+
+div.coverflow div.view-content div.item-list {
+  height: 253px;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  margin: auto;
+  background: url("../images/coverflow-bg.png") no-repeat;
+
+}
+
+div.coverflow div.view-content div.item-list div.info-block{
+	position:absolute;
+	top: 50px;
+	right: 20px;
+	width: 250px;
+}
+
+div.coverflow div.view-content div.item-list div.info-block .title{
+	font-size: 18px;
+	color: #1D8D36;
+}
+
+div.coverflow div.view-content div.item-list div.info-block .title-role_tool{
+	color: #1A7DDD;
+}
+
+div.coverflow div.view-content div.item-list div.info-block .title-widget_bundle{
+	color: #2D8D45;
+}
+
+div.coverflow div.view-content div.item-list div.info-block .teaser p{
+	margin-top: 10px;
+	color:#FFFFFF;
+}
+
+div.coverflow div.view-content div.item-list div.info-block .rating{
+	margin-top: 10px;
+	color:#FFFFFF;
+}
+
+div.coverflow div.view-content div.item-list div.info-block .rating div.label{
+	float:left;
+}
+
+div.coverflow div.view-content div.item-list div.info-block .rating div.fivestar-widget-static{
+	float:left;
+	margin-left:10px;
+}
+
+div.coverflow div.view-content div.item-list ul {
+  height: 200px;
+  width: 400px;
+  margin: 0;
+  text-align: center;
+  margin-left: 20px;
+  margin-top: 40px;
+  overflow: hidden;
+  float: left;
+}
+
+div.coverflow div.view-content div.item-list ul li{
+	list-style: none;
+	padding:0;
+}
+
+div.coverflow div.view-content div.item-list .scrollbar{
+  width: 400px;
+  position: absolute;
+  top: 205px;
+  left: 20px;	
+}
+      
+div.coverflow div.view-content div.item-list ul .ui-jcoverflip--title {
+  position: absolute;
+  top: 260px;
+  width: 100%;
+  text-align: justify;
+  color: #555;
+}
+      
+div.coverflow div.view-content div.item-list ul .title{     	
+	color: #555;
+}
+      
+div.coverflow div.view-content div.item-list ul img {
+}
+      
+div.coverflow div.view-content div.item-list ul a {
+  outline: none;
+}
+ .ui-jcoverflip--item {
+  cursor: pointer;
+}
+
+div.coverflow div.view-content .lstool-thumbnail{
+	background: #fff;
+	height:auto;
+	overflow: hidden;
+	position:relative;
+}
+
+div.coverflow div.view-content .lstool-thumbnail-overlay{
+	/*position:absolute;
+	background:url(../images/thumbnail_overlay.png);
+	height: 112px;
+	width:112px;*/
+}
+
+div.coverflow div.view-content .lstool-thumbnail-overlay-top{
+	position:absolute;
+	background:url(../images/thumbnail_overlay_top_cf.png) no-repeat;
+	height: 8px;
+	width:112px;
+	z-index: 1;
+}
+
+div.coverflow div.view-content .lstool-thumbnail-overlay-mid{
+	position:absolute;
+	background:url(../images/thumbnail_overlay_mid_cf.png) repeat-y;
+	height: 100%;
+	width:112px;
+	z-index: 0;
+}
+
+div.coverflow div.view-content .lstool-thumbnail-overlay-bottom{
+	position:absolute;
+	background:url(../images/thumbnail_overlay_bottom_cf.png) no-repeat;
+	height: 7px;
+	width:112px;
+	bottom: -0px;
+	z-index: 1;
+}
+
+/* ------------------------------------------------------------------------
+ * View: jcarousel
+ * ------------------------------------------------------------------------
+ */ 
+
+.view-content {
+	
+}
+
+.view-content .jcarousel-container {
+	background: #232B36;
+	margin: auto;
+	text-align: center;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.view-content .jcarousel-container-horizontal {
+	width: 100%;
+	height: 400px;
+	padding: 20px 0px;
+}
+
+.view-content .jcarousel-container-vertical {
+	width: 102px;
+	height: 440px;
+	padding: 40px 20px;
+}
+
+.view-content .jcarousel-navigation-before {
+	padding-top: 30px;
+}
+
+.view-content .jcarousel-navigation-after {
+	padding-bottom: 30px;
+}
+
+.view-content .jcarousel-clip-horizontal {
+	width: auto;
+	overflow: hidden;
+	margin: 0 50px 0 50px;
+	height: 400px;
+}
+
+.view-content .jcarousel-clip-vertical {
+	height: 440px;
+	overflow: hidden;
+}
+
+.view-content .jcarousel-item {
+	padding: 0;
+	/*width: 100px;*/
+	height: 400px;
+	overflow: hidden;
+	list-style: none;
+	/*background: #fff none;*/
+}
+
+.view-content .jcarousel-item-horizontal {
+	margin: 0 auto;
+	position: relative;
+}
+
+.view-content .jcarousel-item-vertical {
+	margin: 4px 0;
+}
+
+.view-content .jcarousel-item-placeholder {
+	background: #fff url(../images/throbber.gif) no-repeat center center;
+	color: #000;
+}
+
+.view-content .jcarousel-item-horizontal .views-field-field-idea-images-fid,
+.view-content .jcarousel-item-horizontal .views-field-field-screenshot-mockups-fid,
+.view-content .jcarousel-item-horizontal .views-field-field-screenshots-fid
+	{
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.view-content .jcarousel-item-horizontal .views-field-field-idea-images-data,
+.view-content .jcarousel-item-horizontal .views-field-field-screenshot-mockups-data,
+.view-content .jcarousel-item-horizontal .views-field-field-screenshots-data
+	{
+	display: inline-block;
+	width: 200px;
+	text-align: left;
+	color: #fff;
+	vertical-align: middle;
+	background: #6C717A;
+	padding: 3px 10px 20px 10px;
+	-moz-box-shadow: 2px 2px 2px #111;
+	-webkit-box-shadow: 2px 10px 2px #111;
+	box-shadow: 2px 2px 2px #111;
+}
+
+/**
+ * Buttons
+ */
+.view-content .jcarousel-next,.view-content .jcarousel-prev {
+	display: block;
+	width: 30px;
+	height: 120px;
+}
+
+/**
+ *  Horizontal Buttons
+ */
+.view-content .jcarousel-prev-horizontal {
+	position: absolute;
+	top: 150px;
+	left: 0px;
+	background: url(../images/buttons/arrow_left.png) no-repeat left center
+		#6C717A;
+	display: block;
+}
+
+.view-content .jcarousel-prev-horizontal:hover {
+	background: url(../images/buttons/arrow_left_hover.png) no-repeat left
+		center #1F602A;
+}
+
+.view-content .jcarousel-prev-horizontal:active {
+	background: url(../images/buttons/arrow_left_hover.png) no-repeat left
+		center #1F602A;
+}
+
+.view-content .jcarousel-prev-disabled-horizontal,.view-content .jcarousel-prev-disabled-horizontal:hover,.view-content .jcarousel-prev-disabled-horizontal:active
+	{
+	cursor: default;
+	background: none;
+}
+
+.view-content .jcarousel-next-horizontal {
+	position: absolute;
+	top: 150px;
+	right: 0px;
+	background: url(../images/buttons/arrow_right.png) no-repeat right
+		center #6C717A;
+	display: block;
+}
+
+.view-content .jcarousel-next-horizontal:hover {
+	background: url(../images/buttons/arrow_right_hover.png) no-repeat right
+		center #1F602A;
+}
+
+.view-content .jcarousel-next-horizontal:active {
+	background: url(../images/buttons/arrow_right_hover.png) no-repeat right
+		center #1F602A;
+}
+
+.view-content .jcarousel-next-disabled-horizontal,.view-content .jcarousel-next-disabled-horizontal:hover,.view-content .jcarousel-next-disabled-horizontal:active
+	{
+	cursor: default;
+	background: none;
+}
+
+/**
+ *  Vertical Buttons
+ */
+.view-content .jcarousel-prev-vertical {
+	position: absolute;
+	top: 5px;
+	left: 55px;
+	background-position: 0 -64px;
+}
+
+.view-content .jcarousel-prev-vertical:hover {
+	background-position: -32px -64px;
+}
+
+.view-content .jcarousel-prev-vertical:active {
+	background-position: -64px -64px;
+}
+
+.view-content .jcarousel-prev-disabled-vertical,.view-content .jcarousel-prev-disabled-vertical:hover,.view-content .jcarousel-prev-disabled-vertical:active
+	{
+	cursor: default;
+	background-position: -96px -64px;
+}
+
+.view-content .jcarousel-next-vertical {
+	position: absolute;
+	bottom: 5px;
+	left: 55px;
+	background-position: 0 -96px;
+}
+
+.view-content .jcarousel-next-vertical:hover {
+	background-position: -32px -96px;
+}
+
+.view-content .jcarousel-next-vertical:active {
+	background-position: -64px -96px;
+}
+
+.view-content .jcarousel-next-disabled-vertical,.view-content .jcarousel-next-disabled-vertical:hover,.view-content .jcarousel-next-disabled-vertical:active
+	{
+	cursor: default;
+	background-position: -96px -96px;
+}
+
+.view-content .jcarousel-navigation {
+	margin: 0 0 0 10px;
+	padding: 4px;
+}
+
+.view-content .jcarousel-navigation li {
+	display: inline;
+	padding: 0;
+	background: none;
+}
+
+.view-content .jcarousel-navigation li a {
+	padding: 0;
+	margin-right: 2px;
+	height: 12px;
+	width: 12px;
+	display: block;
+	float: left;
+	background: url(../images/buttons/circle.png) no-repeat;
+}
+
+.view-content .jcarousel-navigation li a:hover {
+	background: url(../images/buttons/circle_hover.png)
+}
+
+.view-content .jcarousel-navigation li.active a {
+	background: url(../images/buttons/circle_active.png)
+}
+
+.view-content .jcarousel-navigation li a span {
+	display: none;
+}
+ 
+ 
+.view-all-ideas-frontpage .view-filters{
+	display: none;
+}
+
+/* ------------------------------------------------------------------------
+ * View: widget_specification_review_sum
+ * ------------------------------------------------------------------------
+ */
+  .view-widget-specification-review-sum{
+  	margin: 0 0 20px 0 ;
+  }
+ 
+ .view-widget-specification-review-sum .views-field-value,
+ .view-widget-specification-review-sum .views-field-value-1,
+ .view-widget-specification-review-sum .views-field-value-2,
+ .view-widget-specification-review-sum .views-field-value-3,
+ .view-widget-specification-review-sum .views-field-value-4{
+ 	float: left;
+ 	margin: 5px 50px 0 0;
+ }
+ 
+  .view-widget-specification-review-sum .views-field-value-5{
+  	clear: both;
+  	padding: 10px 0 0 0;
+  }
+ 
+ /* ------------------------------------------------------------------------
+ * View: view-widget-specification-review-list
+ * ------------------------------------------------------------------------
+ */
+.view-widget-specification-review-list .views-table .views-field-field-originality-rating-rating,
+.view-widget-specification-review-list .views-table .views-field-field-creativity-rating-rating,
+.view-widget-specification-review-list .views-table .views-field-field-didactic-value-rating-rating,
+.view-widget-specification-review-list .views-table .views-field-field-user-experience-rating-rating,
+.view-widget-specification-review-list .views-table .views-field-field-impact-rating-rating{
+	width: 100px;
+}
+ 
+.view-widget-specification-review-list .create-widget-specification-review-link{
+	width: auto;
+	margin: 20px auto 0 auto;
+}
+
+.view-widget-specification-review-list .create-widget-specification-review-link a,
+.view-widget-specification-review-list .create-widget-specification-review-link a:visited{
+	color:#058908;
+	font-size: 18px;
+	background: url("../images/review_logo.png") no-repeat left;
+	display: block;
+	padding: 6px 0 0 33px;
+	height: 30px;
+	margin: auto;
+	width: 380px;
+} 
+ 
+  /* ------------------------------------------------------------------------
+ * View: view-widget-specification-review-list"src/main/drupal/sites/all/modules/nodereference_explorer/css/explorer.tabs.css"
+ * ------------------------------------------------------------------------
+ */
+/*Explorer tabs*/
+
+.nodereference-explorer-tabset ul.nodereference-explorer-tabs,
+.nodereference-explorer-tabset.ui-tabs-nav {
+	/*resets*/margin: 0; padding: 0; border: 0; outline: 0; line-height: 1.3; text-decoration: none; font-size: 100%; list-style: none;
+	font-family: Verdana,Arial,sans-serif;
+	font-size: 1.1em;
+	/*float: left;*/
+	position: relative;
+	display:box;
+	z-index: 1;
+	border-right: 1px solid #d3d3d3;
+	bottom: -1px;
+	width: auto;
+}
+
+.nodereference-explorer-tabset ul.nodereference-explorer-tabs,
+.nodereference-explorer-tabset.ui-tabs-nav ul {
+	/*resets*/margin: 0; padding: 0; border: 0; outline: 0; line-height: 1.3; text-decoration: none; font-size: 100%; list-style: none;
+	
+}
+
+.nodereference-explorer-tabset ul.nodereference-explorer-tabs li,
+.nodereference-explorer-tabset.ui-tabs-nav li {
+	/*resets*/margin: 0; padding: 0; border: 0; outline: 0; line-height: 1.3; text-decoration: none; font-size: 100%; list-style: none;
+	float: left;
+	border: 1px solid #d3d3d3;
+	border-right: none;
+}
+
+.nodereference-explorer-tabset ul.nodereference-explorer-tabs li a,
+.nodereference-explorer-tabset.ui-tabs-nav li a {
+	/*resets*/margin: 0; padding: 0; border: 0; outline: 0; line-height: 1.3; text-decoration: none; font-size: 100%; list-style: none;
+	float: left;
+	font-size: 1em;
+	font-weight: normal;
+	text-decoration: none;
+	padding: .5em 1.7em 0 1.7em;
+	color: #555555;
+	background: #e6e6e6;
+}
+
+.nodereference-explorer-tabset ul.nodereference-explorer-tabs li a:hover,
+.nodereference-explorer-tabset.ui-tabs-nav li a:hover {
+	background: #dadada;
+	color: #212121;
+}
+
+.nodereference-explorer-tabset ul.nodereference-explorer-tabs li.ui-tabs-selected,
+.nodereference-explorer-tabset.ui-tabs-nav li.ui-tabs-selected {
+	border-bottom-color: #ffffff;
+}
+
+
+.nodereference-explorer-tabset ul.nodereference-explorer-tabs li.ui-tabs-selected a, .ui-tabs-nav li.ui-tabs-selected a:hover,
+.nodereference-explorer-tabset.ui-tabs-nav li.ui-tabs-selected a, .ui-tabs-nav li.ui-tabs-selected a:hover {
+	background: #ffffff;
+	color: #212121;
+}
+
+
+.nodereference-explorer-tabset ul.nodereference-explorer-tabs .ui-tabs-panel,
+.nodereference-explorer-tabset.ui-tabs-panel {
+	/*resets*/margin: 0; padding: 0; border: 0; outline: 0; line-height: 1.3; text-decoration: none; font-size: 100%; list-style: none;
+	font-family: Verdana,Arial,sans-serif;
+	clear:left;
+	border: 1px solid #d3d3d3;
+	background: #ffffff;
+	color: #222222;
+	padding: 1.5em 1.7em;	
+	font-size: 1.1em;
+}
+
+.nodereference-explorer-tabset .ui-tabs-hide,
+.nodereference-explorer-tabset.ui-tabs-hide {
+	display: none;/* for accessible hiding: position: absolute; left: -99999999px*/;
+}
+ 
+
+ 
+.view-bundle-tool-browser .views-field-tid,
+.view-nodereference-explorer-default .views-field-tid{
+	width:210px;
+}
+
+.view-bundle-tool-browser .views-field-value,
+.view-nodereference-explorer-default .views-field-value{
+	width:100px;
+}
+
+.view-bundle-tool-browser .views-field-type,
+.view-nodereference-explorer-default .views-field-type{
+	width:100px;
+}
+
+.view-bundle-tool-browser .views-field-field-tool-thumbnail-fid,
+.view-nodereference-explorer-default .views-field-field-tool-thumbnail-fid{
+	width:50px;
+}
+
+  /* ------------------------------------------------------------------------
+ * View: Tool Categories
+ * ------------------------------------------------------------------------
+ */
+ 
+.main-group .view-tool-categories table.views-view-grid td{
+	width: 33%;
+	vertical-align: top;
+}
+
+.main-group .view-tool-categories div.views-field-name a{
+	font-size: 16px;
+	font-weight:bold;
+	text-transform:uppercase;
+
+}
+.main-group .view-tool-categories div.views-field-name{
+	/*text-align:center;
+	margin-bottom:15px;*/
+	height: 50px;
+	/*display: table-cell;
+	vertical-align: middle;*/
+	width: 100%;
+	text-align: center;
+}
+.main-group .view-tool-categories div.views-field-name span{
+	vertical-align: middle;
+	line-height: 50px;
+}
+
+.main-group .view-tool-categories div.views-field-tid{
+	height: 150px;
+	text-align:center;
+}
+.main-group .view-tool-categories div.views-field-description{
+	/*height: 50px;*/
+	padding: 10px;
+	text-align: center;
+}

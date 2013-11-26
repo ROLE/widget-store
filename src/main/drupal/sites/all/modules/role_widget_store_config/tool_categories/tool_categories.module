@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Tool Categories feature.
+ */
+
+include_once 'tool_categories.features.inc';

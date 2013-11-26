@@ -1,0 +1,260 @@
+/* ------------------------------------------------------------------------
+ * Generell Block Setings
+ * ------------------------------------------------------------------------
+ */ 
+ 
+.sidebar-first .widget-block-icon h2.block-title{
+	background: url(../images/widget_icon.png) #232B36 no-repeat;
+	padding-left: 30px;
+}
+
+/* Default block title styles
+/-------------------------------------------------------------- */
+.sidebar-first h2.block-title,
+.sidebar-last h2.block-title,
+.content-top h2.block-title,
+.panel-pane h2.block-title{
+
+	text-transform:uppercase;
+	font-size: 14px;
+	color: white;
+	font-weight:bold;
+	
+	background: #232B36;
+	display:block;
+
+	
+	height: 27px;
+	padding-top:7px;
+	padding-left: 10px;	
+	margin: 0;
+	
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-khtml-border-radius: 3px;
+	border-radius: 3px;		
+}
+
+.content-top h2.block-title{
+	margin-bottom: 5px;
+}
+
+.content-top .block{
+
+}
+
+
+.sidebar-first .block{
+	width:230px;
+	margin-right: 15px;
+}
+
+.sidebar-first .block-tagadelic .content{
+	margin-top:5px;
+}
+
+.block .item-list{
+	padding-top: 5px;
+}
+
+.block .item-list ul{
+	margin-left: 6px;
+}
+
+.block .item-list ul li{
+	list-style: none;
+}
+
+
+/* ------------------------------------------------------------------------
+ * Block: Add a New Idea
+ * ------------------------------------------------------------------------
+ */ 
+.create-idea-icon{
+	background: url("../images/buttons/idea_small.png");
+	height: 30px;
+	width: 30px;
+	display: inline-block;
+	margin:0;
+	vertical-align: middle;
+}
+
+.create-idea-text{
+	font-size: 20px;
+	vertical-align: middle;
+}
+
+/* ------------------------------------------------------------------------
+ * Block: Filter Ideas
+ * ------------------------------------------------------------------------
+ */ 
+ 
+ .block-ideastream_config .filter-ideas-header{
+ height: 24px;
+ 	
+ } 
+ 
+ .filter-ideas-header-title{
+ 	float:left;
+ }
+ 
+ul.filter-ideas-list{
+ 	float:left;
+ 	list-style: none;
+ 	margin:0;
+ }
+ 
+
+ul.filter-ideas-list li{
+	float:left;	
+	padding: 0 5px 0 5px;
+	border-right: #232B36 solid 1px;
+	height: 15px; 
+ }
+ 
+ ul.filter-ideas-list li.first{
+	
+ }
+ 
+ ul.filter-ideas-list li.last{
+	border-right: 0;	
+ }
+ 
+ ul.filter-ideas-list li a,
+ ul.filter-ideas-list li a:visited{
+	color: #232B36;
+ }
+ 
+ ul.filter-ideas-list li a:hover,
+ ul.filter-ideas-list li a:active{
+	text-decoration: underline;
+ }
+ 
+  ul.filter-ideas-list li.active a{
+	text-decoration: underline;
+ }
+ 
+ /* ------------------------------------------------------------------------
+ * Block: Menu Catalouges
+ * ------------------------------------------------------------------------
+ */
+#block-menu-menu-catalogues {
+	margin-top:10px;
+	position:relative;
+	margin-bottom:-2px;
+	z-index: auto;
+}
+#block-menu-menu-catalogues .inner {
+
+}
+/* Set general style for menu here -- background, alignment, etc. */
+#block-menu-menu-catalogues .inner ul.menu {
+	list-style: none;
+	margin:0 ;
+}
+/* Add a border-right here for a separator */
+#block-menu-menu-catalogues .inner ul.menu li {
+	list-style: none;
+	padding-right: 0px;
+	float:left;
+}
+#block-menu-menu-catalogues .inner ul.menu li.first {
+	border-right: 0;
+}
+/* Add border-right: 0; here to remove right separator on last menu item */
+#block-menu-menu-catalogues .inner ul.menu li.last {
+	border-right: 0;
+}
+/* Styles for links */
+#block-menu-menu-catalogues .inner ul.menu li a:link, 
+#block-menu-menu-catalogues .inner ul.menu li a:visited {
+	display:block;
+	width:180px;
+	height:25px;
+	float:left;
+	color:#FFF;
+	text-align:center;
+	text-transform:uppercase;
+	font-weight:bold;
+	font-size:14px;
+	padding-top:2px;
+	position:relative;
+}
+
+/* Styles for links */
+#block-menu-menu-catalogues .inner ul.menu li a:link, 
+#block-menu-menu-catalogues .inner ul.menu li a:visited {
+	background: url(../images/tab_first.png);
+}
+/* Styles for links */
+#block-menu-menu-catalogues .inner ul.menu li.last a:link, 
+#block-menu-menu-catalogues .inner ul.menu li.last a:visited {
+	background: url(../images/tab_last.png);
+}
+
+#block-menu-menu-catalogues .inner ul.menu li a:hover,
+#block-menu-menu-catalogues .inner ul.menu li.last a:hover {
+	background: url(../images/tab_hover.png);
+	text-decoration:none;
+	color:#048909;
+}
+
+#block-menu-menu-catalogues .inner ul.menu li.active-trail a,
+#block-menu-menu-catalogues .inner ul.menu li a:focus,
+#block-menu-menu-catalogues .inner ul.menu li a.active,
+#block-menu-menu-catalogues .inner ul.menu li.last a:focus,
+#block-menu-menu-catalogues .inner ul.menu li.last a.active {
+	background: url(../images/tab_active.png);
+	text-decoration:none;
+	color:#048909;
+}
+ 
+ 
+ /* ------------------------------------------------------------------------
+ * Block: My Contente
+ * ------------------------------------------------------------------------
+ */
+#block-menu-menu-my-content .inner ul.menu {
+  margin-left: 0; /* LTR */
+}
+
+#block-menu-menu-my-content .inner ul.menu li {
+  border-right-style: solid;
+  border-right-width: 1px;
+  display: inline;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+
+#block-menu-menu-my-content .inner ul.menu li a {
+  padding: 0 8px 0 5px; /* LTR */
+}
+
+#block-menu-menu-my-content .inner ul li.last {
+  border: none;
+}
+
+/* Hide second level (and beyond) menu items */
+#block-menu-menu-my-content .inner ul li.expanded ul {
+  display: none;
+}
+
+  /* ------------------------------------------------------------------------
+ * Block: menu-catalogues
+ * ------------------------------------------------------------------------
+ */
+ 
+#block-menu-menu-catalogues{
+	width: 650px;
+	float: left;
+}
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

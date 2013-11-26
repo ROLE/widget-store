@@ -1,0 +1,32 @@
+; $Id: $
+
+name = Widget Contest Module
+description = Adds content types to create a widget contest
+package = ROLE Widget Store
+core = 6.x
+dependencies[] = views
+
+dependencies[] = rules
+dependencies[] = rules_admin
+
+dependencies[] = workflow
+dependencies[] = better_formats
+
+dependencies[] = content
+dependencies[] = text
+dependencies[] = content_copy
+dependencies[] = link
+dependencies[] = nodereference
+dependencies[] = imagefield
+dependencies[] = content_permissions
+
+dependencies[] = fivestar
+
+dependencies[] = views_customfield
+
+
+
+
+
+
+
